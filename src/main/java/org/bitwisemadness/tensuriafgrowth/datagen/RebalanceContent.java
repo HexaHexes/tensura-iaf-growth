@@ -35,6 +35,11 @@ import java.util.Set;
  * a same-path override of Gear Evolution's own {@code short_bow} rung, retargeting the
  * vanilla/Tensura bow ladder through the dragon bone bow (see {@link #addToolChain}).
  *
+ * <p>Six more sit at {@code data/tensura/gear_existence/}, Tensura's own folder (see
+ * {@link #addTensuraGear}): three same-path overrides that unblock Tensura's inert
+ * silver hoe/pickaxe/shovel, terminals for the goblin club and severer blade, and the
+ * kunai's step onto Tensura's pure magisteel rung.
+ *
  * <p>An item driven by an addon chain gets a gear_existence file only when it needs a
  * Tensura engraving, and that file carries maxEP 0 so Tensura never fights the addon
  * over EP or the evolution target.
@@ -55,6 +60,12 @@ public final class RebalanceContent {
      * ladder through the dragon bone bow.
      */
     private static final String SHORT_BOW_PATH = GE_ROOT + "tensura/short_bow.json";
+    /**
+     * Tensura's own gear_existence folder, read by Tensura's datapack registry across
+     * every namespace. Six gap-fix files live here: same-path overrides of Tensura's
+     * inert silver tools, plus items nothing else ships a file for.
+     */
+    private static final String TENSURA_GEAR = "data/tensura/gear_existence/";
     private static final String CHAINS = "data/gearevolution/addon_chains/" + NAMESPACE + "/";
     private static final String MOVESETS = "data/" + NAMESPACE + "/weapon_attributes/";
     private static final String ENTITY_PATH = EntityExistenceContent.PATH;
@@ -110,6 +121,16 @@ public final class RebalanceContent {
     private static final int GAUNTLET_RED = 52000;
 
     /**
+     * Gates for the six Tensura gap-fix files. The silver trio clones Gear Evolution's
+     * own silver rung verbatim (3,800 @ 0.003 into the mithril tools); the kunai hands
+     * off at 52,000, where Tensura itself places the entry into pure magisteel - its
+     * high_magisteel gear evolves at 52,000 and pure_magisteel_kunai starts earning
+     * there too.
+     */
+    private static final int TENSURA_SILVER_GATE = 3800;
+    private static final int KUNAI_GATE = 52000;
+
+    /**
      * The bow ladder slots the dragon bone bow between Tensura's short and long bow by
      * damage and draw speed (short &lt; dragon bone &lt; long &lt; war). The two rungs
      * before and after it are Gear Evolution's own values, kept verbatim upstream; the
@@ -157,6 +178,7 @@ public final class RebalanceContent {
             "blindfold",
             "cockatrice_scepter",
             "cyclops_eye",
+            "dragon_flute",
             "earplugs",
             "fishing_spear",
             "ghost_sword",
@@ -219,6 +241,7 @@ public final class RebalanceContent {
             "armor_silver_metal_leggings",
             "blindfold", "copper_axe", "copper_hoe", "copper_pickaxe", "copper_shovel", "copper_sword",
             "cyclops_eye", "deathworm_gauntlet_red", "deathworm_gauntlet_white", "deathworm_gauntlet_yellow",
+            "dragon_flute",
             "dread_knight_sword", "earplugs", "fishing_spear", "gorgon_head",
             "sheep_boots", "sheep_chestplate", "sheep_helmet", "sheep_leggings",
             "short_bow",
@@ -238,6 +261,7 @@ public final class RebalanceContent {
     public record Content(
             Map<String, JsonObject> geGearExistence,
             Map<String, JsonObject> iafGearExistence,
+            Map<String, JsonObject> tensuraGearExistence,
             Map<String, JsonObject> addonChains,
             Map<String, JsonObject> weaponAttributes,
             Map<String, JsonObject> entityExistence) {
@@ -245,12 +269,14 @@ public final class RebalanceContent {
 
     public static Content build() {
         Map<String, JsonObject> ourGear = new LinkedHashMap<>();
+        Map<String, JsonObject> tensuraGear = new LinkedHashMap<>();
         Map<String, JsonObject> chains = new LinkedHashMap<>();
         Map<String, JsonObject> movesets = new LinkedHashMap<>();
 
         addArmorChain(ourGear, chains);
         addToolChain(ourGear, chains);
         addSingularGear(ourGear);
+        addTensuraGear(tensuraGear);
         addMovesets(movesets);
 
         // Gear Evolution's built-in chains, neutralised at their own resource path.
@@ -273,7 +299,7 @@ public final class RebalanceContent {
                     ADDON_TROLL_WEAPONS.contains(item) ? terminal(item, 0, EP_GAIN_NO_LADDER, null) : inert(item));
         }
 
-        Content content = new Content(geGear, iafGear, chains, movesets, EntityExistenceContent.build());
+        Content content = new Content(geGear, iafGear, tensuraGear, chains, movesets, EntityExistenceContent.build());
         validate(content);
         return content;
     }
@@ -439,6 +465,34 @@ public final class RebalanceContent {
         }
     }
 
+    // --- Tensura gap fixes --------------------------------------------------
+    //
+    // Six files under Tensura's own gear_existence folder: three same-path overrides
+    // that unblock dead silver tools, two terminals for weapons nothing else tracks,
+    // and the kunai's step onto Tensura's pure magisteel rung.
+
+    private static void addTensuraGear(Map<String, JsonObject> gear) {
+        // Tensura ships these three silver tools inert (maxEP 0) and Gear Evolution has
+        // no chain for them, so they never evolved. The override clones Gear Evolution's
+        // silver rung for every other Tensura tool: 3,800 into the mithril tool.
+        for (String tool : List.of("hoe", "pickaxe", "shovel")) {
+            put(gear, TENSURA_GEAR + file("tensura:silver_" + tool),
+                    gear("tensura:silver_" + tool, 0, TENSURA_SILVER_GATE, epGainFor(TENSURA_SILVER_GATE),
+                            HOLY_COAT_1, "tensura:mithril_" + tool));
+        }
+
+        // The kunai is the base form of pure_magisteel_kunai, which Tensura starts
+        // earning from at 52,000 - so the hand-off happens exactly there, at the gate
+        // Tensura's own high_magisteel gear evolves at.
+        put(gear, TENSURA_GEAR + file("tensura:kunai"),
+                gear("tensura:kunai", 0, KUNAI_GATE, epGainFor(KUNAI_GATE), null,
+                        "tensura:pure_magisteel_kunai"));
+
+        // Weapons with no ladder anywhere: terminal, and a trickle so they still pay.
+        put(gear, TENSURA_GEAR + file("tensura:goblin_club"), tensuraTerminal("goblin_club"));
+        put(gear, TENSURA_GEAR + file("tensura:severer_blade"), tensuraTerminal("severer_blade"));
+    }
+
     private static void addMovesets(Map<String, JsonObject> movesets) {
         for (Map.Entry<String, List<String>> parent : MOVESET_PARENTS.entrySet()) {
             for (String item : parent.getValue()) {
@@ -468,6 +522,15 @@ public final class RebalanceContent {
      */
     private static JsonObject terminal(String item, int minEP, double epGain, JsonObject engravings) {
         return gear(id(item), minEP, null, epGain, engravings, null);
+    }
+
+    /**
+     * A Tensura-namespace terminal: no ladder anywhere, so it only ever trickles.
+     *
+     * @param item the bare Tensura item name, without its namespace
+     */
+    private static JsonObject tensuraTerminal(String item) {
+        return gear("tensura:" + item, 0, null, EP_GAIN_NO_LADDER, null, null);
     }
 
     /**
@@ -561,26 +624,30 @@ public final class RebalanceContent {
     private static void validate(Content content) {
         List<String> errors = new ArrayList<>();
 
-        expect(errors, "gear_existence files under data/gearevolution", 170, content.geGearExistence.size());
+        expect(errors, "gear_existence files under data/gearevolution", 171, content.geGearExistence.size());
         expect(errors, "gear_existence files under data/iceandfire", 151, content.iafGearExistence.size());
+        expect(errors, "gear_existence files under data/tensura", 6, content.tensuraGearExistence.size());
         expect(errors, "addon_chains files", 61, content.addonChains.size());
         expect(errors, "weapon_attributes files", 37, content.weaponAttributes.size());
         expect(errors, "entity_existence files", 24, content.entityExistence.size());
         expect(errors, "neutralised Gear Evolution built-ins", 17, GE_BUILTIN_NEUTRALISED.size());
         expect(errors, "files the addon ships that we shadow", 32, ADDON_ONLY.size());
-        expect(errors, "our files the addon does not ship", 34, NOT_IN_ADDON.size());
-        expect(errors, "files in total", 443,
-                content.geGearExistence.size() + content.iafGearExistence.size() + content.addonChains.size()
-                        + content.weaponAttributes.size() + content.entityExistence.size());
+        expect(errors, "our files the addon does not ship", 35, NOT_IN_ADDON.size());
+        expect(errors, "files in total", 450,
+                content.geGearExistence.size() + content.iafGearExistence.size()
+                        + content.tensuraGearExistence.size()
+                        + content.addonChains.size() + content.weaponAttributes.size() + content.entityExistence.size());
 
         List<Map<String, JsonObject>> all = List.of(content.geGearExistence, content.iafGearExistence,
-                content.addonChains, content.weaponAttributes, content.entityExistence);
+                content.tensuraGearExistence, content.addonChains, content.weaponAttributes,
+                content.entityExistence);
 
         // Every file must land under the path the consuming mod reads it from - the
         // same item legitimately appears under two of them. Gear Evolution's short_bow
         // rung is the one file outside the iceandfire folder.
         checkPrefix(errors, content.geGearExistence, GE_GEAR, SHORT_BOW_PATH);
         checkPrefix(errors, content.iafGearExistence, IAF_GEAR);
+        checkPrefix(errors, content.tensuraGearExistence, TENSURA_GEAR);
         checkPrefix(errors, content.addonChains, CHAINS);
         checkPrefix(errors, content.weaponAttributes, MOVESETS);
         checkPrefix(errors, content.entityExistence, ENTITY_PATH);
@@ -595,10 +662,11 @@ public final class RebalanceContent {
             }
         }
 
-        // The item id in every file must carry its namespace: Tensura matches it against
-        // the item's registry name, and an unqualified id resolves to minecraft:<name>,
-        // which would silently match nothing. The short_bow override is the one file
-        // whose type legitimately sits in Tensura's namespace.
+        // The item id in every file must carry a real namespace: Tensura matches it
+        // against the item's registry name, and an unqualified id resolves to
+        // minecraft:<name>, which would silently match nothing. Files under Tensura's
+        // own folder must be tensura ids; everywhere else must be Ice and Fire ids,
+        // with the short_bow override as the single exception.
         for (Map<String, JsonObject> files : all) {
             for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
                 JsonObject json = entry.getValue();
@@ -607,6 +675,12 @@ public final class RebalanceContent {
                         continue;
                     }
                     String value = json.get(field).getAsString();
+                    if (entry.getKey().startsWith(TENSURA_GEAR)) {
+                        if (!value.startsWith("tensura:")) {
+                            errors.add(entry.getKey() + " -> " + field + " is not a tensura id");
+                        }
+                        continue;
+                    }
                     boolean shortBow = field.equals("type") && entry.getKey().equals(SHORT_BOW_PATH)
                             && value.equals("tensura:short_bow");
                     if (!shortBow && !value.startsWith(NAMESPACE + ":")) {
@@ -630,7 +704,7 @@ public final class RebalanceContent {
             }
         }
         for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.iafGearExistence,
-                content.addonChains)) {
+                content.tensuraGearExistence, content.addonChains)) {
             for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
                 JsonObject json = entry.getValue();
                 if (json.has("evolution")) {
@@ -672,7 +746,8 @@ public final class RebalanceContent {
         // drives the item, so Tensura must not manage EP or a target here), any other
         // explicit maxEP must name an evolution, and an omitted maxEP is a terminal
         // that keeps earning with no target - the codec's 2,000,000 default caps it.
-        for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.iafGearExistence)) {
+        for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.iafGearExistence,
+                content.tensuraGearExistence)) {
             for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
                 JsonObject json = entry.getValue();
                 boolean evolves = json.has("evolution") || json.has("evolutionOptions");
@@ -735,6 +810,23 @@ public final class RebalanceContent {
         expectTerminal(errors, content, "dread_queen_sword", 52000, 0.025d);
         expectTerminal(errors, content, "pixie_wand", 0, 0.003d);
         expectTerminal(errors, content, "troll_weapon_axe", 0, 0.003d);
+        expectTerminal(errors, content, "dragon_flute", 0, 0.003d);
+
+        // The six Tensura gap fixes, pinned to the values their providers use: the
+        // silver trio cloned from Gear Evolution's rung, the kunai hand-off at
+        // Tensura's own pure magisteel gate, and two terminals with no ladder.
+        expectRungAt(errors, "tensura:silver_hoe",
+                findTensuraGear(errors, content, "silver_hoe"), 3800, 0.003d, "tensura:mithril_hoe");
+        expectRungAt(errors, "tensura:silver_pickaxe",
+                findTensuraGear(errors, content, "silver_pickaxe"), 3800, 0.003d, "tensura:mithril_pickaxe");
+        expectRungAt(errors, "tensura:silver_shovel",
+                findTensuraGear(errors, content, "silver_shovel"), 3800, 0.003d, "tensura:mithril_shovel");
+        expectRungAt(errors, "tensura:kunai",
+                findTensuraGear(errors, content, "kunai"), 52000, 0.02d, "tensura:pure_magisteel_kunai");
+        expectTerminalAt(errors, "tensura:goblin_club",
+                findTensuraGear(errors, content, "goblin_club"), 0, 0.003d);
+        expectTerminalAt(errors, "tensura:severer_blade",
+                findTensuraGear(errors, content, "severer_blade"), 0, 0.003d);
 
         // Inert files carry maxEP 0 and never name a target: one engraving-only file
         // and one neutralised Gear Evolution built-in.
@@ -757,13 +849,20 @@ public final class RebalanceContent {
         if (generated.contains(target)) {
             return;
         }
-        // The one grandfathered exception to "targets stay Ice and Fire": the dragon
-        // bone bow slots into Tensura's own bow ladder - and it does so from both of
-        // the paths its file ships under (Gear Evolution's folder and the addon's).
-        if (target.equals(LONG_BOW)
-                && (path.equals(GE_GEAR + file("dragonbone_bow"))
-                        || path.equals(IAF_GEAR + file("dragonbone_bow")))) {
-            return;
+        if (target.startsWith("tensura:")) {
+            // Files in Tensura's own folder climb Tensura's own ladder: their targets
+            // are Tensura items this pack does not generate. Each pair is spot-checked.
+            if (path.startsWith(TENSURA_GEAR)) {
+                return;
+            }
+            // The one grandfathered exception to "targets stay Ice and Fire": the dragon
+            // bone bow slots into Tensura's own bow ladder - and it does so from both of
+            // the paths its file ships under (Gear Evolution's folder and the addon's).
+            if (target.equals(LONG_BOW)
+                    && (path.equals(GE_GEAR + file("dragonbone_bow"))
+                            || path.equals(IAF_GEAR + file("dragonbone_bow")))) {
+                return;
+            }
         }
         errors.add(path + " -> unknown evolution target '" + target + "'");
     }
@@ -812,12 +911,16 @@ public final class RebalanceContent {
 
     private static void expectRung(List<String> errors, Content content, String item, int maxEP, double epGain,
             String target) {
-        expectRungAt(errors, item, findGear(errors, content, item), maxEP, epGain, target);
+        JsonObject json = findGear(errors, content, item);
+        if (json != null) {
+            expectRungAt(errors, item, json, maxEP, epGain, target);
+        }
     }
 
     private static void expectRungAt(List<String> errors, String item, JsonObject json, int maxEP, double epGain,
             String target) {
         if (json == null) {
+            errors.add(item + " has no generated file");
             return;
         }
         expectInt(errors, item, "maxEP", maxEP, json);
@@ -831,7 +934,15 @@ public final class RebalanceContent {
 
     private static void expectTerminal(List<String> errors, Content content, String item, int minEP, double epGain) {
         JsonObject json = findGear(errors, content, item);
+        if (json != null) {
+            expectTerminalAt(errors, item, json, minEP, epGain);
+        }
+    }
+
+    private static void expectTerminalAt(List<String> errors, String item, JsonObject json, int minEP,
+            double epGain) {
         if (json == null) {
+            errors.add(item + " has no generated file");
             return;
         }
         if (json.has("maxEP")) {
@@ -842,6 +953,15 @@ public final class RebalanceContent {
         }
         expectInt(errors, item, "minEP", minEP, json);
         expectRate(errors, item, epGain, json);
+    }
+
+    /** The pack's file in Tensura's own gear_existence folder, for spot checks. */
+    private static JsonObject findTensuraGear(List<String> errors, Content content, String item) {
+        JsonObject json = content.tensuraGearExistence.get(TENSURA_GEAR + file(item));
+        if (json == null) {
+            errors.add("expected a Tensura gear_existence file for " + item);
+        }
+        return json;
     }
 
     private static void expectInert(List<String> errors, Content content, String item) {

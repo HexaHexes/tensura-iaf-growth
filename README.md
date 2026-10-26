@@ -115,8 +115,19 @@ ladder at all.
 - **Uniques** (ghost sword, lich staff, tide trident, pixie wand, siren flute,
   cockatrice scepter, cyclops eye, gorgon head, hippocampus slapper,
   hippogryph sword, fishing spear, stymphalian dagger, amphithere macuahuitl,
-  blindfold, earplugs and the dread queen's staff) are terminal and keep
-  earning EP so they stay usable at endgame.
+  blindfold, earplugs, the dread queen's staff and the dragon flute) are
+  terminal and keep earning EP so they stay usable at endgame.
+
+## Tensura gear gap fixes
+
+A few Tensura items had no working progression anywhere - this mod plugs them:
+
+- **Silver hoe, pickaxe and shovel** now evolve like every other Tensura silver
+  tool: at 3,800 EP into their mithril counterpart, engraved with Holy Coat I.
+- **Kunai** evolves into the pure magisteel kunai at 52,000 EP, exactly where
+  Tensura's own pure magisteel tier begins.
+- **Goblin club** and **severer blade** have no upgrade line: they stay usable
+  endgame and keep earning EP.
 
 ## Engravings
 

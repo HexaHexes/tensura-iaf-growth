@@ -39,6 +39,7 @@ public class TensuraIafGrowth {
         var output = event.getGenerator().getPackOutput();
         event.addProvider(new JsonFilesProvider("gear_existence", output, content.geGearExistence()));
         event.addProvider(new JsonFilesProvider("addon_gear_existence", output, content.iafGearExistence()));
+        event.addProvider(new JsonFilesProvider("tensura_gear_existence", output, content.tensuraGearExistence()));
         event.addProvider(new JsonFilesProvider("addon_chains", output, content.addonChains()));
         event.addProvider(new JsonFilesProvider("weapon_attributes", output, content.weaponAttributes()));
         event.addProvider(new JsonFilesProvider("entity_existence", output, content.entityExistence()));
