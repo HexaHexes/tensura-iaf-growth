@@ -44,10 +44,15 @@ abilities are unchanged.
 `Sheep Disguise -> Copper -> Silver -> Troll Leather -> Death Worm Chitin ->
 Sea Serpent Scale -> Dragon Scale -> Dragon Steel`
 
+Copper does not commit to one silver: it rolls at random into either Ice and
+Fire silver (climbing the chain above) or Tensura's silver, which forges up
+Tensura's own metals ladder instead - see the Tensura silver and mithril
+section below.
+
 | Step | Evolves at | Outcome |
 |---|---|---|
 | Sheep Disguise | 550 | Copper |
-| Copper | 3,200 | Silver |
+| Copper | 3,200 | **Random**: Ice and Fire Silver or Tensura Silver |
 | Silver | 7,800 | **Random** of the three troll leather sets (mountain / forest / frost) |
 | Troll Leather | 18,000 | The paired death worm chitin: mountain -> red, forest -> yellow, frost -> white |
 | Death Worm Chitin | 52,000 | **Random** of the seven sea serpent (Tide Guardian) sets |
@@ -68,17 +73,16 @@ are lightning.
 
 | Step | Evolves at | Outcome |
 |---|---|---|
-| Copper | 3,200 | Silver |
-| Silver sword | 18,000 | Dragon Bone |
-| Silver axe / pickaxe / shovel / hoe | 52,000 | Dragon Bone |
+| Copper | 3,200 | **Random**: Ice and Fire Silver or Tensura Silver |
+| Silver sword / axe / pickaxe / shovel / hoe | 52,000 | Dragon Bone |
 | Dragon Bone sword | 225,000 | **Random** blooded (elemental) dragon bone sword |
 | Dragon Bone axe / pickaxe / shovel / hoe | 750,000 | **Random** dragon steel of one of the three elements |
 | Blooded Dragon Bone sword | 750,000 | Dragon steel sword of the matching element |
 | Dragon Steel | Top of the ladder | Keeps earning EP from 750,000 onward |
 
-Swords join the ladder a rung earlier than the other tools because they carry
-the extra blooded tier in between; both ladders still finish together at
-750,000.
+Every silver tool and weapon hands off together at the 52,000 rung. Swords
+still carry the extra blooded tier further up, at 225,000, so both ladders
+finish together at 750,000.
 
 ## Bow chain
 
@@ -123,11 +127,29 @@ ladder at all.
 A few Tensura items had no working progression anywhere - this mod plugs them:
 
 - **Silver hoe, pickaxe and shovel** now evolve like every other Tensura silver
-  tool: at 3,800 EP into their mithril counterpart, engraved with Holy Coat I.
+  item: at 52,000 EP into their mithril counterpart, engraved with Holy Coat I.
 - **Kunai** evolves into the pure magisteel kunai at 52,000 EP, exactly where
   Tensura's own pure magisteel tier begins.
 - **Goblin club** and **severer blade** have no upgrade line: they stay usable
   endgame and keep earning EP.
+
+## Tensura silver and mithril
+
+Tensura's own silver and mithril gear climbs the same spine as Ice and Fire's,
+so both branches of the copper fork move at the same pace:
+
+| Step | Evolves at | Outcome |
+|---|---|---|
+| Tensura silver armor | 7,800 | Mithril armor |
+| Tensura silver weapons and tools | 52,000 | Mithril weapon or tool |
+| Mithril armor | 225,000 | Adamantite armor |
+| Mithril weapons and tools | 225,000 | Adamantite weapon or tool |
+| Adamantite and above | Tensura's own ladder | Climbs on through hihiirokane |
+
+Silver hands off exactly where the matching Ice and Fire silver item does -
+7,800 for armor, 52,000 for every weapon and tool - and mithril starts earning
+at that same point and forges on to 225,000, where Tensura's adamantite tier
+begins. Mithril gear keeps Tensura's Holy Coat II engraving.
 
 ## Engravings
 
@@ -137,6 +159,7 @@ own gear:
 | Tier | Engraving |
 |---|---|
 | Silver weapons and silver armor | Holy Coat I |
+| Tensura mithril gear | Holy Coat II |
 | Blooded dragon bone swords | Elemental Boost I |
 | Sea serpent (Tide Guardian) armor | Breathing Support I |
 | Dragon scale armor | Elemental Resistance I |

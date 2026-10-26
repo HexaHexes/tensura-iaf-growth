@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "iceandfire:armor_silver_metal_chestplate",
+    "tensura:silver_chestplate"
+  ],
+  "item": "iceandfire:armor_copper_metal_chestplate",
+  "maxEP": 3200,
+  "minEP": 0
+}

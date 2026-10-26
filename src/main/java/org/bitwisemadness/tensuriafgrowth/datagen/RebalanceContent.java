@@ -31,14 +31,17 @@ import java.util.Set;
  *       Evolution has no built-in chain for (troll leather, tide guardian).</li>
  * </ul>
  *
- * <p>Besides those three, one file sits at {@code data/gearevolution/gear_existence/tensura/}:
+ * <p>Besides those three, files sit at {@code data/gearevolution/gear_existence/tensura/}:
  * a same-path override of Gear Evolution's own {@code short_bow} rung, retargeting the
- * vanilla/Tensura bow ladder through the dragon bone bow (see {@link #addToolChain}).
+ * vanilla/Tensura bow ladder through the dragon bone bow (see {@link #addToolChain}),
+ * plus aligned copies of Tensura's silver rung that match the ones in Tensura's own
+ * folder byte for byte, so neither provider's file can win the pack-priority race (see
+ * {@link #addTensuraGear}).
  *
- * <p>Six more sit at {@code data/tensura/gear_existence/}, Tensura's own folder (see
- * {@link #addTensuraGear}): three same-path overrides that unblock Tensura's inert
- * silver hoe/pickaxe/shovel, terminals for the goblin club and severer blade, and the
- * kunai's step onto Tensura's pure magisteel rung.
+ * <p>The rest of Tensura's own folder ({@code data/tensura/gear_existence/}) holds the
+ * silver and mithril merge - both tiers re-gated onto the Ice and Fire spine - plus
+ * terminals for the goblin club and severer blade, and the kunai's step onto Tensura's
+ * pure magisteel rung.
  *
  * <p>An item driven by an addon chain gets a gear_existence file only when it needs a
  * Tensura engraving, and that file carries maxEP 0 so Tensura never fights the addon
@@ -53,17 +56,25 @@ public final class RebalanceContent {
     private static final String NAMESPACE = "iceandfire";
     private static final String GE_ROOT = "data/gearevolution/gear_existence/";
     private static final String GE_GEAR = GE_ROOT + NAMESPACE + "/";
+    /**
+     * Gear Evolution's own folder for Tensura-namespace rungs. Besides the short bow,
+     * this pack writes aligned silver copies here - the same content it writes under
+     * {@link #TENSURA_GEAR} - so the two provider files it displaces are both replaced
+     * by identical values and pack priority can no longer pick a winner.
+     */
+    private static final String GE_TENSURA_GEAR = GE_ROOT + "tensura/";
     private static final String IAF_GEAR = "data/" + NAMESPACE + "/gear_existence/";
     /**
-     * The pack's one file outside the Ice and Fire namespace: a same-path override of
-     * Gear Evolution's own {@code short_bow} rung, retargeting the vanilla/Tensura bow
-     * ladder through the dragon bone bow.
+     * The short bow rung at Gear Evolution's path: a same-path override of Gear
+     * Evolution's own value, retargeting the vanilla/Tensura bow ladder through the
+     * dragon bone bow.
      */
     private static final String SHORT_BOW_PATH = GE_ROOT + "tensura/short_bow.json";
     /**
      * Tensura's own gear_existence folder, read by Tensura's datapack registry across
-     * every namespace. Six gap-fix files live here: same-path overrides of Tensura's
-     * inert silver tools, plus items nothing else ships a file for.
+     * every namespace. The silver and mithril merge lives here (nineteen aligned
+     * silver rungs and their nineteen mithril successors), plus the gap fixes: the
+     * kunai's step onto pure magisteel and two terminals nothing else tracks.
      */
     private static final String TENSURA_GEAR = "data/tensura/gear_existence/";
     private static final String CHAINS = "data/gearevolution/addon_chains/" + NAMESPACE + "/";
@@ -74,6 +85,16 @@ public final class RebalanceContent {
 
     private static final List<String> SLOTS = List.of("helmet", "chestplate", "leggings", "boots");
     private static final List<String> TOOLS = List.of("sword", "axe", "pickaxe", "shovel", "hoe");
+
+    /**
+     * Tensura's silver gear, split by what Gear Evolution already ships a rung for:
+     * the twelve weapons and four armor pieces exist at both provider paths, the three
+     * tools only in Tensura's own folder.
+     */
+    private static final List<String> TENSURA_SILVER_WEAPONS = List.of(
+            "axe", "great_sword", "katana", "kodachi", "long_sword", "odachi",
+            "scythe", "short_sword", "sickle", "spear", "sword", "tachi");
+    private static final List<String> TENSURA_SILVER_TOOLS = List.of("hoe", "pickaxe", "shovel");
 
     /** The twelve dragon scale sets, grouped by the dragon element that forges them. */
     private static final Map<String, List<String>> SCALE_COLORS_BY_ELEMENT = scaleColorsByElement();
@@ -105,11 +126,11 @@ public final class RebalanceContent {
     /**
      * Tool and sword rungs, spread over the same spine as the armor ladder so both
      * ladders finish together: tools climb 3,200 / 52,000 / 750,000, swords
-     * 3,200 / 18,000 / 225,000 / 750,000 (swords gain a blooded rung in between).
+     * 3,200 / 52,000 / 225,000 / 750,000 (swords gain a blooded rung in between).
+     * Tensura's silver gear mirrors the same silver rung - see {@link #TENSURA_MITHRIL_GATE}.
      */
     private static final int COPPER_TO_SILVER_TOOL = 3200;
-    private static final int SILVER_TO_DRAGONBONE_TOOL = 52000;
-    private static final int SILVER_TO_DRAGONBONE_SWORD = 18000;
+    private static final int SILVER_TO_DRAGONBONE = 52000;
     private static final int DRAGONBONE_TO_BLOODED = 225000;
     private static final int DRAGONBONE_TO_STEEL = 750000;
     private static final int BLOODED_TO_STEEL = 750000;
@@ -121,13 +142,14 @@ public final class RebalanceContent {
     private static final int GAUNTLET_RED = 52000;
 
     /**
-     * Gates for the six Tensura gap-fix files. The silver trio clones Gear Evolution's
-     * own silver rung verbatim (3,800 @ 0.003 into the mithril tools); the kunai hands
-     * off at 52,000, where Tensura itself places the entry into pure magisteel - its
-     * high_magisteel gear evolves at 52,000 and pure_magisteel_kunai starts earning
-     * there too.
+     * The silver and mithril merge. Tensura silver hands off where the matching Ice and
+     * Fire silver item does - armor at the 7,800 troll rung, every weapon and tool at
+     * the 52,000 dragon bone rung - and mithril forges on at 225,000, the floor
+     * Tensura's own adamantite files carry, so the hand-off lands exactly where the
+     * next tier starts earning. The kunai keeps its own step onto pure magisteel at
+     * 52,000, where Tensura itself places it.
      */
-    private static final int TENSURA_SILVER_GATE = 3800;
+    private static final int TENSURA_MITHRIL_GATE = 225000;
     private static final int KUNAI_GATE = 52000;
 
     /**
@@ -276,14 +298,15 @@ public final class RebalanceContent {
         addArmorChain(ourGear, chains);
         addToolChain(ourGear, chains);
         addSingularGear(ourGear);
-        addTensuraGear(tensuraGear);
-        addMovesets(movesets);
 
         // Gear Evolution's built-in chains, neutralised at their own resource path.
         Map<String, JsonObject> geGear = new LinkedHashMap<>(ourGear);
         for (String item : GE_BUILTIN_NEUTRALISED) {
             put(geGear, GE_GEAR + file(item), inert(item));
         }
+
+        addTensuraGear(tensuraGear, geGear);
+        addMovesets(movesets);
 
         // The addon's file set, reissued with our values: shared files keep our content,
         // the rest are either inert (the addon_chains ladder drives them) or terminal.
@@ -306,8 +329,9 @@ public final class RebalanceContent {
 
     // --- Chain 1: armor -----------------------------------------------------
     //
-    // sheep disguise -> copper -> silver -> troll leather -> death worm chitin ->
-    // sea serpent scale -> dragon scale -> dragon steel
+    // sheep disguise -> copper -> (random) either Ice and Fire silver -> troll leather
+    // -> death worm chitin -> sea serpent scale -> dragon scale -> dragon steel,
+    // or Tensura silver -> mithril -> adamantite -> hihiirokane (see addTensuraGear)
 
     private static void addArmorChain(Map<String, JsonObject> gear, Map<String, JsonObject> chains) {
         for (String slot : SLOTS) {
@@ -316,10 +340,13 @@ public final class RebalanceContent {
                     gear(id("sheep_" + slot), 0, SHEEP_TO_COPPER, epGainFor(SHEEP_TO_COPPER), null,
                             id("armor_copper_metal_" + slot)));
 
-            // Copper -> silver.
-            put(gear, gearPath(id("armor_copper_metal_" + slot)),
-                    gear(id("armor_copper_metal_" + slot), 0, COPPER_TO_SILVER, epGainFor(COPPER_TO_SILVER), null,
-                            id("armor_silver_metal_" + slot)));
+            // Copper -> either silver, rolled at random: the Ice and Fire set or
+            // Tensura's, which then climb their own aligned rungs. The addon chain is
+            // the only file for copper, so Gear Evolution's built-in copper thresholds
+            // can never outvote the fork.
+            put(chains, chainPath(id("armor_copper_metal_" + slot)),
+                    chain(id("armor_copper_metal_" + slot), 0, COPPER_TO_SILVER, epGainFor(COPPER_TO_SILVER),
+                            null, List.of(id("armor_silver_metal_" + slot), "tensura:silver_" + slot)));
 
             // Silver -> branch into the three troll leather sets. The engraving lives in
             // gear_existence (Tensura reads it) with maxEP 0 so Tensura does not manage EP
@@ -375,23 +402,26 @@ public final class RebalanceContent {
 
     // --- Chain 2: tools and weapons ----------------------------------------
     //
-    // copper -> silver -> dragon bone -> blooded dragon bone (swords) -> dragon steel
-    // plus the vanilla/Tensura bow ladder, slotted through the dragon bone bow
+    // copper -> (random) either Ice and Fire silver -> dragon bone -> blooded
+    // dragon bone (swords) -> dragon steel, or Tensura silver -> mithril (see
+    // addTensuraGear); plus the vanilla/Tensura bow ladder, slotted through the
+    // dragon bone bow
 
     private static void addToolChain(Map<String, JsonObject> gear, Map<String, JsonObject> chains) {
         for (String tool : TOOLS) {
-            // Copper -> silver.
-            put(gear, gearPath(id("copper_" + tool)),
-                    gear(id("copper_" + tool), 0, COPPER_TO_SILVER_TOOL, epGainFor(COPPER_TO_SILVER_TOOL), null,
-                            id("silver_" + tool)));
+            // Copper -> either silver, rolled at random: the Ice and Fire tool or
+            // Tensura's, which then climb their own aligned rungs. The addon chain is
+            // the only file for copper, so Gear Evolution's built-in copper thresholds
+            // can never outvote the fork.
+            put(chains, chainPath(id("copper_" + tool)),
+                    chain(id("copper_" + tool), 0, COPPER_TO_SILVER_TOOL, epGainFor(COPPER_TO_SILVER_TOOL),
+                            null, List.of(id("silver_" + tool), "tensura:silver_" + tool)));
 
-            // Silver -> dragon bone. Swords join the spine at the 18,000 rung because
-            // they carry a blooded tier in between; the plain tools skip straight to
-            // the 52,000 rung the armor ladder climbs at.
-            int silverGate = tool.equals("sword") ? SILVER_TO_DRAGONBONE_SWORD : SILVER_TO_DRAGONBONE_TOOL;
+            // Silver -> dragon bone, one rung for every tool now that swords carry
+            // their blooded tier further up instead of joining the spine early.
             put(gear, gearPath(id("silver_" + tool)),
-                    gear(id("silver_" + tool), 0, silverGate, epGainFor(silverGate), HOLY_COAT_1,
-                            id("dragonbone_" + tool)));
+                    gear(id("silver_" + tool), 0, SILVER_TO_DRAGONBONE, epGainFor(SILVER_TO_DRAGONBONE),
+                            HOLY_COAT_1, id("dragonbone_" + tool)));
 
             if (tool.equals("sword")) {
                 // Dragon bone sword -> a blooded (elemental) dragon bone sword, rolled at
@@ -465,20 +495,43 @@ public final class RebalanceContent {
         }
     }
 
-    // --- Tensura gap fixes --------------------------------------------------
+    // --- Tensura silver and mithril merge -----------------------------------
     //
-    // Six files under Tensura's own gear_existence folder: three same-path overrides
-    // that unblock dead silver tools, two terminals for weapons nothing else tracks,
-    // and the kunai's step onto Tensura's pure magisteel rung.
+    // Both tiers climb the Ice and Fire spine: silver hands off where the matching
+    // Ice and Fire silver item does, mithril forges on at 225,000. The kunai hand-off
+    // and the two no-ladder terminals from the original gap fixes live alongside them;
+    // the silver tools simply climbed onto the aligned rung.
 
-    private static void addTensuraGear(Map<String, JsonObject> gear) {
-        // Tensura ships these three silver tools inert (maxEP 0) and Gear Evolution has
-        // no chain for them, so they never evolved. The override clones Gear Evolution's
-        // silver rung for every other Tensura tool: 3,800 into the mithril tool.
-        for (String tool : List.of("hoe", "pickaxe", "shovel")) {
-            put(gear, TENSURA_GEAR + file("tensura:silver_" + tool),
-                    gear("tensura:silver_" + tool, 0, TENSURA_SILVER_GATE, epGainFor(TENSURA_SILVER_GATE),
-                            HOLY_COAT_1, "tensura:mithril_" + tool));
+    private static void addTensuraGear(Map<String, JsonObject> gear, Map<String, JsonObject> geGear) {
+        // Silver, aligned with Ice and Fire's silver rung: armor mirrors the 7,800
+        // step into troll leather, every weapon and tool the 52,000 step into dragon
+        // bone. Gear Evolution ships the sixteen non-tool files itself and Tensura
+        // ships inert copies of all nineteen, so those sixteen get the same JsonObject
+        // at both resource paths: whichever file the pack-priority race picks, the
+        // values match. The three tools have no Gear Evolution file - Tensura's own
+        // folder is their only path.
+        for (String slot : SLOTS) {
+            putSilver(gear, geGear, "silver_" + slot, SILVER_TO_TROLL);
+        }
+        for (String weapon : TENSURA_SILVER_WEAPONS) {
+            putSilver(gear, geGear, "silver_" + weapon, SILVER_TO_DRAGONBONE);
+        }
+        for (String tool : TENSURA_SILVER_TOOLS) {
+            putSilver(gear, null, "silver_" + tool, SILVER_TO_DRAGONBONE);
+        }
+
+        // Mithril: Tensura's own gate (225,000) already sits on our spine, so only the
+        // earning floor moves - down to where the aligned silver input arrives, so no
+        // EP is stranded between the tiers - and the climb rate is re-derived from the
+        // gate. Engravings stay exactly as Tensura ships them (holy coat II).
+        for (String slot : SLOTS) {
+            putMithril(gear, "mithril_" + slot, SILVER_TO_TROLL);
+        }
+        for (String weapon : TENSURA_SILVER_WEAPONS) {
+            putMithril(gear, "mithril_" + weapon, SILVER_TO_DRAGONBONE);
+        }
+        for (String tool : TENSURA_SILVER_TOOLS) {
+            putMithril(gear, "mithril_" + tool, SILVER_TO_DRAGONBONE);
         }
 
         // The kunai is the base form of pure_magisteel_kunai, which Tensura starts
@@ -491,6 +544,32 @@ public final class RebalanceContent {
         // Weapons with no ladder anywhere: terminal, and a trickle so they still pay.
         put(gear, TENSURA_GEAR + file("tensura:goblin_club"), tensuraTerminal("goblin_club"));
         put(gear, TENSURA_GEAR + file("tensura:severer_blade"), tensuraTerminal("severer_blade"));
+    }
+
+    /**
+     * One Tensura silver rung at {@link #TENSURA_GEAR}, and - when Gear Evolution
+     * ships the item too - the identical file at {@link #GE_TENSURA_GEAR}. Both maps
+     * hold the same JsonObject instance on purpose: the content cannot diverge.
+     *
+     * @param geGear the Gear Evolution namespace map, or {@code null} for the tools
+     *                Gear Evolution ships no file for
+     * @param gate   the aligned Ice and Fire silver gate this item hands off at
+     */
+    private static void putSilver(Map<String, JsonObject> gear, Map<String, JsonObject> geGear, String item,
+            int gate) {
+        JsonObject json = gear("tensura:" + item, 0, gate, epGainFor(gate), HOLY_COAT_1,
+                "tensura:mithril_" + item.substring("silver_".length()));
+        put(gear, TENSURA_GEAR + file("tensura:" + item), json);
+        if (geGear != null) {
+            put(geGear, GE_TENSURA_GEAR + file("tensura:" + item), json);
+        }
+    }
+
+    /** One Tensura mithril rung, floored at the silver gate it evolves from. */
+    private static void putMithril(Map<String, JsonObject> gear, String item, int floor) {
+        put(gear, TENSURA_GEAR + file("tensura:" + item),
+                gear("tensura:" + item, floor, TENSURA_MITHRIL_GATE, epGainFor(TENSURA_MITHRIL_GATE),
+                        HOLY_COAT_2, "tensura:adamantite_" + item.substring("mithril_".length())));
     }
 
     private static void addMovesets(Map<String, JsonObject> movesets) {
@@ -624,16 +703,16 @@ public final class RebalanceContent {
     private static void validate(Content content) {
         List<String> errors = new ArrayList<>();
 
-        expect(errors, "gear_existence files under data/gearevolution", 171, content.geGearExistence.size());
+        expect(errors, "gear_existence files under data/gearevolution", 178, content.geGearExistence.size());
         expect(errors, "gear_existence files under data/iceandfire", 151, content.iafGearExistence.size());
-        expect(errors, "gear_existence files under data/tensura", 6, content.tensuraGearExistence.size());
-        expect(errors, "addon_chains files", 61, content.addonChains.size());
+        expect(errors, "gear_existence files under data/tensura", 41, content.tensuraGearExistence.size());
+        expect(errors, "addon_chains files", 70, content.addonChains.size());
         expect(errors, "weapon_attributes files", 37, content.weaponAttributes.size());
         expect(errors, "entity_existence files", 24, content.entityExistence.size());
         expect(errors, "neutralised Gear Evolution built-ins", 17, GE_BUILTIN_NEUTRALISED.size());
         expect(errors, "files the addon ships that we shadow", 32, ADDON_ONLY.size());
         expect(errors, "our files the addon does not ship", 35, NOT_IN_ADDON.size());
-        expect(errors, "files in total", 450,
+        expect(errors, "files in total", 501,
                 content.geGearExistence.size() + content.iafGearExistence.size()
                         + content.tensuraGearExistence.size()
                         + content.addonChains.size() + content.weaponAttributes.size() + content.entityExistence.size());
@@ -643,9 +722,10 @@ public final class RebalanceContent {
                 content.entityExistence);
 
         // Every file must land under the path the consuming mod reads it from - the
-        // same item legitimately appears under two of them. Gear Evolution's short_bow
-        // rung is the one file outside the iceandfire folder.
-        checkPrefix(errors, content.geGearExistence, GE_GEAR, SHORT_BOW_PATH);
+        // same item legitimately appears under two of them. Gear Evolution's short bow
+        // and this pack's aligned Tensura silver copies live in Gear Evolution's own
+        // Tensura folder, so that prefix is accepted alongside the Ice and Fire one.
+        checkPrefix(errors, content.geGearExistence, GE_GEAR, GE_TENSURA_GEAR);
         checkPrefix(errors, content.iafGearExistence, IAF_GEAR);
         checkPrefix(errors, content.tensuraGearExistence, TENSURA_GEAR);
         checkPrefix(errors, content.addonChains, CHAINS);
@@ -665,8 +745,8 @@ public final class RebalanceContent {
         // The item id in every file must carry a real namespace: Tensura matches it
         // against the item's registry name, and an unqualified id resolves to
         // minecraft:<name>, which would silently match nothing. Files under Tensura's
-        // own folder must be tensura ids; everywhere else must be Ice and Fire ids,
-        // with the short_bow override as the single exception.
+        // own folder or Gear Evolution's Tensura folder must be tensura ids; everywhere
+        // else must be Ice and Fire ids.
         for (Map<String, JsonObject> files : all) {
             for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
                 JsonObject json = entry.getValue();
@@ -675,15 +755,13 @@ public final class RebalanceContent {
                         continue;
                     }
                     String value = json.get(field).getAsString();
-                    if (entry.getKey().startsWith(TENSURA_GEAR)) {
+                    if (entry.getKey().startsWith(TENSURA_GEAR) || entry.getKey().startsWith(GE_TENSURA_GEAR)) {
                         if (!value.startsWith("tensura:")) {
                             errors.add(entry.getKey() + " -> " + field + " is not a tensura id");
                         }
                         continue;
                     }
-                    boolean shortBow = field.equals("type") && entry.getKey().equals(SHORT_BOW_PATH)
-                            && value.equals("tensura:short_bow");
-                    if (!shortBow && !value.startsWith(NAMESPACE + ":")) {
+                    if (!value.startsWith(NAMESPACE + ":")) {
                         errors.add(entry.getKey() + " -> " + field + " is missing its namespace");
                     }
                 }
@@ -692,9 +770,11 @@ public final class RebalanceContent {
 
         // Every evolution target must itself be a generated item (catches typos). The ids
         // come from each file's own type/item fields, so the bow override registers as
-        // tensura:short_bow rather than as an Ice and Fire item.
+        // tensura:short_bow rather than as an Ice and Fire item, and Tensura's own
+        // silver/mithril rungs register as the tensura ids the copper fork targets.
         Set<String> generated = new LinkedHashSet<>();
-        for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.addonChains)) {
+        for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.addonChains,
+                content.tensuraGearExistence)) {
             for (JsonObject json : files.values()) {
                 for (String field : new String[] { "type", "item" }) {
                     if (json.has(field)) {
@@ -731,9 +811,14 @@ public final class RebalanceContent {
         // path, or the addon's own thresholds would outvote ours. The neutralised
         // built-ins are the exception: they are inert, their EP comes from the
         // addon_chains ladder, and the addon only ships shadows for some of them.
+        // Files in Gear Evolution's Tensura folder are exempt outright - the addon
+        // never ships Ice and Fire shadows for Tensura-namespace items.
         for (String path : content.geGearExistence.keySet()) {
             String item = name(path);
             if (GE_BUILTIN_NEUTRALISED.contains(item)) {
+                continue;
+            }
+            if (path.startsWith(GE_TENSURA_GEAR)) {
                 continue;
             }
             if (!NOT_IN_ADDON.contains(item)
@@ -771,9 +856,16 @@ public final class RebalanceContent {
         checkAscending(errors, "armor spine",
                 SHEEP_TO_COPPER, COPPER_TO_SILVER, SILVER_TO_TROLL, TROLL_TO_CHITIN_GATE, CHITIN_TO_TIDE,
                 TIDE_TO_SCALE, SCALE_TO_STEEL);
-        checkAscending(errors, "tool ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE_TOOL, DRAGONBONE_TO_STEEL);
-        checkAscending(errors, "sword ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE_SWORD,
+        checkAscending(errors, "tool ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE, DRAGONBONE_TO_STEEL);
+        checkAscending(errors, "sword ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE,
                 DRAGONBONE_TO_BLOODED, BLOODED_TO_STEEL);
+        // The Tensura merge climbs the same spine, entered from the copper fork's
+        // aligned silver branch; both variants top out on Tensura's own hihiirokane
+        // rung, which gates at 750,000 - the value our steel ladder lands on.
+        checkAscending(errors, "tensura weapons spine", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE,
+                TENSURA_MITHRIL_GATE, SCALE_TO_STEEL);
+        checkAscending(errors, "tensura armor spine", COPPER_TO_SILVER, SILVER_TO_TROLL,
+                TENSURA_MITHRIL_GATE, SCALE_TO_STEEL);
         checkAscending(errors, "dread line", DREAD_KNIGHT, DREAD_QUEEN);
         checkAscending(errors, "death worm gauntlets", GAUNTLET_WHITE, GAUNTLET_RED);
         checkAscending(errors, "bow ladder",
@@ -795,10 +887,10 @@ public final class RebalanceContent {
                         .filter(path -> name(path).matches("(mountain|forest|frost)_troll_leather_.*")).count());
 
         // Ladder spot checks, at literal plan values so a change to epGainFor or the
-        // gate tables cannot quietly redefine what "correct" means: the T3 asymmetry
-        // (swords join the spine a rung before tools do) and the bow pair that reaches
-        // outside the Ice and Fire namespace.
-        expectRung(errors, content, "silver_sword", 18000, 0.01d, id("dragonbone_sword"));
+        // gate tables cannot quietly redefine what "correct" means: the one silver
+        // rung every sword and tool shares, and the bow pair that reaches outside the
+        // Ice and Fire namespace.
+        expectRung(errors, content, "silver_sword", 52000, 0.02d, id("dragonbone_sword"));
         expectRung(errors, content, "silver_axe", 52000, 0.02d, id("dragonbone_axe"));
         expectRung(errors, content, "dragonbone_bow", 7200, 0.003d, LONG_BOW);
         expectRungAt(errors, "short_bow", content.geGearExistence.get(SHORT_BOW_PATH),
@@ -812,21 +904,73 @@ public final class RebalanceContent {
         expectTerminal(errors, content, "troll_weapon_axe", 0, 0.003d);
         expectTerminal(errors, content, "dragon_flute", 0, 0.003d);
 
-        // The six Tensura gap fixes, pinned to the values their providers use: the
-        // silver trio cloned from Gear Evolution's rung, the kunai hand-off at
-        // Tensura's own pure magisteel gate, and two terminals with no ladder.
-        expectRungAt(errors, "tensura:silver_hoe",
-                findTensuraGear(errors, content, "silver_hoe"), 3800, 0.003d, "tensura:mithril_hoe");
-        expectRungAt(errors, "tensura:silver_pickaxe",
-                findTensuraGear(errors, content, "silver_pickaxe"), 3800, 0.003d, "tensura:mithril_pickaxe");
-        expectRungAt(errors, "tensura:silver_shovel",
-                findTensuraGear(errors, content, "silver_shovel"), 3800, 0.003d, "tensura:mithril_shovel");
+        // The Tensura silver and mithril merge, pinned to the aligned rungs: armor
+        // mirrors the Ice and Fire silver gate at 7,800, weapons and tools the 52,000
+        // dragon bone rung; mithril floors where its silver input arrives and forges
+        // on at Tensura's own 225,000 adamantite gate. The kunai hand-off and the two
+        // terminals are unchanged gap fixes.
+        expectLadderRung(errors, "tensura:silver_helmet",
+                findTensuraGear(errors, content, "silver_helmet"), 0, 7800, 0.003d, "tensura:mithril_helmet");
+        expectLadderRung(errors, "tensura:silver_katana",
+                findTensuraGear(errors, content, "silver_katana"), 0, 52000, 0.02d, "tensura:mithril_katana");
+        expectLadderRung(errors, "tensura:silver_hoe",
+                findTensuraGear(errors, content, "silver_hoe"), 0, 52000, 0.02d, "tensura:mithril_hoe");
+        expectLadderRung(errors, "tensura:silver_pickaxe",
+                findTensuraGear(errors, content, "silver_pickaxe"), 0, 52000, 0.02d, "tensura:mithril_pickaxe");
+        expectLadderRung(errors, "tensura:silver_shovel",
+                findTensuraGear(errors, content, "silver_shovel"), 0, 52000, 0.02d, "tensura:mithril_shovel");
+        expectLadderRung(errors, "tensura:mithril_helmet",
+                findTensuraGear(errors, content, "mithril_helmet"), 7800, 225000, 0.025d,
+                "tensura:adamantite_helmet");
+        expectLadderRung(errors, "tensura:mithril_katana",
+                findTensuraGear(errors, content, "mithril_katana"), 52000, 225000, 0.025d,
+                "tensura:adamantite_katana");
+        expectLadderRung(errors, "tensura:mithril_shovel",
+                findTensuraGear(errors, content, "mithril_shovel"), 52000, 225000, 0.025d,
+                "tensura:adamantite_shovel");
         expectRungAt(errors, "tensura:kunai",
                 findTensuraGear(errors, content, "kunai"), 52000, 0.02d, "tensura:pure_magisteel_kunai");
         expectTerminalAt(errors, "tensura:goblin_club",
                 findTensuraGear(errors, content, "goblin_club"), 0, 0.003d);
         expectTerminalAt(errors, "tensura:severer_blade",
                 findTensuraGear(errors, content, "severer_blade"), 0, 0.003d);
+
+        // Every silver item exists at both provider paths with identical content, so
+        // the pack-priority race cannot pick a stale winner; the three tools Gear
+        // Evolution ships nothing for exist only in Tensura's own folder.
+        for (String slot : SLOTS) {
+            expectSilverPair(errors, content, "silver_" + slot);
+        }
+        for (String weapon : TENSURA_SILVER_WEAPONS) {
+            expectSilverPair(errors, content, "silver_" + weapon);
+        }
+        expect(errors, "Tensura silver files", 19,
+                (int) content.tensuraGearExistence.keySet().stream()
+                        .filter(path -> name(path).startsWith("silver_")).count());
+        expect(errors, "Tensura mithril files", 19,
+                (int) content.tensuraGearExistence.keySet().stream()
+                        .filter(path -> name(path).startsWith("mithril_")).count());
+        expect(errors, "Gear Evolution silver copies", 16,
+                (int) content.geGearExistence.keySet().stream()
+                        .filter(path -> path.startsWith(GE_TENSURA_GEAR) && name(path).startsWith("silver_"))
+                        .count());
+
+        // The copper fork: every copper item rolls between the two silvers at 3,200,
+        // chain-driven only - a live gear_existence file would outvote the fork.
+        for (String slot : SLOTS) {
+            expectFork(errors, content, "armor_copper_metal_" + slot, 3200, 0.003d,
+                    id("armor_silver_metal_" + slot), "tensura:silver_" + slot);
+            if (content.geGearExistence.containsKey(GE_GEAR + file("armor_copper_metal_" + slot))) {
+                errors.add("armor_copper_metal_" + slot + " must not ship a gear_existence file");
+            }
+        }
+        for (String tool : TOOLS) {
+            expectFork(errors, content, "copper_" + tool, 3200, 0.003d,
+                    id("silver_" + tool), "tensura:silver_" + tool);
+            if (content.geGearExistence.containsKey(GE_GEAR + file("copper_" + tool))) {
+                errors.add("copper_" + tool + " must not ship a gear_existence file");
+            }
+        }
 
         // Inert files carry maxEP 0 and never name a target: one engraving-only file
         // and one neutralised Gear Evolution built-in.
@@ -850,9 +994,10 @@ public final class RebalanceContent {
             return;
         }
         if (target.startsWith("tensura:")) {
-            // Files in Tensura's own folder climb Tensura's own ladder: their targets
-            // are Tensura items this pack does not generate. Each pair is spot-checked.
-            if (path.startsWith(TENSURA_GEAR)) {
+            // Files in either Tensura folder climb Tensura's own ladder: targets this
+            // pack does not generate a file for (adamantite and above) are allowed
+            // there, and each generated pair is spot-checked.
+            if (path.startsWith(TENSURA_GEAR) || path.startsWith(GE_TENSURA_GEAR)) {
                 return;
             }
             // The one grandfathered exception to "targets stay Ice and Fire": the dragon
@@ -873,13 +1018,21 @@ public final class RebalanceContent {
         }
     }
 
+    /**
+     * @param exempt exact paths that are allowed through, or - for entries ending in
+     *               {@code "/"} - path prefixes that are
+     */
     private static void checkPrefix(List<String> errors, Map<String, JsonObject> files, String prefix,
             String... exempt) {
         for (String path : files.keySet()) {
             if (path.startsWith(prefix)) {
                 continue;
             }
-            if (List.of(exempt).contains(path)) {
+            boolean allowed = false;
+            for (String entry : exempt) {
+                allowed |= entry.endsWith("/") ? path.startsWith(entry) : path.equals(entry);
+            }
+            if (allowed) {
                 continue;
             }
             errors.add("file written outside " + prefix + ": " + path);
@@ -985,6 +1138,61 @@ public final class RebalanceContent {
         expectRate(errors, item + " chain", epGain, json);
         if (!json.has("evolution") && !json.has("evolutionOptions")) {
             errors.add(item + " chain names no evolution");
+        }
+    }
+
+    /** A ladder rung pinned on both sides: the earning floor and the hand-off. */
+    private static void expectLadderRung(List<String> errors, String item, JsonObject json, int minEP, int maxEP,
+            double epGain, String target) {
+        if (json == null) {
+            errors.add(item + " has no generated file");
+            return;
+        }
+        expectInt(errors, item, "minEP", minEP, json);
+        expectRungAt(errors, item, json, maxEP, epGain, target);
+    }
+
+    /** An addon chain that forks, pinned to its gate, rate and exact option list. */
+    private static void expectFork(List<String> errors, Content content, String item, int maxEP, double epGain,
+            String... targets) {
+        JsonObject json = content.addonChains.get(chainPath(id(item)));
+        if (json == null) {
+            errors.add("expected an addon_chains file for " + item);
+            return;
+        }
+        expectInt(errors, item + " chain", "maxEP", maxEP, json);
+        expectRate(errors, item + " chain", epGain, json);
+        if (!json.has("evolutionOptions")) {
+            errors.add(item + " chain does not fork");
+            return;
+        }
+        com.google.gson.JsonArray options = json.getAsJsonArray("evolutionOptions");
+        if (options.size() != targets.length) {
+            errors.add(item + " chain should fork into " + targets.length + " items, found " + options.size());
+            return;
+        }
+        for (int i = 0; i < targets.length; i++) {
+            if (!targets[i].equals(options.get(i).getAsString())) {
+                errors.add(item + " chain option " + i + " should be " + targets[i] + ", found " + options.get(i));
+            }
+        }
+    }
+
+    /**
+     * A Tensura silver item that ships at both provider paths: present in each map,
+     * with identical content so pack priority has no stale winner to pick.
+     */
+    private static void expectSilverPair(List<String> errors, Content content, String item) {
+        JsonObject tensura = content.tensuraGearExistence.get(TENSURA_GEAR + file("tensura:" + item));
+        JsonObject ge = content.geGearExistence.get(GE_TENSURA_GEAR + file("tensura:" + item));
+        if (tensura == null) {
+            errors.add("expected a Tensura folder file for " + item);
+        }
+        if (ge == null) {
+            errors.add("expected a Gear Evolution folder copy for " + item);
+        }
+        if (tensura != null && ge != null && !tensura.equals(ge)) {
+            errors.add(item + " differs between its two resource paths");
         }
     }
 

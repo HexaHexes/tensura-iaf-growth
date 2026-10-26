@@ -1,0 +1,10 @@
+{
+  "type": "tensura:silver_katana",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.02,
+  "evolution": "tensura:mithril_katana",
+  "maxEP": 52000,
+  "minEP": 0
+}

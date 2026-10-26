@@ -1,0 +1,10 @@
+{
+  "type": "tensura:silver_tachi",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.02,
+  "evolution": "tensura:mithril_tachi",
+  "maxEP": 52000,
+  "minEP": 0
+}

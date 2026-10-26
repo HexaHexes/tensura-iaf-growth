@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "iceandfire:silver_shovel",
+    "tensura:silver_shovel"
+  ],
+  "item": "iceandfire:copper_shovel",
+  "maxEP": 3200,
+  "minEP": 0
+}

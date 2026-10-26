@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "iceandfire:silver_pickaxe",
+    "tensura:silver_pickaxe"
+  ],
+  "item": "iceandfire:copper_pickaxe",
+  "maxEP": 3200,
+  "minEP": 0
+}

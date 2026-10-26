@@ -1,0 +1,10 @@
+{
+  "type": "tensura:silver_helmet",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.003,
+  "evolution": "tensura:mithril_helmet",
+  "maxEP": 7800,
+  "minEP": 0
+}

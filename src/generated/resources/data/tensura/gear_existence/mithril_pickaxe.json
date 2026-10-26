@@ -1,0 +1,10 @@
+{
+  "type": "tensura:mithril_pickaxe",
+  "engravings": {
+    "tensura:holy_coat": 2
+  },
+  "epGain": 0.025,
+  "evolution": "tensura:adamantite_pickaxe",
+  "maxEP": 225000,
+  "minEP": 52000
+}

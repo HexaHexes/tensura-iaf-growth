@@ -1,0 +1,10 @@
+{
+  "type": "tensura:silver_sickle",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.02,
+  "evolution": "tensura:mithril_sickle",
+  "maxEP": 52000,
+  "minEP": 0
+}
