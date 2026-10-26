@@ -34,6 +34,7 @@ jobs:
       - name: Resolve the version
         id: resolve
         env:
+          GH_TOKEN: ${{ github.token }}
           ALPHA_RELEASES: ${{ vars.ALPHA_RELEASES }}
         run: |
           set -euo pipefail
@@ -44,8 +45,11 @@ jobs:
 
           SKIP=false
 
-          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
-            echo "Tag v$VERSION already exists; nothing to release."
+          # Ask GitHub rather than the local refs: actions/checkout does not
+          # fetch tags by default, so a refs/tags probe would never fire and
+          # the publish step would collide with the release it is meant to skip.
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists; nothing to release."
             SKIP=true
           fi
 
