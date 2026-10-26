@@ -7,8 +7,7 @@ name: Version Bump
 # because the version-bump CI check is what decides whether the bump is allowed - a
 # workflow that force-pushes would sidestep its own guard.
 #
-# The version lives at the end of the pack.mcmeta description (`... - vX.Y.Z`). The
-# PR it opens touches pack.mcmeta and nothing else, and asserts as much before
+# The PR it opens touches gradle.properties and nothing else, and asserts as much before
 # pushing: the same rule CI enforces.
 
 on:
@@ -65,9 +64,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          VERSION_RE='v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?'
-          CURRENT=$(grep -oE "$VERSION_RE" pack.mcmeta | head -1 | tr -d 'v')
-          echo "current version: $CURRENT"
+          CURRENT=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          echo "current mod_version: $CURRENT"
 
           BASE="${CURRENT%%-*}"
           SUFFIX=""
@@ -77,8 +75,8 @@ jobs:
           fi
 
           if ! printf '%s' "$BASE" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
-            echo "::error::version is '$CURRENT', whose base '$BASE' is not X.Y.Z."
-            echo "::error::Fix pack.mcmeta by hand; guessing here would produce a version neither CI nor Release understands."
+            echo "::error::mod_version is '$CURRENT', whose base '$BASE' is not X.Y.Z."
+            echo "::error::Fix gradle.properties by hand; guessing here would produce a version neither CI nor Release understands."
             exit 1
           fi
 
@@ -118,7 +116,7 @@ jobs:
             exit 1
           fi
 
-          echo "new version: $NEW_VERSION"
+          echo "new mod_version: $NEW_VERSION"
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
           echo "branch=version-bump/$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
@@ -130,22 +128,22 @@ jobs:
           set -euo pipefail
 
           git checkout -b "$BRANCH"
-          sed -E -i "s/- v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?\"$/- v$NEW_VERSION\"/" pack.mcmeta
+          sed -i "s/^mod_version=.*/mod_version=$NEW_VERSION/" gradle.properties
 
-          APPLIED=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?' pack.mcmeta | head -1 | tr -d 'v')
+          APPLIED=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
           if [ "$APPLIED" != "$NEW_VERSION" ]; then
             echo "::error::sed wrote '$APPLIED' but '$NEW_VERSION' was expected."
             exit 1
           fi
 
-          git add pack.mcmeta
+          git add gradle.properties
           git -c user.name="github-actions[bot]" \
               -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-              commit -m "Bump pack version to $NEW_VERSION"
+              commit -m "Bump mod_version to $NEW_VERSION"
 
           TOUCHED=$(git show --name-only --format= HEAD)
-          if [ "$TOUCHED" != "pack.mcmeta" ]; then
-            echo "::error::Bump commit touched more than pack.mcmeta:"
+          if [ "$TOUCHED" != "gradle.properties" ]; then
+            echo "::error::Bump commit touched more than gradle.properties:"
             echo "$TOUCHED"
             exit 1
           fi
@@ -168,16 +166,15 @@ jobs:
           # workflow is correct in any repo regardless of its branch naming.
           DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
 
-          VERSION_RE='v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?'
-          CURRENT=$(git show "origin/$DEFAULT_BRANCH:pack.mcmeta" | grep -oE "$VERSION_RE" | head -1 | tr -d 'v')
+          CURRENT=$(git show "origin/$DEFAULT_BRANCH:gradle.properties" | grep '^mod_version=' | cut -d= -f2 | tr -d '[:space:]')
 
           cat > body.md <<EOF
           ## Changeset
 
-          Isolated pack version bump: \`$CURRENT\` -> \`$NEW_VERSION\`
+          Isolated \`mod_version\` bump: \`$CURRENT\` -> \`$NEW_VERSION\`
           (bump: \`$BUMP\`, channel: \`$CHANNEL\`).
 
-          \`pack.mcmeta\` is the only file changed. That is not tidiness -
+          \`gradle.properties\` is the only file changed. That is not tidiness -
           the \`version-bump\` CI check fails any beta or stable bump that
           arrives with any other file, so a red check here would mean the
           workflow misbehaved rather than that anything about the version is
@@ -186,7 +183,7 @@ jobs:
           ## Checklist
 
           - [x] This PR contains **one** logical changeset
-          - [x] This PR bumps the pack version **and nothing else**
+          - [x] This PR bumps \`mod_version\` **and nothing else**
           EOF
 
           if [ "$CHANNEL" = "stable" ]; then
@@ -206,7 +203,7 @@ jobs:
           EOF
 
           URL=$(gh pr create --base "$DEFAULT_BRANCH" --head "$BRANCH" \
-            --title "Bump pack version to $NEW_VERSION" \
+            --title "Bump mod_version to $NEW_VERSION" \
             --body-file body.md)
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "Opened $URL"

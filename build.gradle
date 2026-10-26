@@ -1,0 +1,150 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    // Keep in sync with rootProject.name in settings.gradle and mod_id in
+    // gradle.properties. The shipped jar is <archivesName>-<version>.jar.
+    archivesName = mod_id
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+repositories {
+    // CurseMaven resolves mod jars by CurseForge project + file id, so a clean
+    // checkout (and CI) pulls the exact pack versions pinned in the coordinates
+    // below. Coordinates are annotated with the jar file name they resolve to.
+    maven {
+        name = 'CurseMaven'
+        url = uri('https://cursemaven.com')
+        content { includeGroup('curse.maven') }
+    }
+    mavenCentral()
+}
+
+// --- Dependencies -----------------------------------------------------------
+//
+// Compile against the pack's real mods. The race/skill/attribute APIs live in
+// manascore's nested modules (META-INF/jars inside the core artifact), which
+// are extracted into build/ for the compile classpath and never committed.
+configurations {
+    // Jars staged into run/mods before every dev run (see prepareRunMods).
+    runMods
+    // The resolved manascore core artifact, unpacked by extractManascoreModules.
+    manascoreModules
+}
+
+def manascoreModuleJars = files(fileTree(dir: layout.buildDirectory.dir('manascore-modules').get().asFile, include: '**/*.jar'))
+manascoreModuleJars.builtBy 'extractManascoreModules'
+
+dependencies {
+    compileOnly 'curse.maven:tensura-reincarnated-643695:8793360'        // tensura-neoforge-2.0.1.3
+    compileOnly 'curse.maven:manascore-619025:8022425'                   // manascore-neoforge-4.0.0.2
+    compileOnly 'curse.maven:architectury-419699:8492726'                // architectury-13.0.11-neoforge
+    compileOnly 'curse.maven:tensura-compat-ice-fire-1140209:7905387'    // tensura_iaf-neoforge-2.0.0.1
+    compileOnly 'curse.maven:iceandfire-ce-1040076:7722420'              // IceAndFireCE-2.0-beta.15-1.21.1-neoforge
+    compileOnly 'curse.maven:jupiter-1072905:7738312'                    // jupiter-2.3.7-1.21.1-neoforge
+    compileOnly 'curse.maven:uranus-1010827:8587525'                     // uranus-2.4.1-bugfix-1.21.1-neoforge (I&F pathfinding types in DragonBaseEntity's hierarchy)
+    compileOnly manascoreModuleJars
+
+    manascoreModules 'curse.maven:manascore-619025:8022425'               // manascore-neoforge-4.0.0.2
+
+    // The stack the dev runs boot, staged into run/mods so the game loads it
+    // exactly like the pack does (including manascore's nested module jars).
+    runMods 'curse.maven:tensura-reincarnated-643695:8793360'            // tensura-neoforge-2.0.1.3
+    runMods 'curse.maven:manascore-619025:8022425'                       // manascore-neoforge-4.0.0.2
+    runMods 'curse.maven:architectury-419699:8492726'                    // architectury-13.0.11-neoforge
+    runMods 'curse.maven:tensura-compat-ice-fire-1140209:7905387'        // tensura_iaf-neoforge-2.0.0.1
+    runMods 'curse.maven:iceandfire-ce-1040076:7722420'                  // IceAndFireCE-2.0-beta.15-1.21.1-neoforge
+    runMods 'curse.maven:jupiter-1072905:7738312'                        // jupiter-2.3.7-1.21.1-neoforge
+    runMods 'curse.maven:uranus-1010827:8587525'                         // uranus-2.4.1-bugfix-1.21.1-neoforge (Ice and Fire requirement)
+    runMods 'curse.maven:geckolib-388172:8893490'                        // geckolib-neoforge-1.21.1-4.9.3
+    runMods 'curse.maven:smartbrainlib-661293:7055149'                   // SmartBrainLib-neoforge-1.21.1-1.16.11
+    runMods 'curse.maven:terrablender-940057:6054947'                    // TerraBlender-neoforge-1.21.1-4.1.0.8
+}
+
+// Extract manascore's nested module jars into build/ so javac sees the module APIs.
+tasks.register('extractManascoreModules', Sync) {
+    from { zipTree(configurations.manascoreModules.singleFile) }
+    include 'META-INF/jars/*.jar'
+    into layout.buildDirectory.dir('manascore-modules')
+}
+
+// Stage the dependency mods into run/mods, where FML's mods-folder locator
+// finds them exactly like in the pack (nested jar-in-jar included).
+def prepareRunMods = tasks.register('prepareRunMods', Sync) {
+    from configurations.runMods
+    into 'run/mods'
+}
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        client {
+            client()
+            taskBefore prepareRunMods
+        }
+
+        server {
+            server()
+            programArgument '--nogui'
+            taskBefore prepareRunMods
+        }
+
+        // Regenerates src/generated/resources - the rebalanced datapack that
+        // ships inside the jar. --mod scopes datagen to this mod only, so the
+        // dependencies' own providers never write into our output.
+        data {
+            data()
+            programArguments.addAll '--mod', mod_id, '--all',
+                    '--output', file('src/generated/resources').absolutePath,
+                    '--existing', file('src/main/resources').absolutePath
+            taskBefore prepareRunMods
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+// Expand the ${...} placeholders in src/main/templates into the real
+// neoforge.mods.toml at build time, so mod identity is edited in one place
+// (gradle.properties) rather than duplicated in the toml.
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into layout.buildDirectory.dir('generated/sources/modMetadata')
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+// The generated datapack is committed and packaged as part of the mod's
+// resources; ./gradlew runData rewrites it in place.
+sourceSets.main.resources.srcDir 'src/generated/resources'
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}

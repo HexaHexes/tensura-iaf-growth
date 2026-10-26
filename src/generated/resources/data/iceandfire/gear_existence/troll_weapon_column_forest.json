@@ -1,0 +1,6 @@
+{
+  "type": "iceandfire:troll_weapon_column_forest",
+  "epGain": 0.003,
+  "maxEP": 750000,
+  "minEP": 0
+}

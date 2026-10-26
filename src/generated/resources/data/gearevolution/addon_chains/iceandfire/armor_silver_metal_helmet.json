@@ -1,0 +1,11 @@
+{
+  "epGain": 0.02,
+  "evolutionOptions": [
+    "iceandfire:mountain_troll_leather_helmet",
+    "iceandfire:forest_troll_leather_helmet",
+    "iceandfire:frost_troll_leather_helmet"
+  ],
+  "item": "iceandfire:armor_silver_metal_helmet",
+  "maxEP": 18000,
+  "minEP": 0
+}

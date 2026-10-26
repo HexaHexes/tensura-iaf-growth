@@ -1,0 +1,17 @@
+{
+  "type": "iceandfire:ice_dragon",
+  "abilities": [
+    "tensura:dragon_skin",
+    "tensura:dragon_eye",
+    "tensura:dragon_ear",
+    "tensura:cold_resistance",
+    "tensura:water_attack_resistance",
+    "tensura:ice_breath",
+    "tensura:water_manipulation"
+  ],
+  "max_aura": 10000,
+  "max_magicule": 340000,
+  "min_aura": 10000,
+  "min_magicule": 240000,
+  "spiritualHealth": 2000
+}

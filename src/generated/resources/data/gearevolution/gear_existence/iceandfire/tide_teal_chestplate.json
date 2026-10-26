@@ -1,0 +1,9 @@
+{
+  "type": "iceandfire:tide_teal_chestplate",
+  "engravings": {
+    "tensura:breathing_support": 1
+  },
+  "epGain": 0,
+  "maxEP": 0,
+  "minEP": 0
+}

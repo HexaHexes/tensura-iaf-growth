@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:armor_white_boots",
+  "engravings": {
+    "tensura:elemental_resistance": 1
+  },
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonsteel_ice_boots",
+  "maxEP": 225000,
+  "minEP": 0
+}

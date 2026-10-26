@@ -1,9 +1,42 @@
-# Exported pack archives
-*.zip
+### Gradle ###
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/**/build/
 
-# Editor / OS noise
+### IntelliJ IDEA ###
 .idea/
+*.iws
 *.iml
+*.ipr
+out/
+!**/src/**/out/
+
+.run/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.eclipse/
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/**/bin/
+
+### VS Code ###
 .vscode/
+
+### Mac OS ###
 .DS_Store
 Thumbs.db
+
+### Local mod JARs ###
+libs/
+
+### Minecraft Modding ###
+run/
+!**/src/**/run/
+**/src/generated/**/.cache/

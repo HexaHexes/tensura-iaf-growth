@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.bitwisemadness.tensuriafgrowth.mixin",
+  "compatibilityLevel": "JAVA_21",
+
+  "mixins": [
+    "DragonBaseEntityGrowthMixin",
+    "EnergyHelperMixin",
+    "IafCommonConfigDragonMixin",
+    "AttributeHandlerMixin"
+  ],
+
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

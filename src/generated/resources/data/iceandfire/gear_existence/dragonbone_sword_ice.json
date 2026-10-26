@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:dragonbone_sword_ice",
+  "engravings": {
+    "tensura:elemental_boost": 1
+  },
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonsteel_ice_sword",
+  "maxEP": 225000,
+  "minEP": 0
+}

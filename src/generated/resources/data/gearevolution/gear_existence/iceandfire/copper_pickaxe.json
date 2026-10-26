@@ -1,0 +1,7 @@
+{
+  "type": "iceandfire:copper_pickaxe",
+  "epGain": 0.02,
+  "evolution": "iceandfire:silver_pickaxe",
+  "maxEP": 6000,
+  "minEP": 0
+}

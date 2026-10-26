@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:armor_gray_helmet",
+  "engravings": {
+    "tensura:elemental_resistance": 1
+  },
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonsteel_fire_helmet",
+  "maxEP": 225000,
+  "minEP": 0
+}

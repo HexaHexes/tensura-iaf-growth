@@ -1,0 +1,7 @@
+{
+  "type": "iceandfire:copper_axe",
+  "epGain": 0.02,
+  "evolution": "iceandfire:silver_axe",
+  "maxEP": 6000,
+  "minEP": 0
+}

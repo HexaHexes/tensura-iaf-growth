@@ -1,7 +1,0 @@
-{
-  "type": "iceandfire:sheep_chestplate",
-  "minEP": 0,
-  "maxEP": 6000,
-  "epGain": 0.02,
-  "evolution": "iceandfire:armor_copper_metal_chestplate"
-}

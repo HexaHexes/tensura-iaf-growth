@@ -1,0 +1,104 @@
+# Mod metadata file. Values written in dollar-brace form are replaced at build time
+# from gradle.properties.
+# See https://docs.neoforged.net/docs/concepts/modfiles/ for the full schema.
+
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+[[mods]]
+    modId="${mod_id}"
+    version="${mod_version}"
+    displayName="${mod_name}"
+    authors="${mod_authors}"
+    description='''${mod_description}'''
+
+# The growth/stage hooks. Applied only while every target mod is present - the
+# targets below are all required, so the config is never half-applied.
+[[mixins]]
+    config="tensura_iaf_growth.mixins.json"
+
+# A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
+[[dependencies.tensura_iaf_growth]] #optional
+    modId="neoforge" #mandatory
+    type="required" #mandatory
+    versionRange="[${neo_version},)" #mandatory
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.tensura_iaf_growth]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+
+# Tensura - required. Source of the EP/existence systems, the mastery API the
+# stage hooks drive, and the skill registry the secondary elements are granted from.
+[[dependencies.tensura_iaf_growth]]
+    modId="tensura"
+    type="required"
+    versionRange="[1.9.2.7,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# ManasCore - required. Tensura's library; hosts the attribute and skill APIs.
+[[dependencies.tensura_iaf_growth]]
+    modId="manascore"
+    type="required"
+    versionRange="[3.0.2.9,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Ice and Fire - required. The dragons this addon stretches, and the config the
+# growth cap is widened in.
+[[dependencies.tensura_iaf_growth]]
+    modId="iceandfire"
+    type="required"
+    versionRange="[1.0.0-beta.5,3)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Tensura - Ice and Fire compat addon - required. Registers the Ice and Fire
+# gear/entity existence content this addon rebalances.
+[[dependencies.tensura_iaf_growth]]
+    modId="tensura_iaf"
+    type="required"
+    versionRange="[2,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Architectury - required by Ice and Fire and the compat addon; declared so this
+# addon loads after it.
+[[dependencies.tensura_iaf_growth]]
+    modId="architectury"
+    type="optional"
+    versionRange="[13.0.8,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Jupiter - Ice and Fire's library. Present whenever Ice and Fire is.
+[[dependencies.tensura_iaf_growth]]
+    modId="jupiter"
+    type="optional"
+    versionRange="[2.3,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Gear Evolution - optional. Reads the gear_existence and addon_chains data this
+# addon generates. The addon degrades to Tensura-only behaviour without it.
+[[dependencies.tensura_iaf_growth]]
+    modId="gearevolution"
+    type="optional"
+    versionRange="[1,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Mysticism - optional. Provides the light manipulation skill the fire branch's
+# secondary element is granted from; without it the branch grants nothing extra.
+[[dependencies.tensura_iaf_growth]]
+    modId="mysticism"
+    type="optional"
+    versionRange="[2,)"
+    ordering="AFTER"
+    side="BOTH"

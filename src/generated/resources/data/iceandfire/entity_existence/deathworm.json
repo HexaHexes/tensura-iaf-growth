@@ -1,0 +1,6 @@
+{
+  "type": "iceandfire:deathworm",
+  "max_magicule": 6000,
+  "min_magicule": 4000,
+  "spiritualHealth": 60
+}

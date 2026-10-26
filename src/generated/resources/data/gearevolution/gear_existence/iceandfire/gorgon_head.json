@@ -1,0 +1,6 @@
+{
+  "type": "iceandfire:gorgon_head",
+  "epGain": 0.003,
+  "maxEP": 750000,
+  "minEP": 0
+}

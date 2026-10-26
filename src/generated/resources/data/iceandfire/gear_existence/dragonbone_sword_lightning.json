@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:dragonbone_sword_lightning",
+  "engravings": {
+    "tensura:elemental_boost": 1
+  },
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonsteel_lightning_sword",
+  "maxEP": 225000,
+  "minEP": 0
+}

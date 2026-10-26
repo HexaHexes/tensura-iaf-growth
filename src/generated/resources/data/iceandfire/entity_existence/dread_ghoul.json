@@ -1,0 +1,9 @@
+{
+  "type": "iceandfire:dread_ghoul",
+  "abilities": [
+    "tensura:cold_resistance"
+  ],
+  "max_magicule": 7000,
+  "min_magicule": 6000,
+  "spiritualHealth": 60
+}

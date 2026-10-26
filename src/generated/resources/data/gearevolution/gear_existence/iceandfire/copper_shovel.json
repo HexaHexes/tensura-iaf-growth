@@ -1,0 +1,7 @@
+{
+  "type": "iceandfire:copper_shovel",
+  "epGain": 0.02,
+  "evolution": "iceandfire:silver_shovel",
+  "maxEP": 6000,
+  "minEP": 0
+}

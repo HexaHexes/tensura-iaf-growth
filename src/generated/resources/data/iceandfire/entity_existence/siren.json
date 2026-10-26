@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:siren",
+  "abilities": [
+    "tensura:water_breathing",
+    "tensura:charm"
+  ],
+  "max_magicule": 7500,
+  "min_magicule": 7000,
+  "spiritualHealth": 200
+}

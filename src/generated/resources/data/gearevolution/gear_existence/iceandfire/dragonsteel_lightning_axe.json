@@ -1,0 +1,9 @@
+{
+  "type": "iceandfire:dragonsteel_lightning_axe",
+  "engravings": {
+    "tensura:tsukumogami": 1
+  },
+  "epGain": 0.003,
+  "maxEP": 750000,
+  "minEP": 0
+}

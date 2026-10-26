@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:silver_hoe",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonbone_hoe",
+  "maxEP": 18000,
+  "minEP": 0
+}

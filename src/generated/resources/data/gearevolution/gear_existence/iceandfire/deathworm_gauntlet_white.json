@@ -1,0 +1,7 @@
+{
+  "type": "iceandfire:deathworm_gauntlet_white",
+  "epGain": 0.02,
+  "evolution": "iceandfire:deathworm_gauntlet_red",
+  "maxEP": 52000,
+  "minEP": 0
+}

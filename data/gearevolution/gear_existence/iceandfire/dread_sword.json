@@ -1,7 +1,0 @@
-{
-  "type": "iceandfire:dread_sword",
-  "minEP": 0,
-  "maxEP": 18000,
-  "epGain": 0.02,
-  "evolution": "iceandfire:dread_knight_sword"
-}

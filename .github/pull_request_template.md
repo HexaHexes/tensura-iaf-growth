@@ -5,9 +5,9 @@
 ## Checklist
 
 - [ ] This PR contains **one** logical changeset
-- [ ] `pwsh tools/generate-content.ps1 -Check` passes locally (the committed
-      JSON matches `tools/generate-content.ps1`)
-- [ ] Every JSON file under `data/` still parses
+- [ ] `./gradlew build` passes locally (compiles)
+- [ ] `./gradlew runData` passes locally, and the regenerated
+      `src/generated/resources` is committed with the change
 - [ ] Change is documented; README updated if user-facing
 - [ ] This PR adds a feature, or changes one `README.md` already describes,
       and updates `README.md` in this PR
@@ -23,9 +23,9 @@
 
 ## Version bump
 
-<!-- Only complete this section if pack.mcmeta is changing. -->
+<!-- Only complete this section if gradle.properties is changing. -->
 
-- [ ] This PR bumps the pack version **and nothing else**
+- [ ] This PR bumps `mod_version` **and nothing else**
 - [ ] New version is a clean bump (e.g. `1.0.0`) - releases as stable
 - [ ] New version has a `-beta`/`-rc` suffix - releases as beta
 - [ ] New version has an `-alpha` suffix - releases as alpha; other

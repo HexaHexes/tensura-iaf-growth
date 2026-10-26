@@ -1,0 +1,9 @@
+{
+  "type": "iceandfire:dragonsteel_lightning_chestplate",
+  "engravings": {
+    "tensura:holy_coat": 2
+  },
+  "epGain": 0.003,
+  "maxEP": 750000,
+  "minEP": 0
+}

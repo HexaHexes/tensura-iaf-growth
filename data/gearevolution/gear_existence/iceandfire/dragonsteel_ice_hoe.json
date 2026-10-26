@@ -1,9 +1,0 @@
-{
-  "type": "iceandfire:dragonsteel_ice_hoe",
-  "minEP": 0,
-  "maxEP": 750000,
-  "epGain": 0.003,
-  "engravings": {
-    "tensura:tsukumogami": 1
-  }
-}

@@ -1,0 +1,11 @@
+{
+  "epGain": 0.02,
+  "evolutionOptions": [
+    "iceandfire:dragonsteel_fire_shovel",
+    "iceandfire:dragonsteel_ice_shovel",
+    "iceandfire:dragonsteel_lightning_shovel"
+  ],
+  "item": "iceandfire:dragonbone_shovel",
+  "maxEP": 52000,
+  "minEP": 0
+}

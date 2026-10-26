@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:armor_green_chestplate",
+  "engravings": {
+    "tensura:elemental_resistance": 1
+  },
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonsteel_fire_chestplate",
+  "maxEP": 225000,
+  "minEP": 0
+}
