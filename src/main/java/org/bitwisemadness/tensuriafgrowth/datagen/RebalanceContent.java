@@ -31,6 +31,10 @@ import java.util.Set;
  *       Evolution has no built-in chain for (troll leather, tide guardian).</li>
  * </ul>
  *
+ * <p>Besides those three, one file sits at {@code data/gearevolution/gear_existence/tensura/}:
+ * a same-path override of Gear Evolution's own {@code short_bow} rung, retargeting the
+ * vanilla/Tensura bow ladder through the dragon bone bow (see {@link #addToolChain}).
+ *
  * <p>An item driven by an addon chain gets a gear_existence file only when it needs a
  * Tensura engraving, and that file carries maxEP 0 so Tensura never fights the addon
  * over EP or the evolution target.
@@ -42,8 +46,15 @@ public final class RebalanceContent {
     // --- Layout -------------------------------------------------------------
 
     private static final String NAMESPACE = "iceandfire";
-    private static final String GE_GEAR = "data/gearevolution/gear_existence/" + NAMESPACE + "/";
+    private static final String GE_ROOT = "data/gearevolution/gear_existence/";
+    private static final String GE_GEAR = GE_ROOT + NAMESPACE + "/";
     private static final String IAF_GEAR = "data/" + NAMESPACE + "/gear_existence/";
+    /**
+     * The pack's one file outside the Ice and Fire namespace: a same-path override of
+     * Gear Evolution's own {@code short_bow} rung, retargeting the vanilla/Tensura bow
+     * ladder through the dragon bone bow.
+     */
+    private static final String SHORT_BOW_PATH = GE_ROOT + "tensura/short_bow.json";
     private static final String CHAINS = "data/gearevolution/addon_chains/" + NAMESPACE + "/";
     private static final String MOVESETS = "data/" + NAMESPACE + "/weapon_attributes/";
     private static final String ENTITY_PATH = EntityExistenceContent.PATH;
@@ -64,27 +75,66 @@ public final class RebalanceContent {
     private static final Map<String, String> TROLL_TO_CHITIN = trollToChitin();
 
     /**
-     * EP gates. These are Tensura's own ladder values, so Ice and Fire gear climbs at the
-     * same pace as Tensura gear.
+     * EP gates. The first three rungs are the vanilla progression (leather, iron,
+     * diamond); from there the ladder joins Tensura's own metals spine (low_magisteel,
+     * high_magisteel, pure_magisteel, adamantite), so Ice and Fire gear starts on the
+     * vanilla curve and climbs at Tensura's pace once the metals begin.
      */
-    private static final int SHEEP_TO_COPPER = 6000;
-    private static final int COPPER_TO_SILVER = 10000;
-    private static final int SILVER_TO_TROLL = 18000;
-    private static final int TROLL_TO_CHITIN_GATE = 45000;
+    private static final int SHEEP_TO_COPPER = 550;
+    private static final int COPPER_TO_SILVER = 3200;
+    private static final int SILVER_TO_TROLL = 7800;
+    private static final int TROLL_TO_CHITIN_GATE = 18000;
     private static final int CHITIN_TO_TIDE = 52000;
-    private static final int TIDE_TO_SCALE = 80000;
-    private static final int SCALE_TO_STEEL = 225000;
-    private static final int TERMINAL = 750000;
-    private static final int COPPER_TO_SILVER_TOOL = 6000;
-    private static final int SILVER_TO_DRAGONBONE = 18000;
-    private static final int DRAGONBONE_BRANCH = 52000;
+    private static final int TIDE_TO_SCALE = 225000;
+    private static final int SCALE_TO_STEEL = 750000;
+
+    /** The last gate of every dragonsteel ladder: its terminal hands off from here. */
+    private static final int TERMINAL_MIN = 750000;
+
+    /**
+     * Tool and sword rungs, spread over the same spine as the armor ladder so both
+     * ladders finish together: tools climb 3,200 / 52,000 / 750,000, swords
+     * 3,200 / 18,000 / 225,000 / 750,000 (swords gain a blooded rung in between).
+     */
+    private static final int COPPER_TO_SILVER_TOOL = 3200;
+    private static final int SILVER_TO_DRAGONBONE_TOOL = 52000;
+    private static final int SILVER_TO_DRAGONBONE_SWORD = 18000;
+    private static final int DRAGONBONE_TO_BLOODED = 225000;
+    private static final int DRAGONBONE_TO_STEEL = 750000;
+    private static final int BLOODED_TO_STEEL = 750000;
+
+    /** Singular ladders (dread line, death worm gauntlets), both on the 18k/52k rungs. */
     private static final int DREAD_KNIGHT = 18000;
     private static final int DREAD_QUEEN = 52000;
     private static final int GAUNTLET_WHITE = 18000;
     private static final int GAUNTLET_RED = 52000;
 
-    private static final double EP_GAIN_EVOLVING = 0.02;
-    private static final double EP_GAIN_TERMINAL = 0.003;
+    /**
+     * The bow ladder slots the dragon bone bow between Tensura's short and long bow by
+     * damage and draw speed (short &lt; dragon bone &lt; long &lt; war). The two rungs
+     * before and after it are Gear Evolution's own values, kept verbatim upstream; the
+     * constants below only pin the slot so validation can prove the ordering.
+     */
+    private static final int UPSTREAM_BOW_GATE = 700;
+    private static final int SHORT_BOW_GATE = 3600;
+    private static final int DRAGONBONE_BOW_GATE = 7200;
+    private static final int UPSTREAM_LONG_BOW_GATE = 12500;
+    private static final int UPSTREAM_WAR_BOW_GATE = 16000;
+    /**
+     * The pack's one cross-namespace evolution target: the dragon bone bow slots into
+     * Tensura's own ladder rather than retargeting an Ice and Fire item.
+     */
+    private static final String LONG_BOW = "tensura:long_bow";
+
+    /**
+     * Terminal climb rates: armour-grade gear keeps earning fastest, a singular ladder
+     * that hands off at 52,000 keeps its middle rate, and gear with no ladder at all
+     * still trickles. Climbing rates are derived from each rung's gate by
+     * {@link #epGainFor(int)}.
+     */
+    private static final double EP_GAIN_TOP = 0.04;
+    private static final double EP_GAIN_HANDOFF = 0.025;
+    private static final double EP_GAIN_NO_LADDER = 0.003;
 
     /**
      * Engravings granted by Tensura when the item is created, mirroring what Tensura puts
@@ -158,7 +208,10 @@ public final class RebalanceContent {
             "troll_weapon_axe", "troll_weapon_column", "troll_weapon_column_forest", "troll_weapon_column_frost",
             "troll_weapon_hammer", "troll_weapon_trunk", "troll_weapon_trunk_frost");
 
-    /** Our own gear_existence files the addon does not ship, so no shadow copy is needed. */
+    /**
+     * Our own gear_existence files the addon does not ship, so no shadow copy is needed.
+     * Includes {@code short_bow}, which lives at Gear Evolution's path rather than ours.
+     */
     private static final Set<String> NOT_IN_ADDON = Set.of(
             "armor_copper_metal_boots", "armor_copper_metal_chestplate", "armor_copper_metal_helmet",
             "armor_copper_metal_leggings",
@@ -168,6 +221,7 @@ public final class RebalanceContent {
             "cyclops_eye", "deathworm_gauntlet_red", "deathworm_gauntlet_white", "deathworm_gauntlet_yellow",
             "dread_knight_sword", "earplugs", "fishing_spear", "gorgon_head",
             "sheep_boots", "sheep_chestplate", "sheep_helmet", "sheep_leggings",
+            "short_bow",
             "silver_axe", "silver_hoe", "silver_pickaxe", "silver_shovel", "silver_sword",
             "siren_flute", "stymphalian_feather_bundle");
 
@@ -216,7 +270,7 @@ public final class RebalanceContent {
         }
         for (String item : ADDON_ONLY) {
             put(iafGear, IAF_GEAR + file(item),
-                    ADDON_TROLL_WEAPONS.contains(item) ? terminal(item) : inert(item));
+                    ADDON_TROLL_WEAPONS.contains(item) ? terminal(item, 0, EP_GAIN_NO_LADDER, null) : inert(item));
         }
 
         Content content = new Content(geGear, iafGear, chains, movesets, EntityExistenceContent.build());
@@ -233,12 +287,12 @@ public final class RebalanceContent {
         for (String slot : SLOTS) {
             // Sheep disguise -> copper.
             put(gear, gearPath(id("sheep_" + slot)),
-                    gear(id("sheep_" + slot), 0, SHEEP_TO_COPPER, EP_GAIN_EVOLVING, null,
+                    gear(id("sheep_" + slot), 0, SHEEP_TO_COPPER, epGainFor(SHEEP_TO_COPPER), null,
                             id("armor_copper_metal_" + slot)));
 
             // Copper -> silver.
             put(gear, gearPath(id("armor_copper_metal_" + slot)),
-                    gear(id("armor_copper_metal_" + slot), 0, COPPER_TO_SILVER, EP_GAIN_EVOLVING, null,
+                    gear(id("armor_copper_metal_" + slot), 0, COPPER_TO_SILVER, epGainFor(COPPER_TO_SILVER), null,
                             id("armor_silver_metal_" + slot)));
 
             // Silver -> branch into the three troll leather sets. The engraving lives in
@@ -247,22 +301,23 @@ public final class RebalanceContent {
             put(gear, gearPath(id("armor_silver_metal_" + slot)),
                     gear(id("armor_silver_metal_" + slot), 0, 0, 0, HOLY_COAT_1, null));
             put(chains, chainPath(id("armor_silver_metal_" + slot)),
-                    chain(id("armor_silver_metal_" + slot), 0, SILVER_TO_TROLL, EP_GAIN_EVOLVING, null,
+                    chain(id("armor_silver_metal_" + slot), 0, SILVER_TO_TROLL, epGainFor(SILVER_TO_TROLL), null,
                             TROLL_TO_CHITIN.keySet().stream().map(troll -> id(troll + "_troll_leather_" + slot)).toList()));
 
             // Troll leather -> its paired death worm chitin (deterministic pairing).
             for (Map.Entry<String, String> pairing : TROLL_TO_CHITIN.entrySet()) {
                 String troll = pairing.getKey();
                 put(chains, chainPath(id(troll + "_troll_leather_" + slot)),
-                        chain(id(troll + "_troll_leather_" + slot), 0, TROLL_TO_CHITIN_GATE, EP_GAIN_EVOLVING,
+                        chain(id(troll + "_troll_leather_" + slot), 0, TROLL_TO_CHITIN_GATE,
+                                epGainFor(TROLL_TO_CHITIN_GATE),
                                 id("deathworm_" + pairing.getValue() + "_" + slot), null));
             }
 
             // Death worm chitin (all three, one tier) -> any of the seven sea serpent sets.
             for (String chitin : List.of("yellow", "white", "red")) {
                 put(chains, chainPath(id("deathworm_" + chitin + "_" + slot)),
-                        chain(id("deathworm_" + chitin + "_" + slot), 0, CHITIN_TO_TIDE, EP_GAIN_EVOLVING, null,
-                                ids(TIDE_COLORS, "_" + slot, "tide_")));
+                        chain(id("deathworm_" + chitin + "_" + slot), 0, CHITIN_TO_TIDE, epGainFor(CHITIN_TO_TIDE),
+                                null, ids(TIDE_COLORS, "_" + slot, "tide_")));
             }
 
             // Sea serpent scale -> any of the twelve dragon scale sets.
@@ -270,7 +325,7 @@ public final class RebalanceContent {
                 put(gear, gearPath(id("tide_" + tide + "_" + slot)),
                         gear(id("tide_" + tide + "_" + slot), 0, 0, 0, BREATHING_SUPPORT, null));
                 put(chains, chainPath(id("tide_" + tide + "_" + slot)),
-                        chain(id("tide_" + tide + "_" + slot), 0, TIDE_TO_SCALE, EP_GAIN_EVOLVING, null,
+                        chain(id("tide_" + tide + "_" + slot), 0, TIDE_TO_SCALE, epGainFor(TIDE_TO_SCALE), null,
                                 scaleArmorIds(slot)));
             }
 
@@ -278,16 +333,16 @@ public final class RebalanceContent {
             for (Map.Entry<String, List<String>> element : SCALE_COLORS_BY_ELEMENT.entrySet()) {
                 for (String color : element.getValue()) {
                     put(gear, gearPath(id("armor_" + color + "_" + slot)),
-                            gear(id("armor_" + color + "_" + slot), 0, SCALE_TO_STEEL, EP_GAIN_EVOLVING,
+                            gear(id("armor_" + color + "_" + slot), 0, SCALE_TO_STEEL, epGainFor(SCALE_TO_STEEL),
                                     ELEMENTAL_RESISTANCE, id("dragonsteel_" + element.getKey() + "_" + slot)));
                 }
             }
 
-            // Dragon steel: top of the ladder, keeps earning, engraved like mithril.
+            // Dragon steel: top of the ladder, keeps earning from its own last gate,
+            // engraved like mithril.
             for (String element : SCALE_COLORS_BY_ELEMENT.keySet()) {
                 put(gear, gearPath(id("dragonsteel_" + element + "_" + slot)),
-                        gear(id("dragonsteel_" + element + "_" + slot), 0, TERMINAL, EP_GAIN_TERMINAL,
-                                HOLY_COAT_2, null));
+                        terminal("dragonsteel_" + element + "_" + slot, TERMINAL_MIN, EP_GAIN_TOP, HOLY_COAT_2));
             }
         }
     }
@@ -295,37 +350,41 @@ public final class RebalanceContent {
     // --- Chain 2: tools and weapons ----------------------------------------
     //
     // copper -> silver -> dragon bone -> blooded dragon bone (swords) -> dragon steel
+    // plus the vanilla/Tensura bow ladder, slotted through the dragon bone bow
 
     private static void addToolChain(Map<String, JsonObject> gear, Map<String, JsonObject> chains) {
         for (String tool : TOOLS) {
             // Copper -> silver.
             put(gear, gearPath(id("copper_" + tool)),
-                    gear(id("copper_" + tool), 0, COPPER_TO_SILVER_TOOL, EP_GAIN_EVOLVING, null,
+                    gear(id("copper_" + tool), 0, COPPER_TO_SILVER_TOOL, epGainFor(COPPER_TO_SILVER_TOOL), null,
                             id("silver_" + tool)));
 
-            // Silver -> dragon bone (deterministic), with the holy coat engraving.
+            // Silver -> dragon bone. Swords join the spine at the 18,000 rung because
+            // they carry a blooded tier in between; the plain tools skip straight to
+            // the 52,000 rung the armor ladder climbs at.
+            int silverGate = tool.equals("sword") ? SILVER_TO_DRAGONBONE_SWORD : SILVER_TO_DRAGONBONE_TOOL;
             put(gear, gearPath(id("silver_" + tool)),
-                    gear(id("silver_" + tool), 0, SILVER_TO_DRAGONBONE, EP_GAIN_EVOLVING, HOLY_COAT_1,
+                    gear(id("silver_" + tool), 0, silverGate, epGainFor(silverGate), HOLY_COAT_1,
                             id("dragonbone_" + tool)));
 
             if (tool.equals("sword")) {
                 // Dragon bone sword -> a blooded (elemental) dragon bone sword, rolled at
                 // random; each blooded sword then forges into its matching dragon steel.
                 put(chains, chainPath(id("dragonbone_sword")),
-                        chain(id("dragonbone_sword"), 0, DRAGONBONE_BRANCH, EP_GAIN_EVOLVING, null,
-                                SCALE_COLORS_BY_ELEMENT.keySet().stream()
+                        chain(id("dragonbone_sword"), 0, DRAGONBONE_TO_BLOODED, epGainFor(DRAGONBONE_TO_BLOODED),
+                                null, SCALE_COLORS_BY_ELEMENT.keySet().stream()
                                         .map(element -> id("dragonbone_sword_" + element)).toList()));
 
                 for (String element : SCALE_COLORS_BY_ELEMENT.keySet()) {
                     put(gear, gearPath(id("dragonbone_sword_" + element)),
-                            gear(id("dragonbone_sword_" + element), 0, SCALE_TO_STEEL, EP_GAIN_EVOLVING,
+                            gear(id("dragonbone_sword_" + element), 0, BLOODED_TO_STEEL, epGainFor(BLOODED_TO_STEEL),
                                     ELEMENTAL_BOOST, id("dragonsteel_" + element + "_sword")));
                 }
             } else {
                 // Tools have no blooded tier: dragon bone rolls straight into one of the
                 // three dragon steel elements.
                 put(chains, chainPath(id("dragonbone_" + tool)),
-                        chain(id("dragonbone_" + tool), 0, DRAGONBONE_BRANCH, EP_GAIN_EVOLVING, null,
+                        chain(id("dragonbone_" + tool), 0, DRAGONBONE_TO_STEEL, epGainFor(DRAGONBONE_TO_STEEL), null,
                                 SCALE_COLORS_BY_ELEMENT.keySet().stream()
                                         .map(element -> id("dragonsteel_" + element + "_" + tool)).toList()));
             }
@@ -333,43 +392,50 @@ public final class RebalanceContent {
             // Dragon steel tools and weapons: terminal, engraved like hihiirokane.
             for (String element : SCALE_COLORS_BY_ELEMENT.keySet()) {
                 put(gear, gearPath(id("dragonsteel_" + element + "_" + tool)),
-                        gear(id("dragonsteel_" + element + "_" + tool), 0, TERMINAL, EP_GAIN_TERMINAL,
-                                TSUKUMOGAMI, null));
+                        terminal("dragonsteel_" + element + "_" + tool, TERMINAL_MIN, EP_GAIN_TOP, TSUKUMOGAMI));
             }
         }
 
-        // Dragon bone bow: no dragon steel bow exists, so it tops out on its own.
+        // The bow ladder, slotted by damage and draw speed: short bow -> dragon bone bow
+        // -> Tensura's long bow -> war bow. The rungs outside our two files (bow at 700,
+        // long bow at 12,500, war bow at 16,000) are Gear Evolution's own and stay
+        // upstream; validation pins their ordering against ours.
         put(gear, gearPath(id("dragonbone_bow")),
-                gear(id("dragonbone_bow"), 0, TERMINAL, EP_GAIN_TERMINAL, null, null));
+                gear(id("dragonbone_bow"), 0, DRAGONBONE_BOW_GATE, epGainFor(DRAGONBONE_BOW_GATE), null, LONG_BOW));
+        // Same-path override of Gear Evolution's short_bow rung, retargeted through the
+        // dragon bone bow - the pack's one file outside the Ice and Fire namespace.
+        put(gear, SHORT_BOW_PATH,
+                gear("tensura:short_bow", 0, SHORT_BOW_GATE, epGainFor(SHORT_BOW_GATE), null, id("dragonbone_bow")));
     }
 
     // --- Single-item ladders ------------------------------------------------
 
     private static void addSingularGear(Map<String, JsonObject> gear) {
-        // Death worm gauntlets: yellow -> white -> red, then terminal.
+        // Death worm gauntlets: yellow -> white -> red, then hand off at 52,000.
         put(gear, gearPath(id("deathworm_gauntlet_yellow")),
-                gear(id("deathworm_gauntlet_yellow"), 0, GAUNTLET_WHITE, EP_GAIN_EVOLVING, null,
+                gear(id("deathworm_gauntlet_yellow"), 0, GAUNTLET_WHITE, epGainFor(GAUNTLET_WHITE), null,
                         id("deathworm_gauntlet_white")));
         put(gear, gearPath(id("deathworm_gauntlet_white")),
-                gear(id("deathworm_gauntlet_white"), 0, GAUNTLET_RED, EP_GAIN_EVOLVING, null,
+                gear(id("deathworm_gauntlet_white"), 0, GAUNTLET_RED, epGainFor(GAUNTLET_RED), null,
                         id("deathworm_gauntlet_red")));
         put(gear, gearPath(id("deathworm_gauntlet_red")),
-                gear(id("deathworm_gauntlet_red"), 0, TERMINAL, EP_GAIN_TERMINAL, null, null));
+                terminal("deathworm_gauntlet_red", GAUNTLET_RED, EP_GAIN_HANDOFF, null));
 
         // Dread line: Dread Thrall's Sword -> Dread Knight's Sword -> Blade of the
-        // Dreaded Queen.
+        // Dreaded Queen, then hand off at 52,000.
         put(gear, gearPath(id("dread_sword")),
-                gear(id("dread_sword"), 0, DREAD_KNIGHT, EP_GAIN_EVOLVING, null, id("dread_knight_sword")));
+                gear(id("dread_sword"), 0, DREAD_KNIGHT, epGainFor(DREAD_KNIGHT), null, id("dread_knight_sword")));
         put(gear, gearPath(id("dread_knight_sword")),
-                gear(id("dread_knight_sword"), 0, DREAD_QUEEN, EP_GAIN_EVOLVING, null, id("dread_queen_sword")));
+                gear(id("dread_knight_sword"), 0, DREAD_QUEEN, epGainFor(DREAD_QUEEN), null,
+                        id("dread_queen_sword")));
         put(gear, gearPath(id("dread_queen_sword")),
-                gear(id("dread_queen_sword"), 0, TERMINAL, EP_GAIN_TERMINAL, null, null));
+                terminal("dread_queen_sword", DREAD_QUEEN, EP_GAIN_HANDOFF, null));
         put(gear, gearPath(id("dread_queen_staff")),
-                gear(id("dread_queen_staff"), 0, TERMINAL, EP_GAIN_TERMINAL, null, null));
+                terminal("dread_queen_staff", DREAD_QUEEN, EP_GAIN_HANDOFF, null));
 
-        // Uniques without an upgrade line stay terminal.
+        // Uniques without an upgrade line earn nothing from a ladder they never climb.
         for (String unique : TERMINAL_UNIQUES) {
-            put(gear, gearPath(id(unique)), gear(id(unique), 0, TERMINAL, EP_GAIN_TERMINAL, null, null));
+            put(gear, gearPath(id(unique)), terminal(unique, 0, EP_GAIN_NO_LADDER, null));
         }
     }
 
@@ -395,22 +461,57 @@ public final class RebalanceContent {
     }
 
     /**
-     * A plain top-of-the-ladder rung for items with no upgrade line.
+     * A top-of-the-ladder rung: no evolution target, and it keeps earning from its own
+     * last gate ({@code minEP}) rather than from zero.
      *
      * @param item the bare Ice and Fire item name, without its namespace
      */
-    private static JsonObject terminal(String item) {
-        return gear(id(item), 0, TERMINAL, EP_GAIN_TERMINAL, null, null);
+    private static JsonObject terminal(String item, int minEP, double epGain, JsonObject engravings) {
+        return gear(id(item), minEP, null, epGain, engravings, null);
+    }
+
+    /**
+     * The climb rate for a rung that hands off to another item, derived from its gate.
+     * The vanilla rungs and the whole bow ladder trickle at the no-ladder rate; once the
+     * metals spine begins the rate climbs 0.01 / 0.02 / 0.025 / 0.03 across the 18,000 /
+     * 52,000 / 225,000 / 750,000 rungs.
+     *
+     * @param gate the EP at which the item evolves
+     */
+    private static double epGainFor(int gate) {
+        if (gate == TROLL_TO_CHITIN_GATE) {
+            return 0.01d;
+        }
+        if (gate == CHITIN_TO_TIDE) {
+            return 0.02d;
+        }
+        if (gate == TIDE_TO_SCALE) {
+            return 0.025d;
+        }
+        if (gate == SCALE_TO_STEEL) {
+            return 0.03d;
+        }
+        if (gate < TROLL_TO_CHITIN_GATE) {
+            return EP_GAIN_NO_LADDER;
+        }
+        throw new IllegalStateException("no EP climb rate defined for gate " + gate);
     }
 
     // --- File builders ------------------------------------------------------
 
-    private static JsonObject gear(String item, int minEP, int maxEP, double epGain, JsonObject engravings,
+    /**
+     * @param maxEP the EP at which the item evolves, or {@code null} for a terminal
+     *              (the codec then applies its 2,000,000 ceiling); an explicit {@code 0}
+     *              marks an inert file whose EP the addon_chains ladder drives
+     */
+    private static JsonObject gear(String item, int minEP, Integer maxEP, double epGain, JsonObject engravings,
             String evolution) {
         JsonObject json = new JsonObject();
         json.addProperty("type", item);
         json.addProperty("minEP", minEP);
-        json.addProperty("maxEP", maxEP);
+        if (maxEP != null) {
+            json.addProperty("maxEP", maxEP);
+        }
         json.addProperty("epGain", number(epGain));
         if (engravings != null) {
             json.add("engravings", engravings);
@@ -460,21 +561,25 @@ public final class RebalanceContent {
     private static void validate(Content content) {
         List<String> errors = new ArrayList<>();
 
-        expect(errors, "gear_existence files under data/gearevolution", 169, content.geGearExistence.size());
+        expect(errors, "gear_existence files under data/gearevolution", 170, content.geGearExistence.size());
         expect(errors, "gear_existence files under data/iceandfire", 151, content.iafGearExistence.size());
         expect(errors, "addon_chains files", 61, content.addonChains.size());
         expect(errors, "weapon_attributes files", 37, content.weaponAttributes.size());
         expect(errors, "entity_existence files", 24, content.entityExistence.size());
         expect(errors, "neutralised Gear Evolution built-ins", 17, GE_BUILTIN_NEUTRALISED.size());
         expect(errors, "files the addon ships that we shadow", 32, ADDON_ONLY.size());
-        expect(errors, "our files the addon does not ship", 33, NOT_IN_ADDON.size());
+        expect(errors, "our files the addon does not ship", 34, NOT_IN_ADDON.size());
+        expect(errors, "files in total", 443,
+                content.geGearExistence.size() + content.iafGearExistence.size() + content.addonChains.size()
+                        + content.weaponAttributes.size() + content.entityExistence.size());
 
         List<Map<String, JsonObject>> all = List.of(content.geGearExistence, content.iafGearExistence,
                 content.addonChains, content.weaponAttributes, content.entityExistence);
 
         // Every file must land under the path the consuming mod reads it from - the
-        // same item legitimately appears under two of them.
-        checkPrefix(errors, content.geGearExistence, GE_GEAR);
+        // same item legitimately appears under two of them. Gear Evolution's short_bow
+        // rung is the one file outside the iceandfire folder.
+        checkPrefix(errors, content.geGearExistence, GE_GEAR, SHORT_BOW_PATH);
         checkPrefix(errors, content.iafGearExistence, IAF_GEAR);
         checkPrefix(errors, content.addonChains, CHAINS);
         checkPrefix(errors, content.weaponAttributes, MOVESETS);
@@ -492,25 +597,37 @@ public final class RebalanceContent {
 
         // The item id in every file must carry its namespace: Tensura matches it against
         // the item's registry name, and an unqualified id resolves to minecraft:<name>,
-        // which would silently match nothing.
+        // which would silently match nothing. The short_bow override is the one file
+        // whose type legitimately sits in Tensura's namespace.
         for (Map<String, JsonObject> files : all) {
             for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
                 JsonObject json = entry.getValue();
                 for (String field : new String[] { "type", "item" }) {
-                    if (json.has(field) && !json.get(field).getAsString().startsWith(NAMESPACE + ":")) {
+                    if (!json.has(field)) {
+                        continue;
+                    }
+                    String value = json.get(field).getAsString();
+                    boolean shortBow = field.equals("type") && entry.getKey().equals(SHORT_BOW_PATH)
+                            && value.equals("tensura:short_bow");
+                    if (!shortBow && !value.startsWith(NAMESPACE + ":")) {
                         errors.add(entry.getKey() + " -> " + field + " is missing its namespace");
                     }
                 }
             }
         }
 
-        // Every evolution target must itself be a generated item (catches typos).
+        // Every evolution target must itself be a generated item (catches typos). The ids
+        // come from each file's own type/item fields, so the bow override registers as
+        // tensura:short_bow rather than as an Ice and Fire item.
         Set<String> generated = new LinkedHashSet<>();
-        for (String path : content.geGearExistence.keySet()) {
-            generated.add(id(name(path)));
-        }
-        for (String path : content.addonChains.keySet()) {
-            generated.add(id(name(path)));
+        for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.addonChains)) {
+            for (JsonObject json : files.values()) {
+                for (String field : new String[] { "type", "item" }) {
+                    if (json.has(field)) {
+                        generated.add(json.get(field).getAsString());
+                    }
+                }
+            }
         }
         for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.iafGearExistence,
                 content.addonChains)) {
@@ -536,6 +653,63 @@ public final class RebalanceContent {
             }
         }
 
+        // Everything written for Gear Evolution also needs a shadow under the addon's
+        // path, or the addon's own thresholds would outvote ours. The neutralised
+        // built-ins are the exception: they are inert, their EP comes from the
+        // addon_chains ladder, and the addon only ships shadows for some of them.
+        for (String path : content.geGearExistence.keySet()) {
+            String item = name(path);
+            if (GE_BUILTIN_NEUTRALISED.contains(item)) {
+                continue;
+            }
+            if (!NOT_IN_ADDON.contains(item)
+                    && !content.iafGearExistence.containsKey(IAF_GEAR + file(item))) {
+                errors.add(path + " has no data/iceandfire shadow and is not listed in NOT_IN_ADDON");
+            }
+        }
+
+        // maxEP semantics: an explicit 0 marks an inert file (the addon_chains ladder
+        // drives the item, so Tensura must not manage EP or a target here), any other
+        // explicit maxEP must name an evolution, and an omitted maxEP is a terminal
+        // that keeps earning with no target - the codec's 2,000,000 default caps it.
+        for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.iafGearExistence)) {
+            for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
+                JsonObject json = entry.getValue();
+                boolean evolves = json.has("evolution") || json.has("evolutionOptions");
+                if (!json.has("maxEP")) {
+                    if (evolves) {
+                        errors.add(entry.getKey() + " is terminal but still names an evolution");
+                    }
+                } else if (json.get("maxEP").getAsInt() == 0) {
+                    if (evolves) {
+                        errors.add(entry.getKey() + " is inert (maxEP 0) but still names an evolution");
+                    }
+                } else if (!evolves) {
+                    errors.add(entry.getKey() + " gates at " + json.get("maxEP")
+                            + " but names no evolution target");
+                }
+            }
+        }
+
+        // Every ladder must climb strictly: a stalled or reversed gate would strand
+        // gear below a threshold it can never reach.
+        checkAscending(errors, "armor spine",
+                SHEEP_TO_COPPER, COPPER_TO_SILVER, SILVER_TO_TROLL, TROLL_TO_CHITIN_GATE, CHITIN_TO_TIDE,
+                TIDE_TO_SCALE, SCALE_TO_STEEL);
+        checkAscending(errors, "tool ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE_TOOL, DRAGONBONE_TO_STEEL);
+        checkAscending(errors, "sword ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE_SWORD,
+                DRAGONBONE_TO_BLOODED, BLOODED_TO_STEEL);
+        checkAscending(errors, "dread line", DREAD_KNIGHT, DREAD_QUEEN);
+        checkAscending(errors, "death worm gauntlets", GAUNTLET_WHITE, GAUNTLET_RED);
+        checkAscending(errors, "bow ladder",
+                UPSTREAM_BOW_GATE, SHORT_BOW_GATE, DRAGONBONE_BOW_GATE, UPSTREAM_LONG_BOW_GATE, UPSTREAM_WAR_BOW_GATE);
+
+        // All three dragon steel ladders land on the same last gate, where the
+        // terminal takes over.
+        expect(errors, "dragon steel armor gate", SCALE_TO_STEEL, TERMINAL_MIN);
+        expect(errors, "dragon steel tool gate", SCALE_TO_STEEL, DRAGONBONE_TO_STEEL);
+        expect(errors, "blooded sword forge gate", SCALE_TO_STEEL, BLOODED_TO_STEEL);
+
         // Structural spot checks - the counts a future edit can silently break.
         expect(errors, "dragon scale gear_existence files", 48,
                 (int) content.geGearExistence.keySet().stream().filter(RebalanceContent::isScale).count());
@@ -545,6 +719,34 @@ public final class RebalanceContent {
                 (int) content.addonChains.keySet().stream()
                         .filter(path -> name(path).matches("(mountain|forest|frost)_troll_leather_.*")).count());
 
+        // Ladder spot checks, at literal plan values so a change to epGainFor or the
+        // gate tables cannot quietly redefine what "correct" means: the T3 asymmetry
+        // (swords join the spine a rung before tools do) and the bow pair that reaches
+        // outside the Ice and Fire namespace.
+        expectRung(errors, content, "silver_sword", 18000, 0.01d, id("dragonbone_sword"));
+        expectRung(errors, content, "silver_axe", 52000, 0.02d, id("dragonbone_axe"));
+        expectRung(errors, content, "dragonbone_bow", 7200, 0.003d, LONG_BOW);
+        expectRungAt(errors, "short_bow", content.geGearExistence.get(SHORT_BOW_PATH),
+                3600, 0.003d, id("dragonbone_bow"));
+
+        // Terminal spot checks across all three shapes: ladder top, singular hand-off,
+        // and a unique that never climbs.
+        expectTerminal(errors, content, "dragonsteel_fire_helmet", 750000, 0.04d);
+        expectTerminal(errors, content, "dread_queen_sword", 52000, 0.025d);
+        expectTerminal(errors, content, "pixie_wand", 0, 0.003d);
+        expectTerminal(errors, content, "troll_weapon_axe", 0, 0.003d);
+
+        // Inert files carry maxEP 0 and never name a target: one engraving-only file
+        // and one neutralised Gear Evolution built-in.
+        expectInert(errors, content, "armor_silver_metal_helmet");
+        expectInert(errors, content, "deathworm_red_helmet");
+
+        // Addon chain spot checks: the blooded branch, the dragon steel tool roll, and
+        // the troll leather ladder the chains alone drive.
+        expectChainRung(errors, content, "dragonbone_sword", 225000, 0.025d);
+        expectChainRung(errors, content, "dragonbone_axe", 750000, 0.03d);
+        expectChainRung(errors, content, "mountain_troll_leather_helmet", 18000, 0.01d);
+
         if (!errors.isEmpty()) {
             throw new IllegalStateException(
                     "Rebalanced datapack failed validation:\n  " + String.join("\n  ", errors));
@@ -552,9 +754,18 @@ public final class RebalanceContent {
     }
 
     private static void checkTarget(List<String> errors, String path, String target, Set<String> generated) {
-        if (!generated.contains(target)) {
-            errors.add(path + " -> unknown evolution target '" + target + "'");
+        if (generated.contains(target)) {
+            return;
         }
+        // The one grandfathered exception to "targets stay Ice and Fire": the dragon
+        // bone bow slots into Tensura's own bow ladder - and it does so from both of
+        // the paths its file ships under (Gear Evolution's folder and the addon's).
+        if (target.equals(LONG_BOW)
+                && (path.equals(GE_GEAR + file("dragonbone_bow"))
+                        || path.equals(IAF_GEAR + file("dragonbone_bow")))) {
+            return;
+        }
+        errors.add(path + " -> unknown evolution target '" + target + "'");
     }
 
     private static void expect(List<String> errors, String what, int wanted, int found) {
@@ -563,11 +774,111 @@ public final class RebalanceContent {
         }
     }
 
-    private static void checkPrefix(List<String> errors, Map<String, JsonObject> files, String prefix) {
+    private static void checkPrefix(List<String> errors, Map<String, JsonObject> files, String prefix,
+            String... exempt) {
         for (String path : files.keySet()) {
-            if (!path.startsWith(prefix)) {
-                errors.add("file written outside " + prefix + ": " + path);
+            if (path.startsWith(prefix)) {
+                continue;
             }
+            if (List.of(exempt).contains(path)) {
+                continue;
+            }
+            errors.add("file written outside " + prefix + ": " + path);
+        }
+    }
+
+    private static void checkAscending(List<String> errors, String ladder, int... gates) {
+        for (int i = 1; i < gates.length; i++) {
+            if (gates[i] <= gates[i - 1]) {
+                errors.add(ladder + " is not strictly ascending: gate " + gates[i]
+                        + " does not follow " + gates[i - 1]);
+            }
+        }
+    }
+
+    // --- Ladder spot checks -------------------------------------------------
+
+    /** The pack's gear_existence file for an item, whichever map it was written into. */
+    private static JsonObject findGear(List<String> errors, Content content, String item) {
+        JsonObject json = content.geGearExistence.get(GE_GEAR + file(item));
+        if (json == null) {
+            json = content.iafGearExistence.get(IAF_GEAR + file(item));
+        }
+        if (json == null) {
+            errors.add("expected a gear_existence file for " + item);
+        }
+        return json;
+    }
+
+    private static void expectRung(List<String> errors, Content content, String item, int maxEP, double epGain,
+            String target) {
+        expectRungAt(errors, item, findGear(errors, content, item), maxEP, epGain, target);
+    }
+
+    private static void expectRungAt(List<String> errors, String item, JsonObject json, int maxEP, double epGain,
+            String target) {
+        if (json == null) {
+            return;
+        }
+        expectInt(errors, item, "maxEP", maxEP, json);
+        expectRate(errors, item, epGain, json);
+        String found = json.has("evolution") ? json.get("evolution").getAsString() : null;
+        if (!target.equals(found)) {
+            errors.add(item + " should evolve into " + target + ", found "
+                    + (found == null ? "nothing" : found));
+        }
+    }
+
+    private static void expectTerminal(List<String> errors, Content content, String item, int minEP, double epGain) {
+        JsonObject json = findGear(errors, content, item);
+        if (json == null) {
+            return;
+        }
+        if (json.has("maxEP")) {
+            errors.add(item + " should be terminal but carries maxEP " + json.get("maxEP"));
+        }
+        if (json.has("evolution") || json.has("evolutionOptions")) {
+            errors.add(item + " should be terminal but names an evolution");
+        }
+        expectInt(errors, item, "minEP", minEP, json);
+        expectRate(errors, item, epGain, json);
+    }
+
+    private static void expectInert(List<String> errors, Content content, String item) {
+        JsonObject json = findGear(errors, content, item);
+        if (json == null) {
+            return;
+        }
+        expectInt(errors, item, "maxEP", 0, json);
+        if (json.has("evolution") || json.has("evolutionOptions")) {
+            errors.add(item + " is inert but names an evolution");
+        }
+    }
+
+    private static void expectChainRung(List<String> errors, Content content, String item, int maxEP, double epGain) {
+        JsonObject json = content.addonChains.get(chainPath(id(item)));
+        if (json == null) {
+            errors.add("expected an addon_chains file for " + item);
+            return;
+        }
+        expectInt(errors, item + " chain", "maxEP", maxEP, json);
+        expectRate(errors, item + " chain", epGain, json);
+        if (!json.has("evolution") && !json.has("evolutionOptions")) {
+            errors.add(item + " chain names no evolution");
+        }
+    }
+
+    private static void expectInt(List<String> errors, String item, String field, int wanted, JsonObject json) {
+        if (!json.has(field) || json.get(field).getAsInt() != wanted) {
+            errors.add(item + " should have " + field + " " + wanted + ", found "
+                    + (json.has(field) ? json.get(field) : "nothing"));
+        }
+    }
+
+    private static void expectRate(List<String> errors, String item, double wanted, JsonObject json) {
+        if (!json.has("epGain") || json.get("epGain").getAsDouble() != wanted) {
+            errors.add(item + " should earn " + wanted + " EP per point, found "
+                    + (json.has("epGain") ? json.get("epGain") : "nothing"));
         }
     }
 

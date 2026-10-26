@@ -1,7 +1,7 @@
 {
-  "epGain": 0.02,
+  "epGain": 0.01,
   "evolution": "iceandfire:deathworm_white_leggings",
   "item": "iceandfire:frost_troll_leather_leggings",
-  "maxEP": 45000,
+  "maxEP": 18000,
   "minEP": 0
 }

@@ -3,8 +3,8 @@
   "engravings": {
     "tensura:elemental_resistance": 1
   },
-  "epGain": 0.02,
+  "epGain": 0.03,
   "evolution": "iceandfire:dragonsteel_fire_boots",
-  "maxEP": 225000,
+  "maxEP": 750000,
   "minEP": 0
 }

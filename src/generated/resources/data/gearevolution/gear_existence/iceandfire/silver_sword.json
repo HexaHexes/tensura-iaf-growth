@@ -3,7 +3,7 @@
   "engravings": {
     "tensura:holy_coat": 1
   },
-  "epGain": 0.02,
+  "epGain": 0.01,
   "evolution": "iceandfire:dragonbone_sword",
   "maxEP": 18000,
   "minEP": 0

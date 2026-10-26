@@ -1,5 +1,5 @@
 {
-  "epGain": 0.02,
+  "epGain": 0.025,
   "evolutionOptions": [
     "iceandfire:armor_red_helmet",
     "iceandfire:armor_green_helmet",
@@ -15,6 +15,6 @@
     "iceandfire:armor_black_helmet"
   ],
   "item": "iceandfire:tide_bronze_helmet",
-  "maxEP": 80000,
+  "maxEP": 225000,
   "minEP": 0
 }

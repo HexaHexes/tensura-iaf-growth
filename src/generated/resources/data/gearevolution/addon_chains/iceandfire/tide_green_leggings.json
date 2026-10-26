@@ -1,5 +1,5 @@
 {
-  "epGain": 0.02,
+  "epGain": 0.025,
   "evolutionOptions": [
     "iceandfire:armor_red_leggings",
     "iceandfire:armor_green_leggings",
@@ -15,6 +15,6 @@
     "iceandfire:armor_black_leggings"
   ],
   "item": "iceandfire:tide_green_leggings",
-  "maxEP": 80000,
+  "maxEP": 225000,
   "minEP": 0
 }

@@ -1,0 +1,7 @@
+{
+  "type": "tensura:short_bow",
+  "epGain": 0.003,
+  "evolution": "iceandfire:dragonbone_bow",
+  "maxEP": 3600,
+  "minEP": 0
+}
