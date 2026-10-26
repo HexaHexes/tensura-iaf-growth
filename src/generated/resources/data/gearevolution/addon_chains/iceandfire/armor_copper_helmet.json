@@ -1,0 +1,10 @@
+{
+  "epGain": 0.03,
+  "evolutionOptions": [
+    "iceandfire:dragonsteel_lightning_helmet",
+    "tensura:mithril_helmet"
+  ],
+  "item": "iceandfire:armor_copper_helmet",
+  "maxEP": 750000,
+  "minEP": 0
+}

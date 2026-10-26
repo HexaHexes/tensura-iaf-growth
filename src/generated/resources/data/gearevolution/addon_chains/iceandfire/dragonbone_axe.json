@@ -1,11 +1,24 @@
 {
-  "epGain": 0.03,
+  "epGain": 0.025,
   "evolutionOptions": [
-    "iceandfire:dragonsteel_fire_axe",
-    "iceandfire:dragonsteel_ice_axe",
-    "iceandfire:dragonsteel_lightning_axe"
+    {
+      "id": "iceandfire:dragonsteel_fire_axe",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_ice_axe",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_lightning_axe",
+      "weight": 1
+    },
+    {
+      "id": "tensura:mithril_axe",
+      "weight": 3
+    }
   ],
   "item": "iceandfire:dragonbone_axe",
-  "maxEP": 750000,
+  "maxEP": 225000,
   "minEP": 0
 }

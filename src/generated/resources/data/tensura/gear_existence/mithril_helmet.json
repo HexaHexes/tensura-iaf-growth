@@ -3,8 +3,8 @@
   "engravings": {
     "tensura:holy_coat": 2
   },
-  "epGain": 0.025,
+  "epGain": 0.03,
   "evolution": "tensura:adamantite_helmet",
-  "maxEP": 225000,
-  "minEP": 7800
+  "maxEP": 1000000,
+  "minEP": 750000
 }

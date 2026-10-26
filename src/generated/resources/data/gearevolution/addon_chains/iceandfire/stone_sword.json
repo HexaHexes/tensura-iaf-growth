@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:iron_sword",
+    "iceandfire:copper_sword"
+  ],
+  "item": "minecraft:stone_sword",
+  "maxEP": 500,
+  "minEP": 0
+}

@@ -1,0 +1,10 @@
+{
+  "epGain": 0.03,
+  "evolutionOptions": [
+    "iceandfire:dragonsteel_fire_chestplate",
+    "tensura:mithril_chestplate"
+  ],
+  "item": "iceandfire:armor_bronze_chestplate",
+  "maxEP": 750000,
+  "minEP": 0
+}

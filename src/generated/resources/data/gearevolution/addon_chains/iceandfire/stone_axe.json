@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:iron_axe",
+    "iceandfire:copper_axe"
+  ],
+  "item": "minecraft:stone_axe",
+  "maxEP": 500,
+  "minEP": 0
+}

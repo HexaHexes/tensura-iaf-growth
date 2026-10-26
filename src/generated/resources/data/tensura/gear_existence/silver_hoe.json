@@ -4,7 +4,7 @@
     "tensura:holy_coat": 1
   },
   "epGain": 0.02,
-  "evolution": "tensura:mithril_hoe",
+  "evolution": "iceandfire:dragonbone_hoe",
   "maxEP": 52000,
   "minEP": 0
 }

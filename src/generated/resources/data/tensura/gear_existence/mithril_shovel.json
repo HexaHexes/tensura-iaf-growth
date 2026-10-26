@@ -5,6 +5,6 @@
   },
   "epGain": 0.025,
   "evolution": "tensura:adamantite_shovel",
-  "maxEP": 225000,
-  "minEP": 52000
+  "maxEP": 500000,
+  "minEP": 225000
 }

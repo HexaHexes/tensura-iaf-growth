@@ -4,5 +4,5 @@
     "tensura:tsukumogami": 1
   },
   "epGain": 0.04,
-  "minEP": 750000
+  "minEP": 225000
 }

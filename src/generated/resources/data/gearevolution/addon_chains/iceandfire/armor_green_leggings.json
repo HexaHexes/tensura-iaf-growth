@@ -1,0 +1,10 @@
+{
+  "epGain": 0.03,
+  "evolutionOptions": [
+    "iceandfire:dragonsteel_fire_leggings",
+    "tensura:mithril_leggings"
+  ],
+  "item": "iceandfire:armor_green_leggings",
+  "maxEP": 750000,
+  "minEP": 0
+}

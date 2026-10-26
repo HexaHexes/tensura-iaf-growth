@@ -1,0 +1,11 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:chainmail_boots",
+    "iceandfire:armor_copper_metal_boots",
+    "tensura:monster_leather_boots_d"
+  ],
+  "item": "minecraft:leather_boots",
+  "maxEP": 550,
+  "minEP": 0
+}

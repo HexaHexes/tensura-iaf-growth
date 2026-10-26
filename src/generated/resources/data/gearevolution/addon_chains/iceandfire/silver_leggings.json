@@ -1,0 +1,11 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "iceandfire:mountain_troll_leather_leggings",
+    "iceandfire:forest_troll_leather_leggings",
+    "iceandfire:frost_troll_leather_leggings"
+  ],
+  "item": "tensura:silver_leggings",
+  "maxEP": 7800,
+  "minEP": 0
+}

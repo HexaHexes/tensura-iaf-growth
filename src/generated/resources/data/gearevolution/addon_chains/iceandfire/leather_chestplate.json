@@ -1,0 +1,11 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:chainmail_chestplate",
+    "iceandfire:armor_copper_metal_chestplate",
+    "tensura:monster_leather_chestplate_d"
+  ],
+  "item": "minecraft:leather_chestplate",
+  "maxEP": 550,
+  "minEP": 0
+}

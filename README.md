@@ -7,9 +7,11 @@ ladder, including **branching evolutions** - one item can forge into several
 different sets, rolled at random when it evolves.
 
 Ice and Fire gear starts on the vanilla progression - the same early pace as
-leather, iron and diamond gear - and from there joins Tensura's own metals
-ladder, so every rung climbs where Tensura gear of that tier climbs. Each rung
-is engraved the way Tensura engraves its own equipment at that power level.
+leather and stone gear - but the vanilla opening forks, so either branch of the
+vanilla line can cross into this mod's copper ladder, and from there into
+Tensura's own metals ladder, so every rung climbs where Tensura gear of that
+tier climbs. Each rung is engraved the way Tensura engraves its own equipment
+at that power level.
 
 ## Dragon growth
 
@@ -41,48 +43,67 @@ abilities are unchanged.
 
 ## Armor chain
 
-`Sheep Disguise -> Copper -> Silver -> Troll Leather -> Death Worm Chitin ->
-Sea Serpent Scale -> Dragon Scale -> Dragon Steel`
+`Leather / Sheep Disguise -> Copper -> Silver -> Troll Leather ->
+Death Worm Chitin -> Sea Serpent Scale -> Dragon Scale ->
+Dragon Steel or Mithril`
+
+The vanilla opening forks instead of stepping straight on: at 550 EP leather
+armor rolls between chainmail, Ice and Fire copper and Tensura's monster
+leather (rank D). The chainmail branch then continues on vanilla's own iron ->
+diamond -> netherite line, monster leather climbs Tensura's D -> C -> B -> A
+ranks, and only the copper branch joins the ladder below.
 
 Copper does not commit to one silver: it rolls at random into either Ice and
-Fire silver (climbing the chain above) or Tensura's silver, which forges up
-Tensura's own metals ladder instead - see the Tensura silver and mithril
-section below.
+Fire silver (climbing the chain above) or Tensura's silver, which forges the
+same way - see the Tensura silver and mithril section below.
 
 | Step | Evolves at | Outcome |
 |---|---|---|
+| Leather armor | 550 | **Random**: Chainmail, Copper, or Monster Leather (rank D) |
 | Sheep Disguise | 550 | Copper |
 | Copper | 3,200 | **Random**: Ice and Fire Silver or Tensura Silver |
 | Silver | 7,800 | **Random** of the three troll leather sets (mountain / forest / frost) |
 | Troll Leather | 18,000 | The paired death worm chitin: mountain -> red, forest -> yellow, frost -> white |
 | Death Worm Chitin | 52,000 | **Random** of the seven sea serpent (Tide Guardian) sets |
 | Sea Serpent Scale | 225,000 | **Random** of the twelve dragon scale sets |
-| Dragon Scale | 750,000 | Dragon steel of that dragon's element (fire / ice / lightning) |
-| Dragon Steel | Top of the ladder | Keeps earning EP from 750,000 onward |
+| Dragon Scale | 750,000 | **Random**: dragon steel of that dragon's element or mithril armor |
+| Mithril armor | 1,000,000 | Adamantite armor |
+| Adamantite armor | 1,250,000 | Hihiirokane armor |
+| Dragon Steel / Hihiirokane | Top of the ladder | No further evolution: both keep earning EP |
 
 All three death worm chitin sets are the same tier, so any of them can reach any
 of the seven sea serpent sets, and any sea serpent set can reach any of the
-twelve dragon scale sets. Dragon scale armor then always forges into the dragon
-steel set of its own element: red, green, bronze and gray are fire dragons;
+twelve dragon scale sets. Dragon scale armor then rolls between the dragon
+steel set of its own element - red, green, bronze and gray are fire dragons;
 blue, white, sapphire and silver are ice; electric, amethyst, copper and black
-are lightning.
+are lightning - and Tensura's mithril armor, which forges on through
+adamantite into hihiirokane.
 
 ## Tools and weapons chain
 
-`Copper -> Silver -> Dragon Bone -> (Blooded Dragon Bone) -> Dragon Steel`
+`Stone -> Copper -> Silver -> Dragon Bone -> Dragon Steel (or Mithril)`
+
+Just like leather armor, the vanilla opening forks here: at 500 EP every stone
+tool (sword, axe, pickaxe, shovel, hoe) rolls between iron and Ice and Fire
+copper. The iron branch continues on vanilla's own iron -> diamond -> netherite
+line, only the copper branch joins the ladder below.
 
 | Step | Evolves at | Outcome |
 |---|---|---|
+| Stone tools | 500 | **Random**: Iron or Copper |
 | Copper | 3,200 | **Random**: Ice and Fire Silver or Tensura Silver |
 | Silver sword / axe / pickaxe / shovel / hoe | 52,000 | Dragon Bone |
-| Dragon Bone sword | 225,000 | **Random** blooded (elemental) dragon bone sword |
-| Dragon Bone axe / pickaxe / shovel / hoe | 750,000 | **Random** dragon steel of one of the three elements |
+| Dragon Bone sword | 225,000 | **Random**: blooded (elemental) dragon bone sword or mithril sword |
+| Dragon Bone axe / pickaxe / shovel / hoe | 225,000 | **Random**: dragon steel of one of the three elements or mithril tool |
 | Blooded Dragon Bone sword | 750,000 | Dragon steel sword of the matching element |
-| Dragon Steel | Top of the ladder | Keeps earning EP from 750,000 onward |
+| Dragon steel tools | Top of the ladder | Keep earning EP from 225,000 onward |
+| Dragon steel sword | Top of the ladder | Keeps earning EP from 750,000 onward |
 
-Every silver tool and weapon hands off together at the 52,000 rung. Swords
-still carry the extra blooded tier further up, at 225,000, so both ladders
-finish together at 750,000.
+Both dragon bone forks roll 50/50 between the two branches: the three element
+skins of the existing branch share one half of the roll, mithril the other, no
+matter how many skins a branch carries. A sword that takes the old branch gets
+its extra blooded tier at 225,000 and forges on to 750,000; the other tools
+hand straight off at 225,000, so both ladders reach dragon steel together.
 
 ## Bow chain
 
@@ -104,10 +125,13 @@ back into Tensura's own bows.
 
 How fast a rung earns EP follows its gate: a steady trickle on the vanilla
 rungs and the whole bow ladder (0.003), then 0.01 / 0.02 / 0.025 / 0.03 across
-the 18,000 / 52,000 / 225,000 / 750,000 rungs. Ladder tops that keep earning do
-so at 0.04 for dragon steel, 0.025 for the Blade of the Dreaded Queen, the
-Dread Queen's Staff and the red death worm gauntlet, and 0.003 for gear with no
-ladder at all.
+the 18,000 / 52,000 / 225,000 / 750,000 rungs. The mithril bands keep the rate
+of the rung they sit on: weapons and tools earn at 0.025 across their
+225,000 -> 500,000 band, armor at 0.03 across 750,000 -> 1,000,000, and the
+re-banded adamantite armor at the top rate of 0.04 across 1,000,000 ->
+1,250,000. Ladder tops that keep earning do so at 0.04 for dragon steel, 0.025
+for the Blade of the Dreaded Queen, the Dread Queen's Staff and the red death
+worm gauntlet, and 0.003 for gear with no ladder at all.
 
 ## Other gear
 
@@ -127,7 +151,8 @@ ladder at all.
 A few Tensura items had no working progression anywhere - this mod plugs them:
 
 - **Silver hoe, pickaxe and shovel** now evolve like every other Tensura silver
-  item: at 52,000 EP into their mithril counterpart, engraved with Holy Coat I.
+  item with an Ice and Fire counterpart: at 52,000 EP into the dragon bone tool
+  of the same name, engraved with Holy Coat I.
 - **Kunai** evolves into the pure magisteel kunai at 52,000 EP, exactly where
   Tensura's own pure magisteel tier begins.
 - **Goblin club** and **severer blade** have no upgrade line: they stay usable
@@ -135,21 +160,30 @@ A few Tensura items had no working progression anywhere - this mod plugs them:
 
 ## Tensura silver and mithril
 
-Tensura's own silver and mithril gear climbs the same spine as Ice and Fire's,
-so both branches of the copper fork move at the same pace:
+Tensura's own silver gear rejoins the Ice and Fire chain instead of running
+beside it, and mithril now enters the ladder as a dragon bone or dragon scale
+fork outcome rather than a tier of its own:
 
 | Step | Evolves at | Outcome |
 |---|---|---|
-| Tensura silver armor | 7,800 | Mithril armor |
-| Tensura silver weapons and tools | 52,000 | Mithril weapon or tool |
-| Mithril armor | 225,000 | Adamantite armor |
-| Mithril weapons and tools | 225,000 | Adamantite weapon or tool |
-| Adamantite and above | Tensura's own ladder | Climbs on through hihiirokane |
+| Tensura silver armor | 7,800 | **Random** of the three troll leather sets, same as Ice and Fire silver |
+| Tensura silver sword / axe / hoe / pickaxe / shovel | 52,000 | Dragon Bone of the same name |
+| Tensura silver great sword, katana, kodachi, long sword, odachi, scythe, short sword, sickle, spear, tachi | 225,000 | The matching mithril weapon |
+| Mithril weapons and tools | 500,000 | Adamantite weapon or tool |
+| Mithril armor | 1,000,000 | Adamantite armor |
+| Adamantite armor | 1,250,000 | Hihiirokane armor |
+| Adamantite weapons and tools | Tensura's own ladder (225,000 to 750,000) | Hihiirokane |
 
-Silver hands off exactly where the matching Ice and Fire silver item does -
-7,800 for armor, 52,000 for every weapon and tool - and mithril starts earning
-at that same point and forges on to 225,000, where Tensura's adamantite tier
-begins. Mithril gear keeps Tensura's Holy Coat II engraving.
+The ten exotic silver weapons with no Ice and Fire counterpart hold their silver
+tier all the way to the 225,000 dragon bone fork gate and step straight into
+mithril there; the sword, axe and the three tools step onto dragon bone at
+52,000 like Ice and Fire silver does, and mithril is then one of the fork
+outcomes they roll for at 225,000. Mithril weapons and tools floor at that same
+225,000 and forge on to 500,000, inside the adamantite band Tensura ships
+untouched; mithril armor floors at the 750,000 dragon scale fork and forges on
+to 1,000,000, where this mod re-bands Tensura's adamantite armor to accept the
+carry instead of blowing straight through it. Mithril gear keeps Tensura's
+Holy Coat II engraving.
 
 ## Engravings
 

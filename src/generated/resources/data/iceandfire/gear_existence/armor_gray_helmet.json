@@ -3,8 +3,7 @@
   "engravings": {
     "tensura:elemental_resistance": 1
   },
-  "epGain": 0.03,
-  "evolution": "iceandfire:dragonsteel_fire_helmet",
-  "maxEP": 750000,
+  "epGain": 0,
+  "maxEP": 0,
   "minEP": 0
 }
