@@ -118,13 +118,15 @@ Before starting any new development in this repo:
 
 1. `git status` - confirm what uncommitted work exists. Never disturb or sweep it.
 2. `git pull --ff-only` - sync with the remote. A fast-forward is the normal case,
-   because we push straight to the shared branch.
+   because history on `main` is never rewritten.
 3. If the pull would **not** fast-forward (the branch has diverged), or if it would
    collide with local uncommitted work, **stop and ask** rather than merging, rebase
    or stashing on your own.
 
-This repo currently has **no remote configured**. Create none, and push nothing,
-without the user's explicit go.
+**Remote:** `github.com/HexaHexes/tensura-iaf-growth` (public, default branch
+`main`). Direct pushes to `main` are blocked by branch rulesets - land changes
+through a PR. Push anything only after checks are green and the user has given
+the go.
 
 ## Scope doctrine
 
@@ -178,7 +180,8 @@ without the user's explicit go.
 
 ## Git & release
 
-- No remote yet. Push only after checks are green **and** the user has given the go.
+- Push only after checks are green **and** the user has given the go. `main`
+  accepts changes only through a squash PR (branch rulesets enforce it).
 - Never sweep the user's uncommitted work into a commit - commit only what is intended.
 - Commit subjects: concise, imperative. No emojis, ever.
 - **Version bump on finish:** always bump `mod_version` in `gradle.properties`
@@ -219,8 +222,13 @@ without the user's explicit go.
   bundle work; a PR labelled `breaking` forces the next clean bump to raise the major
   or minor version). This repo has no JUnit or GameTest suite, so it does not use the
   template's `junit`/`gametest` jobs - the drift check is this repo's non-vacuous test.
-- **No branch protection exists yet** (no remote). When a remote is added, the
-  rulesets must require `build` and `version-bump`.
+- **Branch protection:** two active repository rulesets, identical in shape to
+  every other HexaHexes repo: `protect-main` (squash-only PRs,
+  `required_status_checks` with strict up-to-date policy on `build` and
+  `version-bump`, no fast-forward pushes, no branch deletion) and
+  `require-review-from-write-access` (one approving review; the three org
+  maintainers bypass). If a job in `ci.yml` is ever renamed, update the
+  required contexts to match or every PR blocks.
 - `version-bump.yml` opens an isolated version-bump PR (only `gradle.properties`
   changes).
 - `release.yml` runs on pushes to the default branch: when `gradle.properties`
