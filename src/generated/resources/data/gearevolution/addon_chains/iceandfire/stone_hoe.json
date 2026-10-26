@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:iron_hoe",
+    "iceandfire:copper_hoe"
+  ],
+  "item": "minecraft:stone_hoe",
+  "maxEP": 500,
+  "minEP": 0
+}

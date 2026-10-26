@@ -1,0 +1,10 @@
+{
+  "type": "tensura:mithril_sword",
+  "engravings": {
+    "tensura:holy_coat": 2
+  },
+  "epGain": 0.025,
+  "evolution": "tensura:adamantite_sword",
+  "maxEP": 500000,
+  "minEP": 225000
+}

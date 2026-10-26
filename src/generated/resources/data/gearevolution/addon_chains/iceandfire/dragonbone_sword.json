@@ -1,9 +1,22 @@
 {
   "epGain": 0.025,
   "evolutionOptions": [
-    "iceandfire:dragonbone_sword_fire",
-    "iceandfire:dragonbone_sword_ice",
-    "iceandfire:dragonbone_sword_lightning"
+    {
+      "id": "iceandfire:dragonbone_sword_fire",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonbone_sword_ice",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonbone_sword_lightning",
+      "weight": 1
+    },
+    {
+      "id": "tensura:mithril_sword",
+      "weight": 3
+    }
   ],
   "item": "iceandfire:dragonbone_sword",
   "maxEP": 225000,

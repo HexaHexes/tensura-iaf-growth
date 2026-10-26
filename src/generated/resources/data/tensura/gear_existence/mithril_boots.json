@@ -1,0 +1,10 @@
+{
+  "type": "tensura:mithril_boots",
+  "engravings": {
+    "tensura:holy_coat": 2
+  },
+  "epGain": 0.03,
+  "evolution": "tensura:adamantite_boots",
+  "maxEP": 1000000,
+  "minEP": 750000
+}

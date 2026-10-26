@@ -1,11 +1,24 @@
 {
-  "epGain": 0.03,
+  "epGain": 0.025,
   "evolutionOptions": [
-    "iceandfire:dragonsteel_fire_shovel",
-    "iceandfire:dragonsteel_ice_shovel",
-    "iceandfire:dragonsteel_lightning_shovel"
+    {
+      "id": "iceandfire:dragonsteel_fire_shovel",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_ice_shovel",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_lightning_shovel",
+      "weight": 1
+    },
+    {
+      "id": "tensura:mithril_shovel",
+      "weight": 3
+    }
   ],
   "item": "iceandfire:dragonbone_shovel",
-  "maxEP": 750000,
+  "maxEP": 225000,
   "minEP": 0
 }

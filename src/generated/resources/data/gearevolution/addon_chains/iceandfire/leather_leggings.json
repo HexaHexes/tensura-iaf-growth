@@ -1,0 +1,11 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:chainmail_leggings",
+    "iceandfire:armor_copper_metal_leggings",
+    "tensura:monster_leather_leggings_d"
+  ],
+  "item": "minecraft:leather_leggings",
+  "maxEP": 550,
+  "minEP": 0
+}

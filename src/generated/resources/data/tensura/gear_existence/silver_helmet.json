@@ -1,0 +1,9 @@
+{
+  "type": "tensura:silver_helmet",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0,
+  "maxEP": 0,
+  "minEP": 0
+}

@@ -1,0 +1,7 @@
+{
+  "type": "tensura:adamantite_chestplate",
+  "epGain": 0.04,
+  "evolution": "tensura:hihiirokane_chestplate",
+  "maxEP": 1250000,
+  "minEP": 1000000
+}

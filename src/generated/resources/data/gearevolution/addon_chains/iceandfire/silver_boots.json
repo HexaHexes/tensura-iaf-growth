@@ -1,0 +1,11 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "iceandfire:mountain_troll_leather_boots",
+    "iceandfire:forest_troll_leather_boots",
+    "iceandfire:frost_troll_leather_boots"
+  ],
+  "item": "tensura:silver_boots",
+  "maxEP": 7800,
+  "minEP": 0
+}

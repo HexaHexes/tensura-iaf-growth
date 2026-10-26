@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "iceandfire:armor_silver_metal_helmet",
+    "tensura:silver_helmet"
+  ],
+  "item": "iceandfire:armor_copper_metal_helmet",
+  "maxEP": 3200,
+  "minEP": 0
+}

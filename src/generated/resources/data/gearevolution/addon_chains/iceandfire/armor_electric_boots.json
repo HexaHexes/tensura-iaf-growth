@@ -1,0 +1,10 @@
+{
+  "epGain": 0.03,
+  "evolutionOptions": [
+    "iceandfire:dragonsteel_lightning_boots",
+    "tensura:mithril_boots"
+  ],
+  "item": "iceandfire:armor_electric_boots",
+  "maxEP": 750000,
+  "minEP": 0
+}

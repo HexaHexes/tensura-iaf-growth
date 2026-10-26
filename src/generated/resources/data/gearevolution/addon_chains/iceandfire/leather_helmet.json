@@ -1,0 +1,11 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:chainmail_helmet",
+    "iceandfire:armor_copper_metal_helmet",
+    "tensura:monster_leather_helmet_d"
+  ],
+  "item": "minecraft:leather_helmet",
+  "maxEP": 550,
+  "minEP": 0
+}

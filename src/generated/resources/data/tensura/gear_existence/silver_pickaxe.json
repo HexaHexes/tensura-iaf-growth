@@ -3,8 +3,8 @@
   "engravings": {
     "tensura:holy_coat": 1
   },
-  "epGain": 0.003,
-  "evolution": "tensura:mithril_pickaxe",
-  "maxEP": 3800,
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonbone_pickaxe",
+  "maxEP": 52000,
   "minEP": 0
 }

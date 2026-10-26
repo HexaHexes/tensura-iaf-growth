@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "iceandfire:silver_sword",
+    "tensura:silver_sword"
+  ],
+  "item": "iceandfire:copper_sword",
+  "maxEP": 3200,
+  "minEP": 0
+}

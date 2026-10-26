@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:iron_shovel",
+    "iceandfire:copper_shovel"
+  ],
+  "item": "minecraft:stone_shovel",
+  "maxEP": 500,
+  "minEP": 0
+}

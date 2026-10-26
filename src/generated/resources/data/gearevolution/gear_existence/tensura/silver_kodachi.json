@@ -1,0 +1,10 @@
+{
+  "type": "tensura:silver_kodachi",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.025,
+  "evolution": "tensura:mithril_kodachi",
+  "maxEP": 225000,
+  "minEP": 0
+}

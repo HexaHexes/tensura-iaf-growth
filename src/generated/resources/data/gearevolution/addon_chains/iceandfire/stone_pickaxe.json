@@ -1,0 +1,10 @@
+{
+  "epGain": 0.003,
+  "evolutionOptions": [
+    "minecraft:iron_pickaxe",
+    "iceandfire:copper_pickaxe"
+  ],
+  "item": "minecraft:stone_pickaxe",
+  "maxEP": 500,
+  "minEP": 0
+}

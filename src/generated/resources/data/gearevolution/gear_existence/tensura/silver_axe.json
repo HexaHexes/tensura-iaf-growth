@@ -1,0 +1,10 @@
+{
+  "type": "tensura:silver_axe",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.02,
+  "evolution": "iceandfire:dragonbone_axe",
+  "maxEP": 52000,
+  "minEP": 0
+}

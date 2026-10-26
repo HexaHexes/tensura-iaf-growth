@@ -1,0 +1,10 @@
+{
+  "type": "tensura:silver_long_sword",
+  "engravings": {
+    "tensura:holy_coat": 1
+  },
+  "epGain": 0.025,
+  "evolution": "tensura:mithril_long_sword",
+  "maxEP": 225000,
+  "minEP": 0
+}
