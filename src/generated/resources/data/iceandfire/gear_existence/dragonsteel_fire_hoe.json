@@ -3,7 +3,6 @@
   "engravings": {
     "tensura:tsukumogami": 1
   },
-  "epGain": 0.003,
-  "maxEP": 750000,
-  "minEP": 0
+  "epGain": 0.04,
+  "minEP": 750000
 }

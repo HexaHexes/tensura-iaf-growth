@@ -1,11 +1,11 @@
 {
-  "epGain": 0.02,
+  "epGain": 0.025,
   "evolutionOptions": [
     "iceandfire:dragonbone_sword_fire",
     "iceandfire:dragonbone_sword_ice",
     "iceandfire:dragonbone_sword_lightning"
   ],
   "item": "iceandfire:dragonbone_sword",
-  "maxEP": 52000,
+  "maxEP": 225000,
   "minEP": 0
 }

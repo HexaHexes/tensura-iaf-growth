@@ -6,9 +6,10 @@ gives Ice and Fire equipment a full evolution progression along Tensura's own EP
 ladder, including **branching evolutions** - one item can forge into several
 different sets, rolled at random when it evolves.
 
-Ice and Fire gear climbs at exactly the same pace as Tensura gear, using
-Tensura's own EP thresholds, and each rung is engraved the way Tensura engraves
-its own equipment at that power level.
+Ice and Fire gear starts on the vanilla progression - the same early pace as
+leather, iron and diamond gear - and from there joins Tensura's own metals
+ladder, so every rung climbs where Tensura gear of that tier climbs. Each rung
+is engraved the way Tensura engraves its own equipment at that power level.
 
 ## Dragon growth
 
@@ -45,14 +46,14 @@ Sea Serpent Scale -> Dragon Scale -> Dragon Steel`
 
 | Step | Evolves at | Outcome |
 |---|---|---|
-| Sheep Disguise | 6,000 | Copper |
-| Copper | 10,000 | Silver |
-| Silver | 18,000 | **Random** of the three troll leather sets (mountain / forest / frost) |
-| Troll Leather | 45,000 | The paired death worm chitin: mountain -> red, forest -> yellow, frost -> white |
+| Sheep Disguise | 550 | Copper |
+| Copper | 3,200 | Silver |
+| Silver | 7,800 | **Random** of the three troll leather sets (mountain / forest / frost) |
+| Troll Leather | 18,000 | The paired death worm chitin: mountain -> red, forest -> yellow, frost -> white |
 | Death Worm Chitin | 52,000 | **Random** of the seven sea serpent (Tide Guardian) sets |
-| Sea Serpent Scale | 80,000 | **Random** of the twelve dragon scale sets |
-| Dragon Scale | 225,000 | Dragon steel of that dragon's element (fire / ice / lightning) |
-| Dragon Steel | 750,000 | Top of the ladder - keeps earning EP |
+| Sea Serpent Scale | 225,000 | **Random** of the twelve dragon scale sets |
+| Dragon Scale | 750,000 | Dragon steel of that dragon's element (fire / ice / lightning) |
+| Dragon Steel | Top of the ladder | Keeps earning EP from 750,000 onward |
 
 All three death worm chitin sets are the same tier, so any of them can reach any
 of the seven sea serpent sets, and any sea serpent set can reach any of the
@@ -67,14 +68,42 @@ are lightning.
 
 | Step | Evolves at | Outcome |
 |---|---|---|
-| Copper | 6,000 | Silver |
-| Silver | 18,000 | Dragon Bone |
-| Dragon Bone sword | 52,000 | **Random** blooded (elemental) dragon bone sword |
-| Dragon Bone axe / pickaxe / shovel / hoe | 52,000 | **Random** dragon steel of one of the three elements |
-| Blooded Dragon Bone sword | 225,000 | Dragon steel sword of the matching element |
-| Dragon Steel | 750,000 | Top of the ladder - keeps earning EP |
+| Copper | 3,200 | Silver |
+| Silver sword | 18,000 | Dragon Bone |
+| Silver axe / pickaxe / shovel / hoe | 52,000 | Dragon Bone |
+| Dragon Bone sword | 225,000 | **Random** blooded (elemental) dragon bone sword |
+| Dragon Bone axe / pickaxe / shovel / hoe | 750,000 | **Random** dragon steel of one of the three elements |
+| Blooded Dragon Bone sword | 750,000 | Dragon steel sword of the matching element |
+| Dragon Steel | Top of the ladder | Keeps earning EP from 750,000 onward |
 
-The dragon bone bow tops out on its own, since there is no dragon steel bow.
+Swords join the ladder a rung earlier than the other tools because they carry
+the extra blooded tier in between; both ladders still finish together at
+750,000.
+
+## Bow chain
+
+`Bow -> Short Bow -> Dragon Bone Bow -> Long Bow -> War Bow`
+
+| Step | Evolves at | Outcome |
+|---|---|---|
+| Bow | 700 | Short Bow |
+| Short Bow | 3,600 | Dragon Bone Bow |
+| Dragon Bone Bow | 7,200 | Tensura's Long Bow |
+| Long Bow | 12,500 | War Bow |
+| War Bow | Top of the ladder | Keeps earning EP, capped at 16,000 |
+
+The dragon bone bow is slotted between Tensura's short and long bow by damage
+and draw speed, so the vanilla bow line flows through Ice and Fire and straight
+back into Tensura's own bows.
+
+## EP rates
+
+How fast a rung earns EP follows its gate: a steady trickle on the vanilla
+rungs and the whole bow ladder (0.003), then 0.01 / 0.02 / 0.025 / 0.03 across
+the 18,000 / 52,000 / 225,000 / 750,000 rungs. Ladder tops that keep earning do
+so at 0.04 for dragon steel, 0.025 for the Blade of the Dreaded Queen, the
+Dread Queen's Staff and the red death worm gauntlet, and 0.003 for gear with no
+ladder at all.
 
 ## Other gear
 

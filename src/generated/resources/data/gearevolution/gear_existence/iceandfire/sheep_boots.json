@@ -1,7 +1,7 @@
 {
   "type": "iceandfire:sheep_boots",
-  "epGain": 0.02,
+  "epGain": 0.003,
   "evolution": "iceandfire:armor_copper_metal_boots",
-  "maxEP": 6000,
+  "maxEP": 550,
   "minEP": 0
 }

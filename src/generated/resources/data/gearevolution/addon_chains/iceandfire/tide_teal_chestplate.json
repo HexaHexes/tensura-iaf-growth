@@ -1,5 +1,5 @@
 {
-  "epGain": 0.02,
+  "epGain": 0.025,
   "evolutionOptions": [
     "iceandfire:armor_red_chestplate",
     "iceandfire:armor_green_chestplate",
@@ -15,6 +15,6 @@
     "iceandfire:armor_black_chestplate"
   ],
   "item": "iceandfire:tide_teal_chestplate",
-  "maxEP": 80000,
+  "maxEP": 225000,
   "minEP": 0
 }

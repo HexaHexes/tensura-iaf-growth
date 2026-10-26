@@ -37,20 +37,24 @@ generator used to exist and has been deleted deliberately.
 
 ## Gotchas (do not regress them)
 
-- **Four directories, three consumers.**
+- **Five paths, three consumers.**
   `data/gearevolution/gear_existence/iceandfire/` is read by Gear Evolution
   *and* by Tensura's `gear_existence` datapack registry; the same registry also
   reads `data/iceandfire/gear_existence/` (namespace `iceandfire`), which is
   where the `tensura_iaf` addon ships its own files and therefore where this
   mod must write shadow copies or the addon's thresholds would win;
-  `data/gearevolution/addon_chains/iceandfire/` is read only by Gear Evolution.
-  A `gear_existence` file carries exactly one `evolution`; branching exists
-  **only** in `addon_chains` (`evolutionOptions`).
+  `data/gearevolution/addon_chains/iceandfire/` is read only by Gear Evolution;
+  and exactly one file sits at `data/gearevolution/gear_existence/tensura/` -
+  our `short_bow.json`, a same-path override of Gear Evolution's own rung (see
+  the bow carve-outs). A `gear_existence` file carries exactly one `evolution`;
+  branching exists **only** in `addon_chains` (`evolutionOptions`).
 - **The same item legitimately appears under both gear_existence paths**, so
   Tensura sees two entries for it. Keep their values identical: engravings are
   applied with `stack.enchant` (idempotent) but differing `maxEP`/`epGain`
   would race. The datagen's path-prefix and set assertions exist to catch this.
-- **`type` and `item` must carry the `iceandfire:` namespace.** An unqualified
+- **`type` and `item` must carry the `iceandfire:` namespace** - with one
+  carve-out: the short_bow override's `type` is `tensura:short_bow`, because
+  that file replaces Gear Evolution's file for a Tensura item. An unqualified
   id parses as `minecraft:<name>` and matches no item, silently. Validated.
 - **Addon chains win.** When an item has an addon chain, Gear Evolution uses it
   in preference to both the built-in chain and the `gear_existence` override for
@@ -61,6 +65,23 @@ generator used to exist and has been deleted deliberately.
   outside that guard. Never give a branch point a non-zero `maxEP` in
   `gear_existence`: Tensura would pin a single evolution target and fight the
   random branch.
+- **EP gates follow one ladder: vanilla first, then Tensura's metals spine.**
+  The armor ladder runs 550 / 3,200 / 7,800 (vanilla-paced opening) and then
+  18,000 / 52,000 / 225,000 / 750,000 (Tensura's low / high / pure magisteel,
+  adamantite). Tools climb 3,200 / 52,000 / 750,000; swords climb 3,200 /
+  18,000 / 225,000 / 750,000 because the blooded rung gives them an extra
+  step. All gates are constants in `RebalanceContent` and `epGainFor(gate)`
+  derives every climb rate from them: 0.003 below 18,000, then 0.01 / 0.02 /
+  0.025 / 0.03 across the spine. Validation asserts strict ascent on every
+  ladder and that all three dragonsteel ladders land on 750,000.
+- **A terminal omits `maxEP`; inert means `maxEP: 0`.** Top-of-ladder gear
+  (dragon steel, the Blade of the Dreaded Queen and Dread Queen's Staff, the
+  red gauntlet, uniques, troll weapons) ships `minEP` + `epGain` and no
+  `maxEP`/`evolution` - `minEP` is where it starts earning from, and the
+  codec's 2,000,000 default is the ceiling. Terminal rates: 0.04 (ladder top
+  at 750,000), 0.025 (singular ladders handing off at 52,000), 0.003 (no
+  ladder at all). An explicit `maxEP: 0` is the opposite state: inert,
+  chain-driven, never a target. Both are validated.
 - **Gear Evolution ignores `gear_existence` overrides for items it has no
   built-in chain for.** It ships 141 built-in Ice and Fire chains; every one of
   them must be covered by a file of ours or its own thresholds silently win.
@@ -68,6 +89,20 @@ generator used to exist and has been deleted deliberately.
   own resource path - death worm armor in all three chitin colours (12) and the
   five dragonbone tools - because the addon_chains ladder drives them instead.
   The built-in coverage check fails the build if any of the 141 loses coverage.
+  Validation pins the shipped counts: 170 `data/gearevolution` gear files (153
+  ours + 17 neutralised), 151 addon shadows, 61 chains, 37 movesets, 24 entity
+  files - 443 in total.
+- **The bow ladder is the one cross-namespace chain, and it has two
+  carve-outs.** The chain is `bow (700) -> short_bow (3,600) -> dragonbone_bow
+  (7,200) -> long_bow (12,500) -> war_bow (16,000)`, slotted by damage and
+  draw speed; only the two middle rungs are ours. Carve-out one: our
+  `short_bow` file lives at Gear Evolution's `tensura/` path with
+  `type: tensura:short_bow` (the namespace check and the `GE_GEAR` prefix
+  check both exempt exactly that path). Carve-out two:
+  `iceandfire:dragonbone_bow` evolves into `tensura:long_bow`, grandfathered
+  in `checkTarget` from both paths its file ships under. `short_bow` is in
+  `NOT_IN_ADDON` because the addon ships no file for it. Nothing else crosses
+  namespaces.
 - **`branchingDefaultStrategy = "weighted_random"` is a config file, not data.**
   The mod cannot set it. At the default `"first"` the chains still work but
   every branch resolves to the first listed option. The README documents this;
@@ -134,8 +169,11 @@ the go.
 - **Data-driven over code** - prefer datapack JSON (via the datagen providers)
   to Java when both work. The growth/stage/element behaviour is code because no
   datapack reaches it.
-- **I&F-native chains only.** Evolution targets stay Ice and Fire items; this mod
-  deliberately does not cross into Tensura items.
+- **I&F-native chains only.** Evolution targets stay Ice and Fire items, with
+  one grandfathered exception: `iceandfire:dragonbone_bow` hands off to
+  `tensura:long_bow` so the vanilla bow line can slot through Ice and Fire and
+  back into Tensura (see the bow carve-outs). Do not add further
+  cross-namespace targets or files without an explicit decision.
 - **Mixins are sanctioned here** (widening I&F's config range and stretching its
   growth hooks have no public API). They are not a general licence: the org rule
   "public API only, no mixins" still applies to any new addon repo.

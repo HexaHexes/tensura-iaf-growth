@@ -1,6 +1,5 @@
 {
   "type": "iceandfire:troll_weapon_trunk_frost",
   "epGain": 0.003,
-  "maxEP": 750000,
   "minEP": 0
 }

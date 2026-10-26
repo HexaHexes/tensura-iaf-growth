@@ -1,7 +1,7 @@
 {
   "type": "iceandfire:copper_sword",
-  "epGain": 0.02,
+  "epGain": 0.003,
   "evolution": "iceandfire:silver_sword",
-  "maxEP": 6000,
+  "maxEP": 3200,
   "minEP": 0
 }

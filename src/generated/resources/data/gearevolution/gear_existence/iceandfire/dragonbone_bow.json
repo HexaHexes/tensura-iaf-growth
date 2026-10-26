@@ -1,6 +1,7 @@
 {
   "type": "iceandfire:dragonbone_bow",
   "epGain": 0.003,
-  "maxEP": 750000,
+  "evolution": "tensura:long_bow",
+  "maxEP": 7200,
   "minEP": 0
 }

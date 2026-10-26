@@ -1,6 +1,5 @@
 {
   "type": "iceandfire:siren_flute",
   "epGain": 0.003,
-  "maxEP": 750000,
   "minEP": 0
 }

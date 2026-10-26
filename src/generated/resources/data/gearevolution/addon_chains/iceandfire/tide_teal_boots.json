@@ -1,5 +1,5 @@
 {
-  "epGain": 0.02,
+  "epGain": 0.025,
   "evolutionOptions": [
     "iceandfire:armor_red_boots",
     "iceandfire:armor_green_boots",
@@ -15,6 +15,6 @@
     "iceandfire:armor_black_boots"
   ],
   "item": "iceandfire:tide_teal_boots",
-  "maxEP": 80000,
+  "maxEP": 225000,
   "minEP": 0
 }

@@ -1,7 +1,7 @@
 {
   "type": "iceandfire:armor_copper_metal_boots",
-  "epGain": 0.02,
+  "epGain": 0.003,
   "evolution": "iceandfire:armor_silver_metal_boots",
-  "maxEP": 10000,
+  "maxEP": 3200,
   "minEP": 0
 }
