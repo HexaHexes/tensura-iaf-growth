@@ -1,0 +1,7 @@
+{
+  "type": "tensura:kunai",
+  "epGain": 0.02,
+  "evolution": "tensura:pure_magisteel_kunai",
+  "maxEP": 52000,
+  "minEP": 0
+}

@@ -37,12 +37,14 @@ generator used to exist and has been deleted deliberately.
 
 ## Gotchas (do not regress them)
 
-- **Five paths, three consumers.**
+- **Six paths, three consumers.**
   `data/gearevolution/gear_existence/iceandfire/` is read by Gear Evolution
   *and* by Tensura's `gear_existence` datapack registry; the same registry also
   reads `data/iceandfire/gear_existence/` (namespace `iceandfire`), which is
   where the `tensura_iaf` addon ships its own files and therefore where this
-  mod must write shadow copies or the addon's thresholds would win;
+  mod must write shadow copies or the addon's thresholds would win, and
+  `data/tensura/gear_existence/` (namespace `tensura`), where our six gap-fix
+  files live;
   `data/gearevolution/addon_chains/iceandfire/` is read only by Gear Evolution;
   and exactly one file sits at `data/gearevolution/gear_existence/tensura/` -
   our `short_bow.json`, a same-path override of Gear Evolution's own rung (see
@@ -52,10 +54,12 @@ generator used to exist and has been deleted deliberately.
   Tensura sees two entries for it. Keep their values identical: engravings are
   applied with `stack.enchant` (idempotent) but differing `maxEP`/`epGain`
   would race. The datagen's path-prefix and set assertions exist to catch this.
-- **`type` and `item` must carry the `iceandfire:` namespace** - with one
-  carve-out: the short_bow override's `type` is `tensura:short_bow`, because
-  that file replaces Gear Evolution's file for a Tensura item. An unqualified
-  id parses as `minecraft:<name>` and matches no item, silently. Validated.
+- **`type` and `item` must carry a real namespace.** Outside Tensura's folder
+  that means `iceandfire:`, with one carve-out: the short_bow override's `type`
+  is `tensura:short_bow`, because that file replaces Gear Evolution's file for
+  a Tensura item. Files under `data/tensura/gear_existence/` must carry
+  `tensura:` ids instead. An unqualified id parses as `minecraft:<name>` and
+  matches no item, silently. Validated.
 - **Addon chains win.** When an item has an addon chain, Gear Evolution uses it
   in preference to both the built-in chain and the `gear_existence` override for
   EP and the evolution target. So a branch point ships a full addon chain and,
@@ -89,9 +93,9 @@ generator used to exist and has been deleted deliberately.
   own resource path - death worm armor in all three chitin colours (12) and the
   five dragonbone tools - because the addon_chains ladder drives them instead.
   The built-in coverage check fails the build if any of the 141 loses coverage.
-  Validation pins the shipped counts: 170 `data/gearevolution` gear files (153
-  ours + 17 neutralised), 151 addon shadows, 61 chains, 37 movesets, 24 entity
-  files - 443 in total.
+  Validation pins the shipped counts: 171 `data/gearevolution` gear files (154
+  ours + 17 neutralised), 151 addon shadows, 6 Tensura gap-fix files, 61
+  chains, 37 movesets, 24 entity files - 450 in total.
 - **The bow ladder is the one cross-namespace chain, and it has two
   carve-outs.** The chain is `bow (700) -> short_bow (3,600) -> dragonbone_bow
   (7,200) -> long_bow (12,500) -> war_bow (16,000)`, slotted by damage and
@@ -101,8 +105,22 @@ generator used to exist and has been deleted deliberately.
   check both exempt exactly that path). Carve-out two:
   `iceandfire:dragonbone_bow` evolves into `tensura:long_bow`, grandfathered
   in `checkTarget` from both paths its file ships under. `short_bow` is in
-  `NOT_IN_ADDON` because the addon ships no file for it. Nothing else crosses
-  namespaces.
+  `NOT_IN_ADDON` because the addon ships no file for it. Nothing else in the
+  `iceandfire` ladder crosses namespaces.
+- **The six files under `data/tensura/gear_existence/` are the only writes
+  into Tensura's namespace.** Three are same-path overrides of Tensura's inert
+  `silver_hoe`/`silver_pickaxe`/`silver_shovel` (Gear Evolution has no chain for
+  them either, so they were dead): each clones Gear Evolution's silver rung for
+  every other Tensura tool - 3,800 @ 0.003 into `tensura:mithril_<tool>`,
+  Holy Coat I kept. Two are terminals nothing else tracks (`goblin_club`,
+  `severer_blade`: no `maxEP`, 0 / 0.003). One is `tensura:kunai` ->
+  `tensura:pure_magisteel_kunai` at 52,000 @ 0.02: Tensura's own
+  high_magisteel gear evolves into pure magisteel at 52,000 and
+  `pure_magisteel_kunai` starts earning there, so the hand-off is exact.
+  Targets inside that folder may be Tensura items this pack does not generate -
+  `checkTarget` grandfathers them by path - so every evolving pair there is
+  spot-checked at literal values. `dragon_flute` joins the terminal uniques
+  (0 / 0.003) and therefore `NOT_IN_ADDON`.
 - **`branchingDefaultStrategy = "weighted_random"` is a config file, not data.**
   The mod cannot set it. At the default `"first"` the chains still work but
   every branch resolves to the first listed option. The README documents this;
@@ -170,10 +188,12 @@ the go.
   to Java when both work. The growth/stage/element behaviour is code because no
   datapack reaches it.
 - **I&F-native chains only.** Evolution targets stay Ice and Fire items, with
-  one grandfathered exception: `iceandfire:dragonbone_bow` hands off to
+  two sanctioned exceptions: `iceandfire:dragonbone_bow` hands off to
   `tensura:long_bow` so the vanilla bow line can slot through Ice and Fire and
-  back into Tensura (see the bow carve-outs). Do not add further
-  cross-namespace targets or files without an explicit decision.
+  back into Tensura (see the bow carve-outs), and the six gap-fix files under
+  `data/tensura/gear_existence/` climb Tensura's own ladder (silver tools to
+  mithril, kunai to pure magisteel). Do not add further cross-namespace
+  targets or files without an explicit decision.
 - **Mixins are sanctioned here** (widening I&F's config range and stretching its
   growth hooks have no public API). They are not a general licence: the org rule
   "public API only, no mixins" still applies to any new addon repo.
