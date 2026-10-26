@@ -1,0 +1,9 @@
+{
+  "type": "iceandfire:tide_green_leggings",
+  "minEP": 0,
+  "maxEP": 0,
+  "epGain": 0,
+  "engravings": {
+    "tensura:breathing_support": 1
+  }
+}

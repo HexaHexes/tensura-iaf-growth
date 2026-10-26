@@ -1,0 +1,9 @@
+# Exported pack archives
+*.zip
+
+# Editor / OS noise
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db

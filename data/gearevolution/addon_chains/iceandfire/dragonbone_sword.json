@@ -1,0 +1,11 @@
+{
+  "item": "iceandfire:dragonbone_sword",
+  "minEP": 0,
+  "maxEP": 52000,
+  "epGain": 0.02,
+  "evolutionOptions": [
+    "iceandfire:dragonbone_sword_fire",
+    "iceandfire:dragonbone_sword_ice",
+    "iceandfire:dragonbone_sword_lightning"
+  ]
+}

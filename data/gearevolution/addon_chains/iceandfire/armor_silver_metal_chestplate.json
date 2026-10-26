@@ -1,0 +1,11 @@
+{
+  "item": "iceandfire:armor_silver_metal_chestplate",
+  "minEP": 0,
+  "maxEP": 18000,
+  "epGain": 0.02,
+  "evolutionOptions": [
+    "iceandfire:mountain_troll_leather_chestplate",
+    "iceandfire:forest_troll_leather_chestplate",
+    "iceandfire:frost_troll_leather_chestplate"
+  ]
+}

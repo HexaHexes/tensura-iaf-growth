@@ -1,0 +1,7 @@
+{
+  "item": "iceandfire:frost_troll_leather_chestplate",
+  "minEP": 0,
+  "maxEP": 45000,
+  "epGain": 0.02,
+  "evolution": "iceandfire:deathworm_white_chestplate"
+}

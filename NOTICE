@@ -1,0 +1,21 @@
+Tensura - Ice and Fire (tensura-ice-and-fire)
+Copyright (c) 2026 Bitwise Madness
+
+This datapack is free software licensed under the GNU Lesser General Public
+License v2.1. See the LICENSE file for the full license text.
+
+Attribution
+
+- Ice and Fire item identifiers, materials and armor sets referenced by this
+  datapack belong to Ice and Fire: Community Edition (com.iafenvoy.iceandfire).
+  No code, assets or textures from that mod are redistributed here; this pack
+  only names its items as data.
+- EP thresholds, gear existence fields and enchantment engraving identifiers
+  follow Tensura: Reincarnated (io.github.manasmods.tensura).
+- The evolution chain format, addon chain branching format and configuration
+  keys follow Tensura: Gear Evolution (dev.gearevo.gearevolution) by
+  Bigtreeman669, used here as a data contract only.
+- BetterCombat moveset parent identifiers follow BetterCombat.
+
+Tensura: Reincarnated, Tensura: Gear Evolution, Ice and Fire: Community Edition
+and BetterCombat are not affiliated with or endorsed by this project.

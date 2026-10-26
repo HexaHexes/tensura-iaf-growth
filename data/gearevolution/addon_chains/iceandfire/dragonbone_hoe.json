@@ -1,0 +1,11 @@
+{
+  "item": "iceandfire:dragonbone_hoe",
+  "minEP": 0,
+  "maxEP": 52000,
+  "epGain": 0.02,
+  "evolutionOptions": [
+    "iceandfire:dragonsteel_fire_hoe",
+    "iceandfire:dragonsteel_ice_hoe",
+    "iceandfire:dragonsteel_lightning_hoe"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "type": "iceandfire:stymphalian_feather_bundle",
+  "minEP": 0,
+  "maxEP": 750000,
+  "epGain": 0.003
+}

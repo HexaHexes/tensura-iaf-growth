@@ -1,0 +1,84 @@
+name: Release
+
+# Runs on pushes to the default branch: when pack.mcmeta carries a version that has
+# no matching v-published tag yet, zip pack.mcmeta + data and publish the zip as a
+# GitHub release for that tag. This is the datapack exception in the org release
+# model - the "build" is a zip, so no CI-built artifact is needed first.
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve the version
+        id: resolve
+        env:
+          ALPHA_RELEASES: ${{ vars.ALPHA_RELEASES }}
+        run: |
+          set -euo pipefail
+
+          VERSION_RE='v[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.]+)?'
+          VERSION=$(grep -oE "$VERSION_RE" pack.mcmeta | head -1 | tr -d 'v')
+          echo "pack version: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+          SKIP=false
+
+          if git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null; then
+            echo "Tag v$VERSION already exists; nothing to release."
+            SKIP=true
+          fi
+
+          case "$VERSION" in
+            *-alpha*|*-beta*)
+              if [ "${ALPHA_RELEASES:-false}" != "true" ]; then
+                echo "$VERSION is a pre-release and the ALPHA_RELEASES variable is not enabled; skipping."
+                SKIP=true
+              fi ;;
+          esac
+
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+
+      - name: Build the pack zip
+        if: steps.resolve.outputs.skip == 'false'
+        env:
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: zip -r "tensura-ice-and-fire-$VERSION.zip" pack.mcmeta data
+
+      - name: Publish the release
+        if: steps.resolve.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+
+          NOTES="Ice and Fire Gear Evolution chains for Tensura, version $VERSION.
+          Install by dropping the zip into config/paxi/datapacks/ (or any datapack loader).
+
+          Random branches require branchingDefaultStrategy = \"weighted_random\" in
+          config/gearevolution-common.toml - see the README."
+
+          PRERELEASE=""
+          case "$VERSION" in
+            *-alpha*|*-beta*) PRERELEASE="--prerelease" ;;
+          esac
+
+          gh release create "v$VERSION" "tensura-ice-and-fire-$VERSION.zip" \
+            --title "v$VERSION" \
+            --notes "$NOTES" \
+            $PRERELEASE

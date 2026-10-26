@@ -1,0 +1,15 @@
+{
+  "item": "iceandfire:deathworm_white_leggings",
+  "minEP": 0,
+  "maxEP": 52000,
+  "epGain": 0.02,
+  "evolutionOptions": [
+    "iceandfire:tide_blue_leggings",
+    "iceandfire:tide_bronze_leggings",
+    "iceandfire:tide_deepblue_leggings",
+    "iceandfire:tide_green_leggings",
+    "iceandfire:tide_purple_leggings",
+    "iceandfire:tide_red_leggings",
+    "iceandfire:tide_teal_leggings"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "iceandfire:armor_red_leggings",
+  "minEP": 0,
+  "maxEP": 225000,
+  "epGain": 0.02,
+  "engravings": {
+    "tensura:elemental_resistance": 1
+  },
+  "evolution": "iceandfire:dragonsteel_fire_leggings"
+}

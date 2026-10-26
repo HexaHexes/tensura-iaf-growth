@@ -1,0 +1,15 @@
+# Pin LF for authored text so the Linux CI runners and local Windows checkouts read
+# the same bytes, and git stops rewriting line endings on every touch (the
+# "LF will be replaced by CRLF" warnings).
+
+*.json     text eol=lf
+*.mcmeta   text eol=lf
+*.yml      text eol=lf
+*.yaml     text eol=lf
+*.md       text eol=lf
+*.ps1      text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+NOTICE     text eol=lf
+LICENSE    text eol=lf

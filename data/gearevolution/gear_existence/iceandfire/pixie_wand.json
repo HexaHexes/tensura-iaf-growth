@@ -1,0 +1,6 @@
+{
+  "type": "iceandfire:pixie_wand",
+  "minEP": 0,
+  "maxEP": 750000,
+  "epGain": 0.003
+}

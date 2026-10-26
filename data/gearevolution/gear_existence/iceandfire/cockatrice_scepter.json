@@ -1,0 +1,6 @@
+{
+  "type": "iceandfire:cockatrice_scepter",
+  "minEP": 0,
+  "maxEP": 750000,
+  "epGain": 0.003
+}
