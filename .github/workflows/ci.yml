@@ -102,7 +102,12 @@ jobs:
 
       - name: Enforce version bump rules
         env:
-          BASE: ${{ github.event.pull_request.base.sha || github.event.repository.default_branch }}
+          # version-bump.yml dispatches this workflow when BUMP_PR_TOKEN is
+          # absent, so this job also runs with no pull_request context: the
+          # base SHA is unavailable there and the fallback must resolve through
+          # the remote-tracking ref, the only form a fetch-depth: 0 checkout
+          # guarantees.
+          BASE: ${{ github.event.pull_request.base.sha || format('origin/{0}', github.event.repository.default_branch) }}
           HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
@@ -149,7 +154,9 @@ jobs:
       - name: Enforce breaking changes require a major or minor bump
         env:
           GH_TOKEN: ${{ github.token }}
-          BASE: ${{ github.event.pull_request.base.sha || github.event.repository.default_branch }}
+          # Same dispatch fallback as above: with no pull_request context the
+          # base resolves through its remote-tracking ref.
+          BASE: ${{ github.event.pull_request.base.sha || format('origin/{0}', github.event.repository.default_branch) }}
         run: |
           set -euo pipefail
 
