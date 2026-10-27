@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:netherite_chestplate",
+  "epGain": 0.003,
+  "evolution": "tensura:low_magisteel_chestplate",
+  "maxEP": 12000,
+  "minEP": 0
+}

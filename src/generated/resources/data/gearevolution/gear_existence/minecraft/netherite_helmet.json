@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:netherite_helmet",
+  "epGain": 0.003,
+  "evolution": "tensura:low_magisteel_helmet",
+  "maxEP": 12000,
+  "minEP": 0
+}

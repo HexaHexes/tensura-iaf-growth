@@ -1,0 +1,10 @@
+{
+  "epGain": 0.005,
+  "evolutionOptions": [
+    "tensura:armorsaurus_chestplate",
+    "tensura:armorsaurus_scalemail_chestplate"
+  ],
+  "item": "tensura:ant_carapace_chestplate",
+  "maxEP": 6000,
+  "minEP": 3000
+}

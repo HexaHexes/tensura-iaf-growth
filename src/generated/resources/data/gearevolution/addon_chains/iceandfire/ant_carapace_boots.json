@@ -1,0 +1,10 @@
+{
+  "epGain": 0.005,
+  "evolutionOptions": [
+    "tensura:armorsaurus_boots",
+    "tensura:armorsaurus_scalemail_boots"
+  ],
+  "item": "tensura:ant_carapace_boots",
+  "maxEP": 6000,
+  "minEP": 3000
+}

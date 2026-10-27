@@ -1,0 +1,10 @@
+{
+  "epGain": 0.025,
+  "evolutionOptions": [
+    "tensura:serpent_scalemail_chestplate",
+    "tensura:knight_spider_carapace_chestplate"
+  ],
+  "item": "tensura:monster_leather_chestplate_special_a",
+  "maxEP": 225000,
+  "minEP": 80000
+}

@@ -1,0 +1,24 @@
+{
+  "epGain": 0.025,
+  "evolutionOptions": [
+    {
+      "id": "iceandfire:dragonsteel_fire_leggings",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_ice_leggings",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_lightning_leggings",
+      "weight": 1
+    },
+    {
+      "id": "tensura:mithril_leggings",
+      "weight": 3
+    }
+  ],
+  "item": "tensura:charybdis_scalemail_leggings",
+  "maxEP": 750000,
+  "minEP": 60000
+}

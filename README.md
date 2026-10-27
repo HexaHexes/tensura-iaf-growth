@@ -49,9 +49,13 @@ Dragon Steel or Mithril`
 
 The vanilla opening forks instead of stepping straight on: at 550 EP leather
 armor rolls between chainmail, Ice and Fire copper and Tensura's monster
-leather (rank D). The chainmail branch then continues on vanilla's own iron ->
-diamond -> netherite line, monster leather climbs Tensura's D -> C -> B -> A
-ranks, and only the copper branch joins the ladder below.
+leather (rank D). The chainmail branch continues on vanilla's own iron ->
+diamond -> netherite line, and netherite then forges into Tensura's low
+magisteel - at 12,000 EP for armor and 10,000 for tools, so both netherite and
+magisteel keep a band worth wearing - riding the metals spine from there.
+Monster leather climbs Tensura's own ranks and then flows into Tensura's
+creature sets (see the creature ladder below), and only the copper branch
+joins the ladder below.
 
 Copper does not commit to one silver: it rolls at random into either Ice and
 Fire silver (climbing the chain above) or Tensura's silver, which forges the
@@ -78,6 +82,35 @@ steel set of its own element - red, green, bronze and gray are fire dragons;
 blue, white, sapphire and silver are ice; electric, amethyst, copper and black
 are lightning - and Tensura's mithril armor, which forges on through
 adamantite into hihiirokane.
+
+## Creature ladder
+
+`Monster Leather -> Ant Carapace -> Armorsaurus -> Serpent Scalemail or
+Knight Spider Carapace -> Charybdis Scalemail -> Dragon Steel or Mithril`
+
+Tensura's hide, scale and carapace sets are woven into one flow that Monster
+Leather feeds. Monster Leather C forks at 5,000 EP into Monster Leather B (the
+rank ladder as before) or the Ant Carapace, and the creature line runs from
+there. Monster Leather Special A - the rank ladder's top, once a dead end -
+now hands off at 225,000 EP into the same creature sets, so both paths split
+at Monster Leather C and merge again at Serpent Scalemail and Knight Spider
+Carapace.
+
+| Step | Evolves at | Outcome |
+|---|---|---|
+| Monster Leather C | 5,000 | **Random**: Monster Leather B, or Ant Carapace |
+| Ant Carapace | 6,000 | **Random** of the two armorsaurus sets (plain or scalemail) |
+| Armorsaurus | 9,000 | **Random**: Serpent Scalemail or Knight Spider Carapace |
+| Monster Leather Special A | 225,000 | **Random**: Serpent Scalemail or Knight Spider Carapace |
+| Serpent / Knight Spider | 500,000 | Charybdis Scalemail |
+| Charybdis Scalemail | 750,000 | **Random**: dragon steel (any element) or mithril armor |
+
+Serpent Scalemail and Knight Spider Carapace still earn their set-wide
+attribute bumps as they climb - now at 280,000, 360,000 and 440,000 EP, late
+enough that a piece arriving from Special A earns every one of them. Charybdis
+Scalemail hits the same 750,000 fork as dragon scale armor, so every organic
+line - troll leather, monster leather, creature carapace - ends on the metals
+spine, and every metal line ends at hihiirokane.
 
 ## Tools and weapons chain
 
@@ -129,9 +162,12 @@ the 18,000 / 52,000 / 225,000 / 750,000 rungs. The mithril bands keep the rate
 of the rung they sit on: weapons and tools earn at 0.025 across their
 225,000 -> 500,000 band, armor at 0.03 across 750,000 -> 1,000,000, and the
 re-banded adamantite armor at the top rate of 0.04 across 1,000,000 ->
-1,250,000. Ladder tops that keep earning do so at 0.04 for dragon steel, 0.025
-for the Blade of the Dreaded Queen, the Dread Queen's Staff and the red death
-worm gauntlet, and 0.003 for gear with no ladder at all.
+1,250,000. The creature ladder keeps Tensura's own rates for every set it
+re-gates: 0.005 on Monster Leather C and the Ant Carapace, 0.015 on the
+armorsaurus, serpent and knight spider sets, and 0.025 on Special A and
+Charybdis Scalemail. Ladder tops that keep earning do so at 0.04 for dragon
+steel, 0.025 for the Blade of the Dreaded Queen, the Dread Queen's Staff and
+the red death worm gauntlet, and 0.003 for gear with no ladder at all.
 
 ## Other gear
 

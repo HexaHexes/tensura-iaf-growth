@@ -1,0 +1,9 @@
+{
+  "type": "tensura:charybdis_scalemail_chestplate",
+  "engravings": {
+    "tensura:magic_interference": 1
+  },
+  "epGain": 0,
+  "maxEP": 0,
+  "minEP": 0
+}

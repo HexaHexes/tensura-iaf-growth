@@ -1,0 +1,10 @@
+{
+  "epGain": 0.015,
+  "evolutionOptions": [
+    "tensura:serpent_scalemail_helmet",
+    "tensura:knight_spider_carapace_helmet"
+  ],
+  "item": "tensura:armorsaurus_helmet",
+  "maxEP": 9000,
+  "minEP": 6000
+}

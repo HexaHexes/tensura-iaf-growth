@@ -1,0 +1,10 @@
+{
+  "epGain": 0.005,
+  "evolutionOptions": [
+    "tensura:armorsaurus_leggings",
+    "tensura:armorsaurus_scalemail_leggings"
+  ],
+  "item": "tensura:ant_carapace_leggings",
+  "maxEP": 6000,
+  "minEP": 3000
+}

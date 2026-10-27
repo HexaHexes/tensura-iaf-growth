@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:netherite_shovel",
+  "epGain": 0.003,
+  "evolution": "tensura:low_magisteel_shovel",
+  "maxEP": 10000,
+  "minEP": 0
+}

@@ -1,0 +1,24 @@
+{
+  "epGain": 0.025,
+  "evolutionOptions": [
+    {
+      "id": "iceandfire:dragonsteel_fire_helmet",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_ice_helmet",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_lightning_helmet",
+      "weight": 1
+    },
+    {
+      "id": "tensura:mithril_helmet",
+      "weight": 3
+    }
+  ],
+  "item": "tensura:charybdis_scalemail_helmet",
+  "maxEP": 750000,
+  "minEP": 60000
+}
