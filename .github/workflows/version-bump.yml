@@ -39,6 +39,11 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # actions: write is what lets this run's GITHUB_TOKEN dispatch ci.yml on the
+  # bump branch when BUMP_PR_TOKEN is absent: a workflow_dispatch call without
+  # it answers 403, and the PR this run just opened would sit with no required
+  # checks at all.
+  actions: write
 
 # Never cancelled. A branch pushed with no PR open is harder to clean up than a slow run
 # is to wait for.
