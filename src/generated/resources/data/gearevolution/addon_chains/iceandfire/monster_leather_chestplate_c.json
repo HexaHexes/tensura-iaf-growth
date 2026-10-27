@@ -1,0 +1,10 @@
+{
+  "epGain": 0.005,
+  "evolutionOptions": [
+    "tensura:monster_leather_chestplate_b",
+    "tensura:ant_carapace_chestplate"
+  ],
+  "item": "tensura:monster_leather_chestplate_c",
+  "maxEP": 5000,
+  "minEP": 2500
+}

@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:netherite_boots",
+  "epGain": 0.003,
+  "evolution": "tensura:low_magisteel_boots",
+  "maxEP": 12000,
+  "minEP": 0
+}

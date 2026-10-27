@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:netherite_sword",
+  "epGain": 0.003,
+  "evolution": "tensura:low_magisteel_sword",
+  "maxEP": 10000,
+  "minEP": 0
+}

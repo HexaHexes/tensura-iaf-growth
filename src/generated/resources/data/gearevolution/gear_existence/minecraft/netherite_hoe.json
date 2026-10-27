@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:netherite_hoe",
+  "epGain": 0.003,
+  "evolution": "tensura:low_magisteel_hoe",
+  "maxEP": 10000,
+  "minEP": 0
+}

@@ -1,0 +1,24 @@
+{
+  "epGain": 0.025,
+  "evolutionOptions": [
+    {
+      "id": "iceandfire:dragonsteel_fire_boots",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_ice_boots",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_lightning_boots",
+      "weight": 1
+    },
+    {
+      "id": "tensura:mithril_boots",
+      "weight": 3
+    }
+  ],
+  "item": "tensura:charybdis_scalemail_boots",
+  "maxEP": 750000,
+  "minEP": 60000
+}

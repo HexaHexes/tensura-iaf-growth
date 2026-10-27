@@ -38,20 +38,26 @@ import java.util.Set;
  * folder byte for byte, so neither provider's file can win the pack-priority race (see
  * {@link #addTensuraGear}).
  *
- * <p>Two more same-path families: inert overrides of Gear Evolution's bundled vanilla
- * rungs at {@code data/gearevolution/gear_existence/minecraft/}, which turn leather
- * armor and stone tools into forks onto the copper ladder (see {@link #addVanillaFork}),
- * and the adamantite armor override in Tensura's own folder, which re-bands the top of
- * the armor ladder to accept mithril's carry (see {@link #addTensuraGear}).
+ * <p>Two more same-path families: overrides of Gear Evolution's bundled vanilla rungs
+ * at {@code data/gearevolution/gear_existence/minecraft/} - inert companions that turn
+ * leather armor and stone tools into forks onto the copper ladder, and re-banded
+ * netherite rungs whose bundled gates would otherwise leave only a sliver of Tensura's
+ * low magisteel band (see {@link #addVanillaFork}) - and the adamantite armor override
+ * in Tensura's own folder, which re-bands the top of the armor ladder to accept
+ * mithril's carry (see {@link #addTensuraGear}).
  *
  * <p>The rest of Tensura's own folder ({@code data/tensura/gear_existence/}) holds the
- * silver and mithril merge - both tiers re-gated onto the Ice and Fire spine - plus the
- * adamantite armor band, terminals for the goblin club and severer blade, and the
- * kunai's step onto Tensura's pure magisteel rung.
+ * silver and mithril merge - both tiers re-gated onto the Ice and Fire spine - the
+ * adamantite armor band, terminals for the goblin club and severer blade, the kunai's
+ * step onto Tensura's pure magisteel rung, and the creature ladder: Tensura's
+ * hide/scale/carapace sets re-gated into one flow that Monster Leather feeds and the
+ * 750,000 metal fork closes (see {@link #addCreatureLadder}).
  *
  * <p>An item driven by an addon chain gets a gear_existence file only when it needs a
  * Tensura engraving, and that file carries maxEP 0 so Tensura never fights the addon
- * over EP or the evolution target.
+ * over EP or the evolution target. Gear Evolution strips {@code uniqueEvolutions} from
+ * chain-driven items, so milestone bumps survive only on plain gear_existence rungs -
+ * the serpent and knight spider sets - and are dropped wherever a fork takes over.
  */
 public final class RebalanceContent {
     private RebalanceContent() {
@@ -178,6 +184,65 @@ public final class RebalanceContent {
     private static final int KUNAI_GATE = 52000;
 
     /**
+     * The creature ladder: Tensura's hide/scale/carapace sets re-gated into one flow
+     * that Monster Leather feeds. Monster Leather C forks at its own 5,000 gate into
+     * Monster Leather B or the ant carapace, the creature line climbs ant (3,000) ->
+     * armorsaurus (6,000) -> serpent and knight spider (9,000) -> charybdis (60,000),
+     * Special A leaves its terminal rank at 225,000 to rejoin the creature line, and
+     * charybdis hands off at the same 750,000 metal fork dragon scale armor hits.
+     * Every floor is the set's own; every gate keeps the next rung's floor or the
+     * incoming carry below the next milestone, so no tier is ever skipped or
+     * pre-earned.
+     */
+    private static final int ML_C_FORK = 5000;
+    private static final int ANT_GATE = 6000;
+    private static final int ARMORSAURUS_GATE = 9000;
+    private static final int SPECIAL_A_GATE = 225000;
+    private static final int SERPENT_GATE = 500000;
+    private static final int CHARYBDIS_GATE = 750000;
+
+    /**
+     * The creature sets' own earning floors, kept on every re-banded rung and chain.
+     * A hand-off that lands exactly on the next floor - ant into armorsaurus,
+     * armorsaurus into serpent, ML A into Special A - leaves no band skipped; the two
+     * entries that land inside a band (the monster leather fork into the ant carapace,
+     * Special A into serpent) both sit below its first milestone.
+     */
+    private static final int ML_C_FLOOR = 2500;
+    private static final int ANT_FLOOR = 3000;
+    private static final int ARMORSAURUS_FLOOR = 6000;
+    private static final int SERPENT_FLOOR = 9000;
+    private static final int CHARYBDIS_FLOOR = 60000;
+    private static final int ML_SPECIAL_A_FLOOR = 80000;
+
+    /**
+     * Serpent and knight spider milestone EPs, shifted out of the Special A carry's
+     * reach: the native 18,000 / 52,000 / 225,000 bumps would all fire the instant a
+     * Special A piece arrives with 225,000 EP, so the same reward ladder now spans
+     * 280,000 / 360,000 / 440,000 - above both entries (the armorsaurus branch at
+     * 9,000, Special A at 225,000) and inside the 500,000 gate. The native 750,000
+     * milestone dies with the rung: the set no longer lives that long.
+     */
+    private static final int SERPENT_MILESTONE_1 = 280000;
+    private static final int SERPENT_MILESTONE_2 = 360000;
+    private static final int SERPENT_MILESTONE_3 = 440000;
+
+    /** Tensura's own climb rates for the creature sets, preserved on every re-banded rung. */
+    private static final double TENSURA_GAIN_LOW = 0.005d;
+    private static final double TENSURA_GAIN_MID = 0.015d;
+    private static final double TENSURA_GAIN_HIGH = 0.025d;
+
+    /**
+     * Netherite's re-banded hand-offs into Tensura's low magisteel. Gear Evolution's
+     * bundled rungs gate at 17,500 (armor) and 13,500 (tools) against a magisteel band
+     * that tops out at 18,000 - the carry would leave 500 EP of low magisteel before it
+     * morphed again, a de-facto skipped tier. These gates leave both a real netherite
+     * band (from diamond's 7,800 / 7,000 hand-off) and a real magisteel band.
+     */
+    private static final int NETHERITE_ARMOR_GATE = 12000;
+    private static final int NETHERITE_TOOL_GATE = 10000;
+
+    /**
      * The bow ladder slots the dragon bone bow between Tensura's short and long bow by
      * damage and draw speed (short &lt; dragon bone &lt; long &lt; war). The two rungs
      * before and after it are Gear Evolution's own values, kept verbatim upstream; the
@@ -215,6 +280,8 @@ public final class RebalanceContent {
     private static final JsonObject ELEMENTAL_RESISTANCE = engravings("tensura:elemental_resistance", 1);
     private static final JsonObject BREATHING_SUPPORT = engravings("tensura:breathing_support", 1);
     private static final JsonObject TSUKUMOGAMI = engravings("tensura:tsukumogami", 1);
+    /** Charybdis scalemail's own engraving, preserved when the fork takes over its EP. */
+    private static final JsonObject MAGIC_INTERFERENCE = engravings("tensura:magic_interference", 1);
 
     /**
      * Unique Ice and Fire weapons and accessories with no upgrade line: they stay usable
@@ -344,6 +411,7 @@ public final class RebalanceContent {
         addVanillaFork(geGear, chains);
 
         addTensuraGear(tensuraGear, geGear, chains);
+        addCreatureLadder(tensuraGear, chains);
         addMovesets(movesets);
 
         // The addon's file set, reissued with our values: shared files keep our content,
@@ -532,7 +600,11 @@ public final class RebalanceContent {
     /**
      * Replaces Gear Evolution's bundled leather and stone rungs - inert at their own
      * resource path - with forks, so either branch of the vanilla line can cross into
-     * this pack's copper ladder while the other continues untouched.
+     * this pack's copper ladder while the other continues untouched. Also re-bands the
+     * bundled netherite rungs: they are real gear_existence rungs rather than forks,
+     * replaced outright at the same path with gates that leave both netherite and
+     * Tensura's low magisteel a band worth wearing (the bundled 17,500 armor gate
+     * handed off 500 EP before magisteel's own 18,000 gate).
      *
      * @param gear Gear Evolution's namespace map, which holds the bundled rungs
      */
@@ -551,6 +623,16 @@ public final class RebalanceContent {
             put(chains, chainPath("minecraft:stone_" + tool),
                     chain("minecraft:stone_" + tool, 0, STONE_TO_FORK, epGainFor(STONE_TO_FORK), null,
                             List.of("minecraft:iron_" + tool, id("copper_" + tool))));
+        }
+        for (String slot : SLOTS) {
+            put(gear, GE_VANILLA + file("minecraft:netherite_" + slot),
+                    gear("minecraft:netherite_" + slot, 0, NETHERITE_ARMOR_GATE, EP_GAIN_NO_LADDER, null,
+                            "tensura:low_magisteel_" + slot));
+        }
+        for (String tool : TOOLS) {
+            put(gear, GE_VANILLA + file("minecraft:netherite_" + tool),
+                    gear("minecraft:netherite_" + tool, 0, NETHERITE_TOOL_GATE, EP_GAIN_NO_LADDER, null,
+                            "tensura:low_magisteel_" + tool));
         }
     }
 
@@ -658,6 +740,108 @@ public final class RebalanceContent {
         put(gear, TENSURA_GEAR + file("tensura:severer_blade"), tensuraTerminal("severer_blade"));
     }
 
+    // --- Chain 4: Tensura's creature ladder ----------------------------------
+    //
+    // monster leather C forks at 5,000 into monster leather B or the ant
+    // carapace, and the creature line climbs ant (3,000 -> 6,000) -> armorsaurus
+    // or armorsaurus scalemail (6,000 -> 9,000) -> serpent scalemail or knight
+    // spider carapace (9,000 -> 500,000) -> charybdis (500,000 -> 750,000), where
+    // it hits the same dragon steel / mithril fork dragon scale armor does.
+    // Special A leaves its terminal rank at 225,000 to rejoin the line at the
+    // serpent fork, so the leather and creature sub-lines split at monster
+    // leather C and merge at serpent and again at the metal fork.
+
+    /**
+     * Re-gates Tensura's hide/scale/carapace sets into one flow, overriding each set's
+     * file in Tensura's own folder the way the adamantite armor band is overridden.
+     * Three shapes, dictated by what can carry milestones: Gear Evolution strips
+     * {@code uniqueEvolutions} from chain-driven items, so
+     * <ul>
+     *   <li>every fork point (monster leather C, Special A, ant, both armorsaurus sets,
+     *   charybdis) ships an inert companion - maxEP 0, plus the engraving where Tensura
+     *   ships one - and an addon chain that drives EP and rolls the branch;</li>
+     *   <li>the serpent and knight spider sets are plain rungs (single target, no
+     *   chain), so their milestone bumps survive - shifted above the Special A carry,
+     *   which would otherwise clear all three native thresholds on arrival;</li>
+     *   <li>charybdis's native milestones die with its fork; its magic interference
+     *   engraving is the part that carries over.</li>
+     * </ul>
+     * Every floor is the set's own, every climb rate is Tensura's own, and every
+     * hand-off lands at or below the next rung's floor - ant at armorsaurus's floor,
+     * armorsaurus at the serpent floor, ML A at Special A's - so no band is skipped
+     * and no milestone is pre-earned.
+     *
+     * @param gear   Tensura's namespace map, which holds the native rungs
+     * @param chains the addon chain map, which drives every fork
+     */
+    private static void addCreatureLadder(Map<String, JsonObject> gear, Map<String, JsonObject> chains) {
+        for (String slot : SLOTS) {
+            // Monster leather C: inert companion plus the fork into Monster Leather B
+            // (Tensura's own rung, untouched) or the ant carapace, rolled evenly.
+            String leatherC = "tensura:monster_leather_" + slot + "_c";
+            put(gear, TENSURA_GEAR + file(leatherC), tensuraInert(leatherC));
+            put(chains, chainPath(leatherC),
+                    chain(leatherC, ML_C_FLOOR, ML_C_FORK, TENSURA_GAIN_LOW, null,
+                            List.of("tensura:monster_leather_" + slot + "_b", "tensura:ant_carapace_" + slot)));
+
+            // Special A: inert companion plus the fork that opens the creature line.
+            String specialA = "tensura:monster_leather_" + slot + "_special_a";
+            put(gear, TENSURA_GEAR + file(specialA), tensuraInert(specialA));
+            put(chains, chainPath(specialA),
+                    chain(specialA, ML_SPECIAL_A_FLOOR, SPECIAL_A_GATE, TENSURA_GAIN_HIGH, null,
+                            List.of("tensura:serpent_scalemail_" + slot,
+                                    "tensura:knight_spider_carapace_" + slot)));
+
+            // Ant carapace: inert companion plus the fork into the two armorsaurus sets.
+            String ant = "tensura:ant_carapace_" + slot;
+            put(gear, TENSURA_GEAR + file(ant), tensuraInert(ant));
+            put(chains, chainPath(ant),
+                    chain(ant, ANT_FLOOR, ANT_GATE, TENSURA_GAIN_LOW, null,
+                            List.of("tensura:armorsaurus_" + slot, "tensura:armorsaurus_scalemail_" + slot)));
+
+            // Both armorsaurus sets: inert companions plus one shared fork into the
+            // two 9,000 creature sets - the point where the creature line meets the
+            // leather line again.
+            for (String set : List.of("tensura:armorsaurus_" + slot, "tensura:armorsaurus_scalemail_" + slot)) {
+                put(gear, TENSURA_GEAR + file(set), tensuraInert(set));
+                put(chains, chainPath(set),
+                        chain(set, ARMORSAURUS_FLOOR, ARMORSAURUS_GATE, TENSURA_GAIN_MID, null,
+                                List.of("tensura:serpent_scalemail_" + slot,
+                                        "tensura:knight_spider_carapace_" + slot)));
+            }
+
+            // Serpent scalemail and knight spider carapace: plain rungs, so the
+            // shifted milestone bumps survive the run. Both entries land before the
+            // first shifted milestone - the armorsaurus branch at the 9,000 floor,
+            // Special A at 225,000.
+            for (String set : List.of("tensura:serpent_scalemail_" + slot,
+                    "tensura:knight_spider_carapace_" + slot)) {
+                put(gear, TENSURA_GEAR + file(set),
+                        tensuraRung(set, SERPENT_FLOOR, SERPENT_GATE, TENSURA_GAIN_MID,
+                                "tensura:charybdis_scalemail_" + slot, List.of(
+                                        milestone(SERPENT_MILESTONE_1, 1.0d, 1.5d),
+                                        milestone(SERPENT_MILESTONE_2, 3.0d, 3.0d),
+                                        milestone(SERPENT_MILESTONE_3, 1.0d, 1.0d))));
+            }
+
+            // Charybdis scalemail: the top of the creature line, forked into the metal
+            // spine at the same 750,000 gate dragon scale armor uses - the three
+            // dragon steel skins weigh 1 each and mithril weighs 3, the same 50/50
+            // branch roll the dragon bone forks run. The inert companion keeps the
+            // magic interference engraving; the native milestones cannot survive the
+            // fork and are dropped.
+            String charybdis = "tensura:charybdis_scalemail_" + slot;
+            put(gear, TENSURA_GEAR + file(charybdis),
+                    gear(charybdis, 0, 0, 0, MAGIC_INTERFERENCE, null));
+            put(chains, chainPath(charybdis),
+                    chainWeighted(charybdis, CHARYBDIS_FLOOR, CHARYBDIS_GATE, TENSURA_GAIN_HIGH,
+                            branchWeights(
+                                    SCALE_COLORS_BY_ELEMENT.keySet().stream()
+                                            .map(element -> id("dragonsteel_" + element + "_" + slot)).toList(),
+                                    "tensura:mithril_" + slot)));
+        }
+    }
+
     /**
      * One Tensura silver weapon or tool rung at {@link #TENSURA_GEAR}, and - when Gear
      * Evolution ships the item too - the identical file at {@link #GE_TENSURA_GEAR}.
@@ -739,6 +923,59 @@ public final class RebalanceContent {
      */
     private static JsonObject tensuraTerminal(String item) {
         return gear("tensura:" + item, 0, null, EP_GAIN_NO_LADDER, null, null);
+    }
+
+    /**
+     * A Tensura-namespace inert companion: maxEP 0 so Tensura's own registry never
+     * manages the item's EP or evolution - the addon chain does - while any engravings
+     * on the file still apply (Tensura reads them outside that guard).
+     *
+     * @param item the full Tensura item id, namespace included
+     */
+    private static JsonObject tensuraInert(String item) {
+        return gear(item, 0, 0, 0, null, null);
+    }
+
+    /**
+     * A Tensura-namespace ladder rung that also carries milestone bumps: the one shape
+     * that keeps {@code uniqueEvolutions} alive, because it is a plain gear_existence
+     * entry rather than a chain-driven branch point.
+     *
+     * @param item the full Tensura item id, namespace included
+     */
+    private static JsonObject tensuraRung(String item, int minEP, int maxEP, double epGain, String evolution,
+            List<JsonObject> milestones) {
+        JsonObject json = gear(item, minEP, maxEP, epGain, null, evolution);
+        JsonArray array = new JsonArray();
+        milestones.forEach(array::add);
+        json.add("uniqueEvolutions", array);
+        return json;
+    }
+
+    /**
+     * One {@code uniqueEvolutions} milestone: the EP it fires at and the set-wide
+     * attribute bumps, in the shape Tensura's own files use - every armor slot takes
+     * the same armor and toughness pair.
+     */
+    private static JsonObject milestone(int ep, double armor, double toughness) {
+        JsonObject json = new JsonObject();
+        json.addProperty("EP", ep);
+        JsonArray attributes = new JsonArray();
+        for (String slot : List.of("head", "chest", "legs", "feet")) {
+            attributes.add(attribute("minecraft:generic.armor", armor, slot));
+            attributes.add(attribute("minecraft:generic.armor_toughness", toughness, slot));
+        }
+        json.add("attributes", attributes);
+        return json;
+    }
+
+    /** One milestone attribute entry: {@code {"type": ..., "amount": ..., "slot": ...}}. */
+    private static JsonObject attribute(String type, double amount, String slot) {
+        JsonObject json = new JsonObject();
+        json.addProperty("type", type);
+        json.addProperty("amount", amount);
+        json.addProperty("slot", slot);
+        return json;
     }
 
     /**
@@ -889,16 +1126,16 @@ public final class RebalanceContent {
     private static void validate(Content content) {
         List<String> errors = new ArrayList<>();
 
-        expect(errors, "gear_existence files under data/gearevolution", 187, content.geGearExistence.size());
+        expect(errors, "gear_existence files under data/gearevolution", 196, content.geGearExistence.size());
         expect(errors, "gear_existence files under data/iceandfire", 151, content.iafGearExistence.size());
-        expect(errors, "gear_existence files under data/tensura", 45, content.tensuraGearExistence.size());
-        expect(errors, "addon_chains files", 131, content.addonChains.size());
+        expect(errors, "gear_existence files under data/tensura", 77, content.tensuraGearExistence.size());
+        expect(errors, "addon_chains files", 155, content.addonChains.size());
         expect(errors, "weapon_attributes files", 37, content.weaponAttributes.size());
         expect(errors, "entity_existence files", 24, content.entityExistence.size());
         expect(errors, "neutralised Gear Evolution built-ins", 17, GE_BUILTIN_NEUTRALISED.size());
         expect(errors, "files the addon ships that we shadow", 32, ADDON_ONLY.size());
         expect(errors, "our files the addon does not ship", 35, NOT_IN_ADDON.size());
-        expect(errors, "files in total", 575,
+        expect(errors, "files in total", 640,
                 content.geGearExistence.size() + content.iafGearExistence.size()
                         + content.tensuraGearExistence.size()
                         + content.addonChains.size() + content.weaponAttributes.size() + content.entityExistence.size());
@@ -1081,6 +1318,12 @@ public final class RebalanceContent {
                 SCALE_TO_STEEL, MITHRIL_ARMOR_GATE, ADAMANTITE_ARMOR_GATE);
         checkAscending(errors, "dread line", DREAD_KNIGHT, DREAD_QUEEN);
         checkAscending(errors, "death worm gauntlets", GAUNTLET_WHITE, GAUNTLET_RED);
+        // The creature ladder runs parallel to the armor spine: monster leather C
+        // forks at 5,000, the creature line climbs 6,000 / 9,000, Special A rejoins
+        // at 225,000, and charybdis tops out on the same 750,000 metal fork dragon
+        // scale armor uses.
+        checkAscending(errors, "tensura creature ladder", ML_C_FORK, ANT_GATE, ARMORSAURUS_GATE,
+                SPECIAL_A_GATE, SERPENT_GATE, CHARYBDIS_GATE);
         checkAscending(errors, "bow ladder",
                 UPSTREAM_BOW_GATE, SHORT_BOW_GATE, DRAGONBONE_BOW_GATE, UPSTREAM_LONG_BOW_GATE, UPSTREAM_WAR_BOW_GATE);
 
@@ -1090,6 +1333,7 @@ public final class RebalanceContent {
         expect(errors, "dragon steel armor gate", SCALE_TO_STEEL, TERMINAL_MIN);
         expect(errors, "dragon bone fork gate", DRAGONBONE_TO_BLOODED, DRAGONBONE_TO_STEEL);
         expect(errors, "blooded sword forge gate", SCALE_TO_STEEL, BLOODED_TO_STEEL);
+        expect(errors, "charybdis metal fork gate", CHARYBDIS_GATE, SCALE_TO_STEEL);
 
         // Structural spot checks - the counts a future edit can silently break.
         expect(errors, "dragon scale gear_existence files", 48,
@@ -1101,9 +1345,20 @@ public final class RebalanceContent {
                         .filter(path -> name(path).matches("(mountain|forest|frost)_troll_leather_.*")).count());
         expect(errors, "dragon scale addon chains", 48,
                 (int) content.addonChains.keySet().stream().filter(RebalanceContent::isScale).count());
-        expect(errors, "vanilla fork gear files", 9,
+        expect(errors, "vanilla override gear files", 18,
                 (int) content.geGearExistence.keySet().stream()
                         .filter(path -> path.startsWith(GE_VANILLA)).count());
+        expect(errors, "creature ladder chains", 24,
+                (int) content.addonChains.keySet().stream()
+                        .filter(path -> name(path).matches(
+                                "(monster_leather_.*_c|monster_leather_.*_special_a|ant_carapace_.*"
+                                        + "|armorsaurus(_scalemail)?_.*|charybdis_scalemail_.*)")).count());
+        expect(errors, "creature ladder gear files", 32,
+                (int) content.tensuraGearExistence.keySet().stream()
+                        .filter(path -> name(path).matches(
+                                "(monster_leather_.*_c|monster_leather_.*_special_a|ant_carapace_.*"
+                                        + "|armorsaurus(_scalemail)?_.*|serpent_scalemail_.*"
+                                        + "|knight_spider_carapace_.*|charybdis_scalemail_.*)")).count());
 
         // Ladder spot checks, at literal plan values so a change to epGainFor or the
         // gate tables cannot quietly redefine what "correct" means: the one silver
@@ -1226,6 +1481,56 @@ public final class RebalanceContent {
                 id("dragonsteel_fire_axe"), id("dragonsteel_ice_axe"), id("dragonsteel_lightning_axe"),
                 "tensura:mithril_axe");
         expectChainRung(errors, content, "mountain_troll_leather_helmet", 18000, 0.01d);
+
+        // The creature ladder, pinned at literal plan values. The fork points ship
+        // inert companions plus chains - Gear Evolution strips milestones from
+        // chain-driven items, so they carry none - while the serpent and knight
+        // spider sets are plain rungs whose shifted milestones survive, and charybdis
+        // keeps its engraving while the fork takes over its EP. The netherite
+        // re-bands sit on Gear Evolution's bundled resource paths with gates that
+        // leave both netherite and low magisteel a band worth wearing.
+        expectInertAt(errors, "tensura:monster_leather_helmet_c",
+                findTensuraGear(errors, content, "monster_leather_helmet_c"));
+        expectFork(errors, content, "tensura:monster_leather_helmet_c", 5000, 0.005d,
+                "tensura:monster_leather_helmet_b", "tensura:ant_carapace_helmet");
+        expectInertAt(errors, "tensura:monster_leather_helmet_special_a",
+                findTensuraGear(errors, content, "monster_leather_helmet_special_a"));
+        expectFork(errors, content, "tensura:monster_leather_helmet_special_a", 225000, 0.025d,
+                "tensura:serpent_scalemail_helmet", "tensura:knight_spider_carapace_helmet");
+        expectInertAt(errors, "tensura:ant_carapace_helmet",
+                findTensuraGear(errors, content, "ant_carapace_helmet"));
+        expectFork(errors, content, "tensura:ant_carapace_helmet", 6000, 0.005d,
+                "tensura:armorsaurus_helmet", "tensura:armorsaurus_scalemail_helmet");
+        expectInertAt(errors, "tensura:armorsaurus_helmet",
+                findTensuraGear(errors, content, "armorsaurus_helmet"));
+        expectFork(errors, content, "tensura:armorsaurus_helmet", 9000, 0.015d,
+                "tensura:serpent_scalemail_helmet", "tensura:knight_spider_carapace_helmet");
+        expectFork(errors, content, "tensura:armorsaurus_scalemail_helmet", 9000, 0.015d,
+                "tensura:serpent_scalemail_helmet", "tensura:knight_spider_carapace_helmet");
+        expectLadderRung(errors, "tensura:serpent_scalemail_helmet",
+                findTensuraGear(errors, content, "serpent_scalemail_helmet"), 9000, 500000, 0.015d,
+                "tensura:charybdis_scalemail_helmet");
+        expectMilestones(errors, "tensura:serpent_scalemail_helmet",
+                findTensuraGear(errors, content, "serpent_scalemail_helmet"),
+                SERPENT_MILESTONE_1, SERPENT_MILESTONE_2, SERPENT_MILESTONE_3);
+        expectLadderRung(errors, "tensura:knight_spider_carapace_helmet",
+                findTensuraGear(errors, content, "knight_spider_carapace_helmet"), 9000, 500000, 0.015d,
+                "tensura:charybdis_scalemail_helmet");
+        JsonObject charybdis = findTensuraGear(errors, content, "charybdis_scalemail_helmet");
+        expectInertAt(errors, "tensura:charybdis_scalemail_helmet", charybdis);
+        if (charybdis != null && (!charybdis.has("engravings")
+                || !charybdis.getAsJsonObject("engravings").has("tensura:magic_interference"))) {
+            errors.add("tensura:charybdis_scalemail_helmet lost its magic interference engraving");
+        }
+        expectFork(errors, content, "tensura:charybdis_scalemail_helmet", 750000, 0.025d,
+                new int[] { 1, 1, 1, 3 }, id("dragonsteel_fire_helmet"), id("dragonsteel_ice_helmet"),
+                id("dragonsteel_lightning_helmet"), "tensura:mithril_helmet");
+        expectRungAt(errors, "minecraft:netherite_boots",
+                content.geGearExistence.get(GE_VANILLA + file("minecraft:netherite_boots")),
+                NETHERITE_ARMOR_GATE, 0.003d, "tensura:low_magisteel_boots");
+        expectRungAt(errors, "minecraft:netherite_pickaxe",
+                content.geGearExistence.get(GE_VANILLA + file("minecraft:netherite_pickaxe")),
+                NETHERITE_TOOL_GATE, 0.003d, "tensura:low_magisteel_pickaxe");
 
         if (!errors.isEmpty()) {
             throw new IllegalStateException(
@@ -1374,13 +1679,40 @@ public final class RebalanceContent {
     }
 
     private static void expectInert(List<String> errors, Content content, String item) {
-        JsonObject json = findGear(errors, content, item);
+        expectInertAt(errors, item, findGear(errors, content, item));
+    }
+
+    /** maxEP 0 and no target named: the addon chain drives everything else. */
+    private static void expectInertAt(List<String> errors, String item, JsonObject json) {
         if (json == null) {
             return;
         }
         expectInt(errors, item, "maxEP", 0, json);
         if (json.has("evolution") || json.has("evolutionOptions")) {
             errors.add(item + " is inert but names an evolution");
+        }
+    }
+
+    /** The milestone EPs of a rung's {@code uniqueEvolutions} list, pinned in order. */
+    private static void expectMilestones(List<String> errors, String item, JsonObject json, int... eps) {
+        if (json == null) {
+            return;
+        }
+        if (!json.has("uniqueEvolutions")) {
+            errors.add(item + " carries no milestones");
+            return;
+        }
+        com.google.gson.JsonArray milestones = json.getAsJsonArray("uniqueEvolutions");
+        if (milestones.size() != eps.length) {
+            errors.add(item + " should carry " + eps.length + " milestones, found " + milestones.size());
+            return;
+        }
+        for (int i = 0; i < eps.length; i++) {
+            JsonObject milestone = milestones.get(i).getAsJsonObject();
+            if (!milestone.has("EP") || milestone.get("EP").getAsInt() != eps[i]) {
+                errors.add(item + " milestone " + i + " should fire at " + eps[i] + ", found "
+                        + (milestone.has("EP") ? milestone.get("EP") : "nothing"));
+            }
         }
     }
 
@@ -1675,16 +2007,21 @@ public final class RebalanceContent {
     /**
      * The exact fork targets this pack ships no gear_existence file for: chainmail
      * and iron continue on Gear Evolution's bundled ladders, monster leather D on
-     * Tensura's own tier files.
+     * Tensura's own tier files, monster leather B on Tensura's file (the creature
+     * fork hands one branch back to it), and the netherite re-bands hand off to
+     * Tensura's untouched low magisteel rungs.
      */
     private static Set<String> forkTargets() {
         Set<String> targets = new LinkedHashSet<>();
         for (String slot : SLOTS) {
             targets.add("minecraft:chainmail_" + slot);
             targets.add("tensura:monster_leather_" + slot + "_d");
+            targets.add("tensura:monster_leather_" + slot + "_b");
+            targets.add("tensura:low_magisteel_" + slot);
         }
         for (String tool : TOOLS) {
             targets.add("minecraft:iron_" + tool);
+            targets.add("tensura:low_magisteel_" + tool);
         }
         return Set.copyOf(targets);
     }

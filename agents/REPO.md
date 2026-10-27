@@ -110,13 +110,49 @@ generator used to exist and has been deleted deliberately.
   untouched adamantite band, 225,000-750,000); mithril armor floors at 750,000
   and forges to 1,000,000, where this pack's adamantite armor override
   (1,000,000 -> 1,250,000 @ 0.04) accepts the carry and hands off to
-  hihiirokane. All gates are constants in `RebalanceContent` and
+  hihiirokane. The vanilla metal line closes the same way: Gear Evolution's
+  bundled netherite rungs are re-banded in this pack (netherite -> low
+  magisteel at 12,000 armor / 10,000 tools - the bundled 17,500 armor gate
+  handed off 500 EP before magisteel's own 18,000 gate, a de-facto skipped
+  tier), so chainmail -> iron -> diamond -> netherite rides the metals spine
+  too. The creature ladder (next bullet) runs parallel to the armor spine and
+  merges with it at the 750,000 metal fork. All gates are constants in
+  `RebalanceContent` and
   `epGainFor(gate)` derives every climb rate from them: 0.003 below 18,000,
   then 0.01 / 0.02 / 0.025 / 0.03 across the spine, plus 500,000 -> 0.025,
   1,000,000 -> 0.03 and 1,250,000 -> 0.04 for the mithril bands. Validation
   asserts strict ascent on every ladder, that the dragon bone fork sits on
-  225,000 for both ladders, and that the blooded sword forge still lands on
-  750,000.
+  225,000 for both ladders, that the blooded sword forge still lands on
+  750,000, and that charybdis's metal fork sits on the same 750,000 gate.
+- **The creature ladder re-gates Tensura's hide/scale/carapace sets into one
+  flow, and what carries milestones dictates each file's shape.** Gear
+  Evolution strips `uniqueEvolutions` from chain-driven items (verified in
+  `GearEquipLogic.initTrackedGear` and `GearExistenceApplicator`), so every
+  fork point - monster leather C, Special A, ant carapace, both armorsaurus
+  sets, charybdis - ships an inert companion (`maxEP: 0`, plus the engraving
+  where Tensura ships one) and an addon chain, while the serpent and knight
+  spider sets are plain re-banded rungs whose milestones survive. The rungs:
+  monster leather C forks at 5,000 into {monster leather B | ant carapace};
+  ant climbs 3,000 -> 6,000 into {armorsaurus | armorsaurus scalemail}; both
+  climb 6,000 -> 9,000 into {serpent scalemail | knight spider carapace};
+  those climb 9,000 -> 500,000 into charybdis; charybdis forks at 750,000 into
+  {dragon steel 3x weight 1 | mithril weight 3}, the same 50/50 roll the dragon
+  bone forks run and the same gate dragon scale armor forks at. Special A
+  leaves its terminal rank at 225,000 into the serpent fork, so the leather
+  and creature sub-lines split at monster leather C and merge at serpent and
+  again at the metal fork. Every floor is the set's own (2,500 / 3,000 / 6,000
+  / 9,000 / 60,000 / 80,000) and every climb rate is Tensura's own (0.005 /
+  0.015 / 0.025) - preserved deliberately, unlike the derived rates the IaF
+  rungs use. Serpent and knight spider milestones shift from 18,000 / 52,000 /
+  225,000 / 750,000 to 280,000 / 360,000 / 440,000: the Special A carry
+  (225,000) would instantly clear all three native thresholds, and the 750,000
+  milestone dies with the 500,000 gate. Charybdis's native milestones cannot
+  survive its fork and are dropped - its `magic_interference` engraving is the
+  part that carries over. Hand-offs land exactly on the next floor where the
+  floors align (ant -> armorsaurus -> serpent, ML A -> Special A) and inside
+  the band below its first milestone where they do not (monster leather fork
+  -> ant at 5,000, Special A -> serpent at 225,000), so no tier is skipped and
+  no milestone is pre-earned.
 - **A terminal omits `maxEP`; inert means `maxEP: 0`.** Top-of-ladder gear
   (dragon steel, the Blade of the Dreaded Queen and Dread Queen's Staff, the
   red gauntlet, uniques, troll weapons) ships `minEP` + `epGain` and no
@@ -133,9 +169,10 @@ generator used to exist and has been deleted deliberately.
   own resource path - death worm armor in all three chitin colours (12) and the
   five dragonbone tools - because the addon_chains ladder drives them instead.
   The built-in coverage check fails the build if any of the 141 loses coverage.
-  Validation pins the shipped counts: 187 `data/gearevolution` gear files (161
-  ours + 17 neutralised + 9 vanilla fork companions), 151 addon shadows, 45
-  Tensura-folder files, 131 chains, 37 movesets, 24 entity files - 575 in total.
+  Validation pins the shipped counts: 196 `data/gearevolution` gear files (161
+  ours + 17 neutralised + 18 vanilla overrides - the 9 fork companions and the
+  9 re-banded netherite rungs), 151 addon shadows, 77 Tensura-folder files, 155
+  chains, 37 movesets, 24 entity files - 640 in total.
 - **The bow ladder is the one cross-namespace chain, and it has two
   carve-outs.** The chain is `bow (700) -> short_bow (3,600) -> dragonbone_bow
   (7,200) -> long_bow (12,500) -> war_bow (16,000)`, slotted by damage and
@@ -155,15 +192,20 @@ generator used to exist and has been deleted deliberately.
   an inert companion (`maxEP: 0`) at `data/gearevolution/gear_existence/
   minecraft/` - same resource path as Gear Evolution's bundled rung, so the
   single-target thresholds are replaced outright - and the addon chain that
-  actually forks. No addon shadow is needed: the addon ships no vanilla
-  files at all. The copper side is content this pack generates; chainmail (4),
-  iron (5) and monster leather D (4) are content it deliberately does not, and
-  exactly those thirteen ids are grandfathered through `FORK_TARGETS` in
-  `checkTarget` - chainmail and iron continue on Gear Evolution's bundled
-  ladders (chainmail -> iron at 1,350, iron -> diamond at 3,200/2,600),
-  monster leather D on Tensura's own D -> C -> B -> A files (floor 1,000,
-  top 2,500, so the 550 carry sits safely below it). Do not widen that set
-  without a decision: it is the only allowlist of ungenerated targets.
+  actually forks. The nine netherite rungs in the same folder are the other
+  kind of override: real rungs (maxEP 12,000 armor / 10,000 tools, evolution
+  `tensura:low_magisteel_*`) that replace the bundled thresholds outright. No
+  addon shadow is needed: the addon ships no vanilla files at all. The copper
+  side is content this pack generates; chainmail (4), iron (5), monster
+  leather D (4), monster leather B (4) and the low magisteel targets (9) are
+  content it deliberately does not, and exactly those twenty-six ids are
+  grandfathered through `FORK_TARGETS` in
+  `checkTarget` - chainmail, iron, monster leather B and the magisteel rungs
+  continue on their own providers' files (chainmail -> iron at 1,350, iron ->
+  diamond at 3,200/2,600), monster leather D on Tensura's own D -> C -> B -> A
+  files (floor 1,000, top 2,500, so the 550 carry sits safely below it). Do
+  not widen that set without a decision: it is the only allowlist of
+  ungenerated targets.
 - **Fork options are strings unless a fork needs weights.** Plain string
   options all weigh 1, which is what the copper fork and the vanilla openings
   use (uniform roll). The two dragon bone forks at 225,000 use object options
@@ -258,13 +300,18 @@ generator used to exist and has been deleted deliberately.
   back into Tensura (see the bow carve-outs); the files under
   `data/tensura/gear_existence/` (plus their Gear Evolution silver copies)
   climb Tensura's own ladder (silver, mithril, adamantite armor, kunai to pure
-  magisteel); and the forks deliberately name outside items - the vanilla
-  openings name `minecraft:chainmail_*` / `minecraft:iron_*` (continuing on
-  Gear Evolution's bundled ladders) and `tensura:monster_leather_*_d`
-  (continuing on Tensura's own), the copper and dragon bone forks name
-  `tensura:silver_*` and `tensura:mithril_*`, and the dragon scale fork names
-  `tensura:mithril_*` armor. Every such target is either generated by this
-  pack, grandfathered by path, or on the `FORK_TARGETS` allowlist. Do not add
+  magisteel, and the whole creature ladder - monster leather, ant, armorsaurus,
+  serpent, knight spider, charybdis); and the forks deliberately name outside
+  items - the vanilla openings name `minecraft:chainmail_*` /
+  `minecraft:iron_*` (continuing on Gear Evolution's bundled ladders), the
+  netherite re-bands name `tensura:low_magisteel_*`, the vanilla leather fork
+  names `tensura:monster_leather_*_d` (continuing on Tensura's own), the
+  copper and dragon bone forks name `tensura:silver_*` and
+  `tensura:mithril_*`, the dragon scale fork names `tensura:mithril_*` armor,
+  and the creature forks name `tensura:monster_leather_*_b` (the one branch
+  that hands back to Tensura's untouched rung). Every such target is either
+  generated by this pack, grandfathered by path, or on the `FORK_TARGETS`
+  allowlist. Do not add
   further cross-namespace targets or files without an explicit decision.
 - **Mixins are sanctioned here** (widening I&F's config range and stretching its
   growth hooks have no public API). They are not a general licence: the org rule

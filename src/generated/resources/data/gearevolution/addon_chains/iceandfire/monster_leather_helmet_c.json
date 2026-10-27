@@ -1,0 +1,10 @@
+{
+  "epGain": 0.005,
+  "evolutionOptions": [
+    "tensura:monster_leather_helmet_b",
+    "tensura:ant_carapace_helmet"
+  ],
+  "item": "tensura:monster_leather_helmet_c",
+  "maxEP": 5000,
+  "minEP": 2500
+}

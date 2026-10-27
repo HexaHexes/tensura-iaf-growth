@@ -1,0 +1,24 @@
+{
+  "epGain": 0.025,
+  "evolutionOptions": [
+    {
+      "id": "iceandfire:dragonsteel_fire_chestplate",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_ice_chestplate",
+      "weight": 1
+    },
+    {
+      "id": "iceandfire:dragonsteel_lightning_chestplate",
+      "weight": 1
+    },
+    {
+      "id": "tensura:mithril_chestplate",
+      "weight": 3
+    }
+  ],
+  "item": "tensura:charybdis_scalemail_chestplate",
+  "maxEP": 750000,
+  "minEP": 60000
+}
