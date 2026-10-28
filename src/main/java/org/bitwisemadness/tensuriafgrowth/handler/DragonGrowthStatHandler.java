@@ -74,8 +74,30 @@ public final class DragonGrowthStatHandler {
         }
     }
 
-    /** Called from the mixin at the tail of {@code updateAttributes} and after banked gains. */
+    /**
+     * Called from the mixin at the tail of {@code updateAttributes} and after banked gains.
+     *
+     * <p>Reentrancy guard lives here: Tensura fires
+     * {@code ATTRIBUTE_BASE_CHANGE_EVENT} from an {@code @Inject} at the
+     * <em>HEAD</em> of {@code AttributeInstance.setBaseValue} (verified in
+     * {@code MixinAttributeInstance}), so while listeners run
+     * {@code getBaseValue()} still reads the old value and the new base has
+     * not committed. Every max-base write this pin makes therefore re-enters
+     * through the bake mixin ({@code addStatOnEPGain} -&gt;
+     * {@code updateAttributes} -&gt; tail) with the write still mid-flight, and
+     * without this guard the nested pass sees the same stale base, "raises"
+     * it again, and recurses until the stack blows - the 1.5.0 spawn-egg
+     * {@code StackOverflowError}. Nested calls return immediately; the
+     * outermost pass is still running and completes every remaining write
+     * itself, so nothing is skipped. Entity attribute writes run on the server
+     * thread, so a plain static flag is correct.
+     */
+    private static boolean refreshing;
+
     public static void refresh(DragonBaseEntity dragon) {
+        if (refreshing) {
+            return;
+        }
         if (dragon.level() == null || dragon.level().isClientSide) {
             return;
         }
@@ -83,7 +105,12 @@ public final class DragonGrowthStatHandler {
         if (existence == null) {
             return;
         }
-        pin(dragon, existence);
+        refreshing = true;
+        try {
+            pin(dragon, existence);
+        } finally {
+            refreshing = false;
+        }
     }
 
     /** One of the two pin paths; guarded writes, storage marked dirty only when something moved. */
@@ -136,9 +163,10 @@ public final class DragonGrowthStatHandler {
     /**
      * Sets a max-energy attribute's base value, in the shape
      * {@code initEntityExistence} uses. Raising it fires Tensura's
-     * attribute-base-change event, whose bake our mixin cancels for dragons -
-     * the banked delta is harmless and {@code updateAttributes} re-enters this
-     * handler idempotently.
+     * attribute-base-change event <em>before</em> the write commits, whose bake
+     * our mixin cancels for dragons - the banked delta is harmless, and the
+     * nested {@code updateAttributes} tail returns at the guard in
+     * {@link #refresh} while this write is still in flight.
      */
     private static boolean setMaxBase(DragonBaseEntity dragon, Holder<Attribute> attribute, double value) {
         AttributeInstance instance = dragon.getAttribute(attribute);
