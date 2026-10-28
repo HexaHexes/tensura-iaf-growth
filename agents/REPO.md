@@ -10,18 +10,20 @@ restating them.
 **Platform:** Minecraft 1.21.1 / NeoForge 21.1.259 / JDK 21 · **Jar:** `build/libs/tensura_iaf_growth-<version>.jar`
 
 A NeoForge addon for the Tensura RPG pack. It stretches Ice and Fire's dragon
-growth (wider age cap, stage-scaled EP), tags dragon melee with the natural
-element, grants each dragon a secondary element, and ships a rebalanced
-datapack - gear chains, entity existence bands, BetterCombat movesets - inside
-its own jar.
+growth (wider age cap, stage-scaled growth windows), pins each dragon's EP to a
+configurable stage-banded curve, tags dragon melee with the natural element,
+grants each dragon a secondary element, and ships a rebalanced datapack - gear
+chains, entity existence bands, BetterCombat movesets - inside its own jar.
 
 **Dependencies**
 - Required: Tensura: Reincarnated (`tensura`), ManasCore (`manascore`), Ice and
   Fire CE (`iceandfire`), Tensura: Ice and Fire (`tensura_iaf`).
 - Optional: Tensura: Gear Evolution (`gearevolution`) - the gear chains do not
   run without it; Mysticism (`mysticism`) - source of the light manipulation
-  skill fire dragons are granted; BetterCombat - only the `weapon_attributes`
-  files need it.
+  skill fire dragons are granted; TensuraRPGSystem - only the status-layer
+  exclusion (`MobStatusSystemMixin`, issue #31) applies to it, and that mixin
+  is `@Pseudo` so it is skipped without the mod; BetterCombat - only the
+  `weapon_attributes` files need it.
 - Install on client **and** server: growth stage drives the render size, so a
   client without the mod shows the wrong dragon.
 
@@ -41,6 +43,13 @@ hand-editing JSON** - run `./gradlew runData` afterwards and commit
 moveset table all live in `RebalanceContent`; the magicule/aura bands live in
 `EntityExistenceContent`. There is no script form of this: a PowerShell
 generator used to exist and has been deleted deliberately.
+
+The dragon EP curve is the one tunable that is **not** in datagen: it lives in
+this mod's own config, `config/tensura_iaf_growth-common.toml` (`[dragon_ep]`,
+class `DragonEpConfig`), read live on every refresh. The datapack's dragon
+`entity_existence` band (magicule 9,000-720,000, aura 1,000-80,000) is the
+pre-refresh spawn-roll range the pin spans; if the config curve is retuned past
+those bounds, re-cut the band in `EntityExistenceContent` to match.
 
 ---
 
@@ -279,30 +288,53 @@ generator used to exist and has been deleted deliberately.
   `IafDragonColors`); re-check them against the jar when the mod updates.
 - **Mixins are the mechanism, not a shortcut.** `IafCommonConfigDragonMixin`
   widens the age cap range, `DragonBaseEntityGrowthMixin` stretches the growth
-  hooks, `EnergyHelperMixin` and `AttributeHandlerMixin` force mastery. All are
-  `remap = false` with `defaultRequire 1`; `@ModifyConstant` applies to every
-  match in the method it is on, so check the target method's literals before
-  adding one. At the default age cap of 128 every growth hook is an identity
-  transform - that is the regression test: defaults must be unchanged.
-- **Dragon stats are three layers, and the bake layer must stay severed.**
-  `DragonGrowthStatHandler` (refresh at the tail of `updateAttributes`, plus a
-  HEAD takeover of `AttributeHandler.addStatOnEPGain`) is what stops Tensura's
-  unbounded stat-on-EP accumulation - the mechanism that produced stage 1
-  dragons at 1,900 HP and wild lightning dragons at 20k. Layers: IaF's own
-  curve (deterministic floor, re-run before every refresh), a growth-pinned EP
-  value (`lerp` inside the entity_existence band by `age/125f` - also the kill
-  payout base), and a banked-EP bonus capped by
-  `floor(min(gainedEP, band_max x growth) / 10,000) x gains` (gains live-read
-  from Tensura's `AttributeConfig`, so server config still tunes the rate).
-  The recompute is total, never incremental - old inflated dragons self-correct
-  on first load. Do not "simplify" the HEAD takeover back to the
-  `ep_initiate_excluded` tag: the join handler reads that same tag and skips
-  `updateEntityExistence` for marked entities entirely, which strips dragons of
-  their granted abilities (breaths, resistances, secondary elements). The
-  recommended `maxHealth = 9,965` in `iaf-common.json` is what makes a
-  fully-banked max-growth dragon land exactly at 10,000 HP; IaF's armor curve
-  (1 -> 20) is deliberately kept, clamped to the span so it cannot grow past
-  full growth. Storage access goes through the `StorageHolder` interface cast
+  hooks, `EnergyHelperMixin` and `AttributeHandlerMixin` force mastery (and
+  sever the stat-on-EP bake), and `MobStatusSystemMixin` excludes dragons from
+  TensuraRPGSystem's status layer. All are `remap = false` with
+  `defaultRequire 1`; `@ModifyConstant` applies to every match in the method it
+  is on, so check the target method's literals before adding one. At the
+  default age cap of 128 every growth hook is an identity transform - that is
+  the regression test: defaults must be unchanged.
+- **Dragon stats: the EP pin and the pure IaF curve.** HP, attack and armor are
+  the pure Ice and Fire growth curve - the old banked-EP stat budget is
+  deprecated (issue #30). The stat-on-EP bake (`AttributeHandler.addStatOnEPGain`)
+  is cancelled outright for dragons by the HEAD takeover in
+  `AttributeHandlerMixin`; it used to add `HPGain`/`armorGain`/`attackGain`
+  unboundedly per 10,000 EP and produced stage 1 dragons at 1,900 HP and wild
+  lightning dragons at 20k. What is pinned is the dragon's existence - EP and
+  the aura/magicule pools and their max bases behind them - by
+  `DragonGrowthStatHandler`, which runs at the tail of every
+  `updateAttributes` call and on `EntityJoinLevelEvent`. The target is the
+  stage-banded curve from this mod's own config (`DragonEpConfig`,
+  `config/tensura_iaf_growth-common.toml`, `[dragon_ep]`): the EP line at hatch
+  and each stage end (10k / 100k / 200k / 350k / 550k / 800k by default),
+  interpolated linearly across the stretched stage windows and split 1 aura :
+  9 magicule. Two paths, switched by a persistent-data flag
+  (`tensura_iaf_growth_ep_pinned`): the first refresh on 1.5.0 (flag absent) is
+  a **migration snap** that rewrites pools and max bases to the line exactly
+  (one-time normalization of spawn rolls, old-band values and modifier
+  artifacts - indistinguishable from a top-up, so it wipes once); every later
+  refresh is a **floor pin**, `sum := clamp(sum, line, ceiling)` - below the
+  line the pools are lifted to the line shares, above the ceiling clipped down
+  and re-split 1:9, in between untouched, which is what lets earned top-ups
+  survive. The ceiling is `max(stage cap, max-attribute bases read pre-write)`,
+  and the naming gains - subdue, evolve, and endow's 9x EP, which Tensura
+  grants by raising MAX_AURA/MAX_MAGICULE bases before lifting the pools -
+  ride that base-derived ceiling past any stage cap. The max bases themselves
+  get the line as a floor and never fall behind the pools, preserving
+  Tensura's `current <= max` invariant. Do not "simplify" the HEAD takeover
+  back to the `ep_initiate_excluded` tag: the join handler reads that same tag
+  and skips `updateEntityExistence` for marked entities entirely, which strips
+  dragons of their granted abilities (breaths, resistances, secondary
+  elements). `MobStatusSystemMixin` is the Path B counterpart for
+  TensuraRPGSystem (issue #31): `MobStatusSystem.excluded(Mob)` is the single
+  choke point every RPS mutating path funnels through, so HEAD-injecting
+  `true` for `DragonBaseEntity` there drops dragons off the +1%-HP-per-level
+  layer while every other mob keeps it - and it is string-targeted `@Pseudo`
+  because TensuraRPGSystem is a pack member, not a compile dependency. IaF's
+  armor curve (1 -> 20) is deliberately kept, clamped to the span so it cannot
+  grow past full growth. Storage access goes through the `StorageHolder`
+  interface cast
   (`((StorageHolder) entity).manasCore$getStorage(ExistenceStorage.getKey())`)
   - the injected `Entity.manasCore$getStorage` is not visible at compile time.
 - Datagen does not load `EnergyHelper`, so `EnergyHelperMixin` is not proven by

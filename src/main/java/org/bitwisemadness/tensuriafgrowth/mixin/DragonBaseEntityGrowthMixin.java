@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * <p>Two hooks live on {@code updateAttributes} beyond the stretch: the armor
  * line's raw age is clamped to the span (vanilla's 128 cap hid the overshoot),
  * and the tail hands off to {@link DragonGrowthStatHandler} so the dragon's EP
- * and banked-EP stats follow growth - see that class for the layering.
+ * follows growth - see that class for the pin.
  */
 @Mixin(value = DragonBaseEntity.class, remap = false)
 public final class DragonBaseEntityGrowthMixin {
@@ -172,11 +172,10 @@ public final class DragonBaseEntityGrowthMixin {
 
     // --- Growth-pinned existence -------------------------------------------
     // Every updateAttributes run ends with the growth handler: the dragon's EP
-    // is pinned inside its entity_existence band by age, and the banked-EP stat
-    // bonus is re-derived under the growth budget - see DragonGrowthStatHandler.
-    // updateAttributes runs at construction, on load, on each growth day
-    // (growDragon) and on equipment changes, so the recompute covers every way
-    // a dragon's age or belongings can move.
+    // is pinned to the stage-banded curve from this mod's config by age - see
+    // DragonGrowthStatHandler. updateAttributes runs at construction, on load,
+    // on each growth day (growDragon) and on equipment changes, so the recompute
+    // covers every way a dragon's age or belongings can move.
 
     @Inject(method = "updateAttributes()V", at = @At("TAIL"))
     private void tensura_iaf_growth$refreshGrowthPinnedStats(CallbackInfo ci) {

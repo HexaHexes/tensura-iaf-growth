@@ -9,9 +9,9 @@
     "tensura:electricity_resistance",
     "tensura:wind_manipulation"
   ],
-  "max_aura": 10000,
-  "max_magicule": 340000,
-  "min_aura": 10000,
-  "min_magicule": 240000,
+  "max_aura": 80000,
+  "max_magicule": 720000,
+  "min_aura": 1000,
+  "min_magicule": 9000,
   "spiritualHealth": 2000
 }

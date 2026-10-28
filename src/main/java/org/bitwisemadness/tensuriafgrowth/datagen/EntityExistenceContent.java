@@ -61,16 +61,19 @@ public final class EntityExistenceContent {
                 List.of("tensura:water_breathing", "tensura:hydraulic_propulsion"), null);
 
         // The end game: one band for all three dragons, each with its secondary element.
-        add(files, "fire_dragon", 2000, 240000, 340000, 10000, 10000,
+        // The band is the range the stage-banded pin (DragonEpConfig) spans:
+        // magicule 9k-720k and aura 1k-80k, so hatch = 1k/9k and full growth =
+        // 80k/720k - the pre-refresh spawn roll lands in-band for any age.
+        add(files, "fire_dragon", 2000, 9000, 720000, 1000, 80000,
                 List.of("tensura:dragon_skin", "tensura:dragon_eye", "tensura:dragon_ear",
                         "tensura:flame_breath", "tensura:flame_attack_resistance", FIRE_DRAGON_SECONDARY),
                 null);
-        add(files, "ice_dragon", 2000, 240000, 340000, 10000, 10000,
+        add(files, "ice_dragon", 2000, 9000, 720000, 1000, 80000,
                 List.of("tensura:dragon_skin", "tensura:dragon_eye", "tensura:dragon_ear",
                         "tensura:cold_resistance", "tensura:water_attack_resistance", "tensura:ice_breath",
                         ICE_DRAGON_SECONDARY),
                 null);
-        add(files, "lightning_dragon", 2000, 240000, 340000, 10000, 10000,
+        add(files, "lightning_dragon", 2000, 9000, 720000, 1000, 80000,
                 List.of("tensura:dragon_skin", "tensura:dragon_eye", "tensura:dragon_ear",
                         "tensura:thunder_breath", "tensura:wind_attack_resistance",
                         "tensura:electricity_resistance", LIGHTNING_DRAGON_SECONDARY),
