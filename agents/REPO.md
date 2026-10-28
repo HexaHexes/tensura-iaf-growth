@@ -284,6 +284,27 @@ generator used to exist and has been deleted deliberately.
   match in the method it is on, so check the target method's literals before
   adding one. At the default age cap of 128 every growth hook is an identity
   transform - that is the regression test: defaults must be unchanged.
+- **Dragon stats are three layers, and the bake layer must stay severed.**
+  `DragonGrowthStatHandler` (refresh at the tail of `updateAttributes`, plus a
+  HEAD takeover of `AttributeHandler.addStatOnEPGain`) is what stops Tensura's
+  unbounded stat-on-EP accumulation - the mechanism that produced stage 1
+  dragons at 1,900 HP and wild lightning dragons at 20k. Layers: IaF's own
+  curve (deterministic floor, re-run before every refresh), a growth-pinned EP
+  value (`lerp` inside the entity_existence band by `age/125f` - also the kill
+  payout base), and a banked-EP bonus capped by
+  `floor(min(gainedEP, band_max x growth) / 10,000) x gains` (gains live-read
+  from Tensura's `AttributeConfig`, so server config still tunes the rate).
+  The recompute is total, never incremental - old inflated dragons self-correct
+  on first load. Do not "simplify" the HEAD takeover back to the
+  `ep_initiate_excluded` tag: the join handler reads that same tag and skips
+  `updateEntityExistence` for marked entities entirely, which strips dragons of
+  their granted abilities (breaths, resistances, secondary elements). The
+  recommended `maxHealth = 9,965` in `iaf-common.json` is what makes a
+  fully-banked max-growth dragon land exactly at 10,000 HP; IaF's armor curve
+  (1 -> 20) is deliberately kept, clamped to the span so it cannot grow past
+  full growth. Storage access goes through the `StorageHolder` interface cast
+  (`((StorageHolder) entity).manasCore$getStorage(ExistenceStorage.getKey())`)
+  - the injected `Entity.manasCore$getStorage` is not visible at compile time.
 - Datagen does not load `EnergyHelper`, so `EnergyHelperMixin` is not proven by
   `runData`. Runtime mixin application has been verified once with
   `mixin.debug.export=true` (`run/.mixin.out/class/`); re-run that rather than

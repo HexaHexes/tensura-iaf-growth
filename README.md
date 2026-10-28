@@ -26,6 +26,19 @@ at that power level.
 - **Growth stage is the EP lever.** How much EP a dragon earns is set by its
   stage: 15% as a hatchling, then 30%, 50%, 75%, and the full rate once fully
   grown. Growing one up is the main way to make it strong.
+- **A dragon's own EP follows its growth.** A dragon's magicules and aura no
+  longer come from a random roll at spawn - they climb with its age inside its
+  species' band, so a hatchling reads as a hatchling and a fully grown dragon
+  reads as the apex predator it is. Fighting still matters: every EP a dragon
+  earns can harden it further, but what its battle experience adds to its
+  stats is capped by its growth, so a whelp can never be inflated past its
+  size and a max-growth dragon tops out just under its curve's ceiling. A
+  dragon's stats are rebuilt from its growth on every load, so dragons that
+  were inflated by older versions come back down on their own.
+- **Set dragon max health to 9,965.** With the recommended `maxHealth` in
+  `iaf-common.json`, a fully grown dragon that has seen real battle lands
+  exactly at 10,000 HP - the ceiling stays the ceiling no matter how much EP
+  it has banked.
 - **Dragons fight with their element.** A dragon's melee hits carry its natural
   element - fire dragons burn, ice dragons chill, lightning dragons shock - so
   resistances and weaknesses apply the way they do to any other elemental attack.
