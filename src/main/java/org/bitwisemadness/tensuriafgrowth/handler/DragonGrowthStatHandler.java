@@ -1,64 +1,77 @@
 package org.bitwisemadness.tensuriafgrowth.handler;
 
 import com.iafenvoy.iceandfire.entity.DragonBaseEntity;
-import io.github.manasmods.manascore.config.ConfigRegistry;
 import io.github.manasmods.manascore.storage.api.StorageHolder;
-import io.github.manasmods.tensura.config.entity.AttributeConfig;
-import io.github.manasmods.tensura.registry.data.TensuraCustomData;
-import io.github.manasmods.tensura.data.existence.EntityExistenceData;
 import io.github.manasmods.tensura.registry.attribute.TensuraAttributes;
 import io.github.manasmods.tensura.storage.ep.ExistenceStorage;
 import io.github.manasmods.tensura.storage.ep.IExistence;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import org.bitwisemadness.tensuriafgrowth.Growth;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import org.bitwisemadness.tensuriafgrowth.config.DragonEpConfig;
 
 /**
- * Makes a dragon's Tensura existence follow its growth, and caps what its banked
- * EP can do to its stats.
+ * Pins a dragon's Tensura existence (EP, and the aura/magicule pools and their
+ * max caps behind it) to the stage-banded growth curve shipped as this mod's
+ * config - see {@link DragonEpConfig}.
  *
- * <p>Three layers, each with one job:
+ * <p>Two paths, chosen by a persistent-data flag:
  *
  * <ul>
- *   <li><strong>The growth curve</strong> - Ice and Fire's own {@code updateAttributes},
- *   stretched by {@link org.bitwisemadness.tensuriafgrowth.mixin.DragonBaseEntityGrowthMixin},
- *   sets HP/attack/armor from age. Deterministic, identical for all three dragon types
- *   (min {@code 0.04 x maxHealth} to max {@code maxHealth} over the span), and it is
- *   re-run before every refresh below, so the curve is always the floor.</li>
- *   <li><strong>The EP pin</strong> - the dragon's aura and magicule no longer come from
- *   the spawn roll. They lerp inside the entity_existence band with the growth fraction,
- *   and the matching max-attribute caps follow, so Tensura's join-time clamping and EP
- *   regen stay aligned with the pin instead of fighting it. This is what makes growth
- *   stage the EP lever for the dragon's own existence.</li>
- *   <li><strong>The capped bank</strong> - EP the dragon earns (kills, regen - anything
- *   that reaches {@code addStatOnEPGain}, which {@link org.bitwisemadness.tensuriafgrowth.mixin.AttributeHandlerMixin}
- *   turns into a bank-only operation for dragons) still makes it stronger, but the stat
- *   bonus is recomputed from {@code floor(min(bank, budget) / 10,000) x gains} where the
- *   budget is the band maximum scaled by the growth fraction. A whelp has no budget, so
- *   no amount of banked EP inflates a stage 1; a max-growth dragon's budget is the full
- *   band, so a well-fought one lands at the cap and can never exceed it. The recomputation
- *   is total, never incremental: every refresh writes {@code curve + bonus}, so old
- *   dragons with inflated bases correct themselves on the first refresh after load.</li>
+ *   <li><strong>Migration snap (first refresh on 1.5.0, flag absent)</strong> -
+ *   pools and max bases are rewritten to the line exactly: aura = line / 10,
+ *   magicule = line x 9 / 10, so {@code aura + magicule = line} at every age.
+ *   History at this point - spawn rolls, values pinned against the old
+ *   240k-340k band, modifier artifacts - is indistinguishable from a top-up,
+ *   so it is normalized once, here.</li>
+ *   <li><strong>Floor pin (flag present)</strong> - "grow up, never clip down":
+ *   {@code sum := clamp(sum, line, ceiling)}. Below the line the pools are
+ *   lifted to the line shares; above the ceiling they are clipped down and
+ *   re-split 1:9; in between they are left untouched, which is what lets
+ *   earned top-ups survive. The ceiling is
+ *   {@code max(stage cap, max-attribute bases)}: naming gains - including
+ *   endow's 9x EP, which Tensura grants by raising MAX_AURA/MAX_MAGICULE bases
+ *   before lifting the pools - ride the bases through every refresh and relog,
+ *   even past {@code stage5EpCap}. Kill top-ups that only touch the pools ride
+ *   the stage cap. The max bases themselves get the line as a floor (never
+ *   clipped down, raised when the line grows) and never fall behind the pools
+ *   they cap, preserving Tensura's {@code current <= max} invariant.</li>
  * </ul>
  *
- * <p>Refresh runs at the tail of every {@code updateAttributes} call - construction,
- * load, each growth day via {@code growDragon}, and equipment changes - and after every
- * banked EP gain, which is where "gets stronger as it fights" is felt. It never heals and
- * never touches movement speed or the equipment armor modifier; those layers belong to
- * Ice and Fire.
+ * <p>Refresh runs at the tail of every {@code updateAttributes} call -
+ * construction, load, each growth day via {@code growDragon}, equipment changes
+ * - and on {@link EntityJoinLevelEvent}, which is what catches spawn rolls and
+ * load-time values before anything else observes them. It never heals and never
+ * touches movement speed or the equipment armor modifier; HP, attack and armor
+ * are the pure Ice and Fire growth curve (the banked-EP stat budget is
+ * deprecated - see issue #30).
  */
 public final class DragonGrowthStatHandler {
-    /** Tensura's stat-step size: one step of each gain per this much banked EP. */
-    private static final double EP_PER_STEP = 10000.0D;
-    /** The full-growth span Ice and Fire's attribute curve was authored against. */
-    private static final int CURVE_SPAN = 125;
+    /**
+     * Persistent-data flag: the migration snap has run, so this dragon is under
+     * floor-pin semantics from here on.
+     */
+    private static final String MIGRATED_KEY = "tensura_iaf_growth_ep_pinned";
 
     private DragonGrowthStatHandler() {
+    }
+
+    /**
+     * Join-time refresh. The spawn roll (and any load-time value pinned against
+     * the old band) exceeds the early-stage caps and {@code updateAttributes}
+     * does not run at construction, so the pin must also run the moment the
+     * dragon enters the level.
+     */
+    public static void onJoin(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide()) {
+            return;
+        }
+        if (event.getEntity() instanceof DragonBaseEntity dragon) {
+            refresh(dragon);
+        }
     }
 
     /** Called from the mixin at the tail of {@code updateAttributes} and after banked gains. */
@@ -70,77 +83,79 @@ public final class DragonGrowthStatHandler {
         if (existence == null) {
             return;
         }
-        EntityExistenceData band = dragon.level().registryAccess()
-                .registryOrThrow(TensuraCustomData.ENTITY_EXISTENCE)
-                .get(BuiltInRegistries.ENTITY_TYPE.getKey(dragon.getType()));
-        double growth = Mth.clamp(dragon.getAgeInDays() / (double) Growth.scaleDays(CURVE_SPAN), 0.0D, 1.0D);
-        if (band != null) {
-            pinExistence(dragon, existence, band, growth);
-            applyBankedBonus(dragon, existence, band, growth);
-        }
+        pin(dragon, existence);
     }
 
-    /**
-     * Pins aura and magicule, and their max-attribute caps, to the growth fraction
-     * inside the entity_existence band. Guarded writes: refresh runs often, and the
-     * storage is marked dirty only when a value actually moved.
-     */
-    private static void pinExistence(DragonBaseEntity dragon, IExistence existence,
-            EntityExistenceData band, double growth) {
-        double magicule = Mth.lerp(growth, band.minMagicule(), band.maxMagicule());
-        double aura = Mth.lerp(growth, band.minAura(), band.maxAura());
+    /** One of the two pin paths; guarded writes, storage marked dirty only when something moved. */
+    private static void pin(DragonBaseEntity dragon, IExistence existence) {
+        CompoundTag data = dragon.getPersistentData();
+        int age = dragon.getAgeInDays();
+        double line = DragonEpConfig.stageLine(age);
+        double lineAura = line / 10.0D;
+        double lineMagicule = line * 9.0D / 10.0D;
         boolean moved = false;
-        if (existence.getMagicule() != magicule) {
-            existence.setMagicule(magicule);
-            setMaxBase(dragon, TensuraAttributes.MAX_MAGICULE, magicule);
-            moved = true;
-        }
-        if (existence.getAura() != aura) {
-            existence.setAura(aura);
-            setMaxBase(dragon, TensuraAttributes.MAX_AURA, aura);
-            moved = true;
+        if (!data.getBoolean(MIGRATED_KEY)) {
+            moved |= setPools(existence, lineAura, lineMagicule);
+            moved |= setMaxBase(dragon, TensuraAttributes.MAX_AURA, lineAura);
+            moved |= setMaxBase(dragon, TensuraAttributes.MAX_MAGICULE, lineMagicule);
+            data.putBoolean(MIGRATED_KEY, true);
+        } else {
+            // Ceiling first: the bases are read before this refresh writes them,
+            // so raises naming made since the last refresh (namingReward puts the
+            // gain into both bases) are still counted here.
+            double ceiling = Math.max(DragonEpConfig.stageCeiling(age), maxBaseSum(dragon));
+            double sum = existence.getAura() + existence.getMagicule();
+            double target = Mth.clamp(sum, line, ceiling);
+            if (target != sum) {
+                moved |= setPools(existence, target / 10.0D, target * 9.0D / 10.0D);
+            }
+            moved |= setMaxBase(dragon, TensuraAttributes.MAX_AURA,
+                    Math.max(lineAura, existence.getAura()));
+            moved |= setMaxBase(dragon, TensuraAttributes.MAX_MAGICULE,
+                    Math.max(lineMagicule, existence.getMagicule()));
         }
         if (moved) {
             existence.markDirty();
         }
     }
 
+    /** Writes both pools; returns whether either one actually changed. */
+    private static boolean setPools(IExistence existence, double aura, double magicule) {
+        boolean moved = false;
+        if (existence.getAura() != aura) {
+            existence.setAura(aura);
+            moved = true;
+        }
+        if (existence.getMagicule() != magicule) {
+            existence.setMagicule(magicule);
+            moved = true;
+        }
+        return moved;
+    }
+
     /**
-     * Applies the banked-EP stat bonus on top of the curve base the caller has just
-     * written. The budget grows with the dragon: {@code (maxMagicule + maxAura) x growth},
-     * so a hatchling's budget is zero and a full-growth dragon's is the whole band.
+     * Sets a max-energy attribute's base value, in the shape
+     * {@code initEntityExistence} uses. Raising it fires Tensura's
+     * attribute-base-change event, whose bake our mixin cancels for dragons -
+     * the banked delta is harmless and {@code updateAttributes} re-enters this
+     * handler idempotently.
      */
-    private static void applyBankedBonus(DragonBaseEntity dragon, IExistence existence,
-            EntityExistenceData band, double growth) {
-        double budget = (band.maxMagicule() + band.maxAura()) * growth;
-        double banked = Math.min(existence.getGainedEP(), budget);
-        double steps = Math.floor(banked / EP_PER_STEP);
-        if (steps <= 0.0D) {
-            return;
-        }
-        AttributeConfig config = ConfigRegistry.getConfig(AttributeConfig.class);
-        addBaseBonus(dragon, Attributes.MAX_HEALTH, steps * config.HPGain);
-        addBaseBonus(dragon, Attributes.ATTACK_DAMAGE, steps * config.attackGain);
-        addBaseBonus(dragon, Attributes.ARMOR, steps * config.armorGain);
-    }
-
-    /** Adds the bonus to the attribute's base value - the curve - without touching modifiers. */
-    private static void addBaseBonus(LivingEntity entity, Holder<Attribute> attribute, double bonus) {
-        AttributeInstance instance = entity.getAttribute(attribute);
-        if (instance == null) {
-            return;
-        }
-        double target = instance.getBaseValue() + bonus;
-        if (instance.getBaseValue() != target) {
-            instance.setBaseValue(target);
-        }
-    }
-
-    /** Sets a max-energy attribute's base value, in the shape {@code initEntityExistence} uses. */
-    private static void setMaxBase(DragonBaseEntity dragon, Holder<Attribute> attribute, double value) {
+    private static boolean setMaxBase(DragonBaseEntity dragon, Holder<Attribute> attribute, double value) {
         AttributeInstance instance = dragon.getAttribute(attribute);
-        if (instance != null && instance.getBaseValue() != value) {
-            instance.setBaseValue(value);
+        if (instance == null || instance.getBaseValue() == value) {
+            return false;
         }
+        instance.setBaseValue(value);
+        return true;
+    }
+
+    /** The sum of the two max-energy bases, before this refresh writes anything. */
+    private static double maxBaseSum(DragonBaseEntity dragon) {
+        return baseOf(dragon, TensuraAttributes.MAX_AURA) + baseOf(dragon, TensuraAttributes.MAX_MAGICULE);
+    }
+
+    private static double baseOf(DragonBaseEntity dragon, Holder<Attribute> attribute) {
+        AttributeInstance instance = dragon.getAttribute(attribute);
+        return instance == null ? 0.0D : instance.getBaseValue();
     }
 }

@@ -26,19 +26,33 @@ at that power level.
 - **Growth stage is the EP lever.** How much EP a dragon earns is set by its
   stage: 15% as a hatchling, then 30%, 50%, 75%, and the full rate once fully
   grown. Growing one up is the main way to make it strong.
-- **A dragon's own EP follows its growth.** A dragon's magicules and aura no
-  longer come from a random roll at spawn - they climb with its age inside its
-  species' band, so a hatchling reads as a hatchling and a fully grown dragon
-  reads as the apex predator it is. Fighting still matters: every EP a dragon
-  earns can harden it further, but what its battle experience adds to its
-  stats is capped by its growth, so a whelp can never be inflated past its
-  size and a max-growth dragon tops out just under its curve's ceiling. A
-  dragon's stats are rebuilt from its growth on every load, so dragons that
-  were inflated by older versions come back down on their own.
-- **Set dragon max health to 9,965.** With the recommended `maxHealth` in
-  `iaf-common.json`, a fully grown dragon that has seen real battle lands
-  exactly at 10,000 HP - the ceiling stays the ceiling no matter how much EP
-  it has banked.
+- **A dragon's EP is pinned to a growth curve.** A dragon's total EP (aura +
+  magicule) is no longer a random roll at spawn - it is pinned, by age, to a
+  stage-banded curve this mod ships as its own config (see the configuration
+  section below): 10,000 at hatch, then 100k / 200k / 350k / 550k / 800k at the
+  end of each growth stage. The split is always 1 aura : 9 magicule, so a
+  hatchling reads as a hatchling and a fully grown dragon reads as the apex
+  predator it is. The pin runs on every load and every growth day, so a
+  dragon's EP is always its age's curve value.
+- **Battle scars roll up, inflation rolls back.** The pin works as a floor:
+  EP a dragon earns on top of the curve (kill top-ups) survives up to a
+  ceiling, and anything above the ceiling is clipped back down - a whelp can
+  never be inflated past its stage and a max-growth dragon tops out at its
+  curve's value plus what it has banked. On first load after 1.5.0 existing
+  dragons are snapped onto the curve once, so dragons inflated by older
+  versions come back down on their own.
+- **Naming survives the pin.** Gains naming grants a dragon - subdue, evolve,
+  and the endow mode's 9x EP raise - are carried by the dragon's max-attribute
+  bases, which the pin reads as its ceiling. Endowed and evolved dragons keep
+  their named EP past the stage caps, through every load.
+- **TensuraRPGSystem levels no longer fight the curve.** Dragons are excluded
+  from RPS's +1%-HP-per-level status layer, so a dragon's HP, attack and armor
+  are the pure Ice and Fire growth curve. Every other mob keeps the layer
+  unchanged.
+- **A fully grown dragon hits exactly 10,000 HP.** With the recommended
+  `maxHealth` in `iaf-common.json`, max-growth stage-5 dragons land exactly at
+  10,000 HP on the pure growth curve - no banked bonus needed, and the cap
+  stays the cap no matter how much EP they have earned.
 - **Dragons fight with their element.** A dragon's melee hits carry its natural
   element - fire dragons burn, ice dragons chill, lightning dragons shock - so
   resistances and weaknesses apply the way they do to any other elemental attack.
@@ -266,6 +280,29 @@ would show the wrong size.
 The gear, evolution and mob data all ship inside the jar; there is nothing to
 extract and no separate datapack to install.
 
+## Configuration - the dragon EP curve
+
+Since 1.5.0 the curve a dragon's EP is pinned to lives in this mod's own
+config, `config/tensura_iaf_growth-common.toml`, section `[dragon_ep]`. The
+six values are the curve's vertices - the EP at hatch and at the end of each
+growth stage - and the pin interpolates a straight line between them, so the
+curve is correct at any growth-cap stretch:
+
+| Key | Default | Meaning |
+|---|---|---|
+| `hatchEpFloor` | 10,000 | EP at day 0 (1,000 aura + 9,000 magicule) |
+| `stage1EpCap` | 100,000 | EP at the end of stage 1 |
+| `stage2EpCap` | 200,000 | EP at the end of stage 2 |
+| `stage3EpCap` | 350,000 | EP at the end of stage 3 |
+| `stage4EpCap` | 550,000 | EP at the end of stage 4 |
+| `stage5EpCap` | 800,000 | EP at full growth (stage 5) and the cap below naming |
+
+The line is the total EP (`aura + magicule`); aura always takes a tenth and
+magicule nine tenths. The values are read live, so a world reload picks them
+up, and they are validated to be non-decreasing (a stage cap below the one
+before it would make the line run backwards) - broken values are clamped into
+order with one warning in the log.
+
 ## Required configuration for random branches
 
 Branching is implemented through Gear Evolution's addon chains, and the mod
@@ -293,6 +330,7 @@ instead (the chains still work, but the roll is fixed). The other modes are
 | Required | Tensura: Ice and Fire (compat addon) | Registers the Ice and Fire gear and entity data this mod rebalances |
 | Optional | Tensura: Gear Evolution | Reads the chain files; without it the gear chains do not run |
 | Optional | Mysticism | Provides the light manipulation skill fire dragons are granted |
+| Optional | TensuraRPGSystem | Dragons are excluded from its +1% HP-per-level status layer when it is present |
 | Optional | BetterCombat | Only needed for the weapon movesets |
 
 ## Credits
