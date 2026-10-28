@@ -6,8 +6,8 @@
 
 - [ ] This PR contains **one** logical changeset
 - [ ] `./gradlew build` passes locally (compiles)
-- [ ] `./gradlew runData` passes locally, and the regenerated
-      `src/generated/resources` is committed with the change
+- [ ] `./gradlew runGameTestServer` passes locally (assert on the
+      `required tests passed` line - the exit code is not reliable)
 - [ ] Change is documented; README updated if user-facing
 - [ ] This PR adds a feature, or changes one `README.md` already describes,
       and updates `README.md` in this PR
