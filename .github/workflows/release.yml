@@ -78,7 +78,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          JAR="build/libs/tensura_iaf_growth-$VERSION.jar"
+          # Derived from mod_id rather than written out: the template changed
+          # this deliberately for rename-safety, and this repo's rename
+          # checklist makes a hardcoded jar name a latent trap.
+          MOD_ID=$(grep '^mod_id=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          JAR="build/libs/$MOD_ID-$VERSION.jar"
           if [ ! -f "$JAR" ]; then
             echo "::error::Expected $JAR after the build; found:"
             ls -l build/libs
