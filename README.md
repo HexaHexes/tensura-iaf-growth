@@ -1,10 +1,11 @@
 # Tensura - Ice and Fire Growth
 
 A NeoForge mod for the **Tensura RPG** pack (MC 1.21.1) that does two things: it
-lets Ice and Fire dragons grow all the way up instead of stopping short, and it
-gives Ice and Fire equipment a full evolution progression along Tensura's own EP
-ladder, including **branching evolutions**: one item can forge into several
-different sets, rolled at random when it evolves.
+raises Ice and Fire's dragon growth cap from 128 days up to 4096, so a hatchling
+keeps growing for as long as you keep feeding it, and it gives Ice and Fire
+equipment a full evolution progression along Tensura's own EP ladder, including
+**branching evolutions**: one item can forge into several different sets,
+rolled at random when it evolves.
 
 Ice and Fire gear starts on the vanilla progression, at the same early pace as
 leather and stone gear, but the vanilla opening forks. Either branch of the
@@ -12,11 +13,6 @@ vanilla line can cross into this mod's copper ladder and from there into
 Tensura's own metals ladder, so every rung climbs where Tensura gear of that
 tier climbs. Each rung is engraved the way Tensura engraves its own equipment
 at that power level.
-
-The jar goes in the `mods` folder on the server and on every client: growth
-stage decides how large a dragon renders, so a client without the mod would
-show the wrong size. The gear, evolution and mob data all ship inside the jar,
-with nothing to extract and no separate datapack to install.
 
 ## Dragon growth
 
