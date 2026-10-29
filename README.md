@@ -1,69 +1,69 @@
 # Tensura - Ice and Fire Growth
 
 A NeoForge mod for the **Tensura RPG** pack (MC 1.21.1) that does two things: it
-lets Ice and Fire dragons grow all the way up instead of stopping short, and it
-gives Ice and Fire equipment a full evolution progression along Tensura's own EP
-ladder, including **branching evolutions** - one item can forge into several
-different sets, rolled at random when it evolves.
+raises Ice and Fire's dragon growth cap from 128 days up to 4096, so a hatchling
+keeps growing for as long as you keep feeding it, and it gives Ice and Fire
+equipment a full evolution progression along Tensura's own EP ladder, including
+**branching evolutions**: one item can forge into several different sets,
+rolled at random when it evolves.
 
-Ice and Fire gear starts on the vanilla progression - the same early pace as
-leather and stone gear - but the vanilla opening forks, so either branch of the
-vanilla line can cross into this mod's copper ladder, and from there into
+Ice and Fire gear starts on the vanilla progression, at the same early pace as
+leather and stone gear, but the vanilla opening forks. Either branch of the
+vanilla line can cross into this mod's copper ladder and from there into
 Tensura's own metals ladder, so every rung climbs where Tensura gear of that
 tier climbs. Each rung is engraved the way Tensura engraves its own equipment
 at that power level.
 
 ## Dragon growth
 
-- **The growth cap is raised.** Ice and Fire stops a tamed dragon growing at 128
-  days of age; this mod widens that ceiling (up to 4096), so a hatchling keeps
-  growing for as long as you keep feeding it. The default is unchanged - dragons
-  behave exactly as before until the cap is raised.
-- **The ladder stretches with the cap.** Everything that decides when a dragon
+- The growth cap is raised. Ice and Fire stops a tamed dragon growing at 128
+  days of age; this mod widens that ceiling up to 4096, so a hatchling keeps
+  growing for as long as you keep feeding it. The default is unchanged:
+  dragons behave exactly as before until the cap is raised.
+- The ladder stretches with the cap. Everything that decides when a dragon
   reaches its next stage is scaled to the cap, so raising it does not skip a
-  stage or compress one: the same progression simply takes longer. Endpoints are
-  identical, only the timing moves.
+  stage or compress one. The same progression simply takes longer; the
+  endpoints are identical and only the timing moves.
 - **Growth stage is the EP lever.** How much EP a dragon earns is set by its
   stage: 15% as a hatchling, then 30%, 50%, 75%, and the full rate once fully
   grown. Growing one up is the main way to make it strong.
-- **A dragon's EP is pinned to a growth curve.** A dragon's total EP (aura +
-  magicule) is no longer a random roll at spawn - it is pinned, by age, to a
-  stage-banded curve this mod ships as its own config (see the configuration
-  section below): 10,000 at hatch, then 100k / 200k / 350k / 550k / 800k at the
-  end of each growth stage. The split is always 1 aura : 9 magicule, so a
-  hatchling reads as a hatchling and a fully grown dragon reads as the apex
-  predator it is. The pin runs on every load and every growth day, so a
-  dragon's EP is always its age's curve value.
-- **Battle scars roll up, inflation rolls back.** The pin works as a floor:
-  EP a dragon earns on top of the curve (kill top-ups) survives up to a
-  ceiling, and anything above the ceiling is clipped back down - a whelp can
-  never be inflated past its stage and a max-growth dragon tops out at its
-  curve's value plus what it has banked. On first load after 1.5.0 existing
-  dragons are snapped onto the curve once, so dragons inflated by older
-  versions come back down on their own.
-- **Naming survives the pin.** Gains naming grants a dragon - subdue, evolve,
-  and the endow mode's 9x EP raise - are carried by the dragon's max-attribute
+- A dragon's EP is pinned to a growth curve. The total EP (aura + magicule) is
+  no longer a random roll at spawn. It is pinned, by age, to a stage-banded
+  curve this mod ships as its own config (see the configuration section
+  below): 10,000 at hatch, then 100k / 200k / 350k / 550k / 800k at the end of
+  each growth stage. The split is always 1 aura : 9 magicule, so a hatchling
+  reads as a hatchling and a fully grown dragon reads as the apex predator it
+  is. The pin runs on every load and every growth day, so a dragon's EP is
+  always its age's curve value.
+- The pin works as a floor. EP a dragon earns on top of the curve (kill
+  top-ups) survives up to a ceiling, and anything above the ceiling is clipped
+  back down, so a whelp can never be inflated past its stage and a max-growth
+  dragon tops out at its curve's value plus what it has banked. On first load
+  after 1.5.0, existing dragons are snapped onto the curve once, so dragons
+  inflated by older versions come back down on their own.
+- Naming survives the pin. Gains naming grants a dragon (subdue, evolve, and
+  the endow mode's 9x EP raise) are carried by the dragon's max-attribute
   bases, which the pin reads as its ceiling. Endowed and evolved dragons keep
   their named EP past the stage caps, through every load.
-- **TensuraRPGSystem levels no longer fight the curve.** Dragons are excluded
-  from RPS's +1%-HP-per-level status layer, so a dragon's HP, attack and armor
-  are the pure Ice and Fire growth curve. Every other mob keeps the layer
-  unchanged.
-- **A fully grown dragon hits exactly 10,000 HP.** With the recommended
+- Dragons are excluded from TensuraRPGSystem's +1%-HP-per-level status layer,
+  so a dragon's HP, attack and armor are the pure Ice and Fire growth curve.
+  Every other mob keeps the layer unchanged.
+- A fully grown dragon hits exactly 10,000 HP. With the recommended
   `maxHealth` in `iaf-common.json`, max-growth stage-5 dragons land exactly at
-  10,000 HP on the pure growth curve - no banked bonus needed, and the cap
+  10,000 HP on the pure growth curve, with no banked bonus needed. The cap
   stays the cap no matter how much EP they have earned.
-- **Dragons fight with their element.** A dragon's melee hits carry its natural
-  element - fire dragons burn, ice dragons chill, lightning dragons shock - so
-  resistances and weaknesses apply the way they do to any other elemental attack.
-- **Dragons gain a secondary element.** Fire dragons are granted light
-  manipulation, ice dragons water manipulation, lightning dragons wind
+- Dragons fight with their element. A dragon's melee hits carry its natural
+  element: fire dragons burn, ice dragons chill, lightning dragons shock.
+  Resistances and weaknesses apply the way they do to any other elemental
+  attack.
+- Dragons gain a secondary element. Fire dragons are granted light
+  manipulation, ice dragons water manipulation, and lightning dragons wind
   manipulation, alongside their existing breath and resistances.
 
 ## Mob strength bands
 
 Every Ice and Fire mob's magicule and aura band is rebalanced so it sits where
-its threat level belongs - death worms and sirens at the low end, the dread
+its threat level belongs: death worms and sirens at the low end, the dread
 ramp climbing form by form, cyclops and sea serpents in the middle, and all
 three dragons at the top of the ladder. Spiritual health and each mob's
 abilities are unchanged.
@@ -74,19 +74,19 @@ abilities are unchanged.
 Death Worm Chitin -> Sea Serpent Scale -> Dragon Scale ->
 Dragon Steel or Mithril`
 
-The vanilla opening forks instead of stepping straight on: at 550 EP leather
+The vanilla opening forks instead of stepping straight on: at 550 EP, leather
 armor rolls between chainmail, Ice and Fire copper and Tensura's monster
 leather (rank D). The chainmail branch continues on vanilla's own iron ->
 diamond -> netherite line, and netherite then forges into Tensura's low
-magisteel - at 12,000 EP for armor and 10,000 for tools, so both netherite and
-magisteel keep a band worth wearing - riding the metals spine from there.
+magisteel at 12,000 EP for armor and 10,000 for tools (so both netherite and
+magisteel keep a band worth wearing), riding the metals spine from there.
 Monster leather climbs Tensura's own ranks and then flows into Tensura's
-creature sets (see the creature ladder below), and only the copper branch
-joins the ladder below.
+creature sets (see the creature ladder below). Only the copper branch joins
+the ladder below.
 
 Copper does not commit to one silver: it rolls at random into either Ice and
 Fire silver (climbing the chain above) or Tensura's silver, which forges the
-same way - see the Tensura silver and mithril section below.
+same way (see the Tensura silver and mithril section below).
 
 | Step | Evolves at | Outcome |
 |---|---|---|
@@ -105,10 +105,10 @@ same way - see the Tensura silver and mithril section below.
 All three death worm chitin sets are the same tier, so any of them can reach any
 of the seven sea serpent sets, and any sea serpent set can reach any of the
 twelve dragon scale sets. Dragon scale armor then rolls between the dragon
-steel set of its own element - red, green, bronze and gray are fire dragons;
-blue, white, sapphire and silver are ice; electric, amethyst, copper and black
-are lightning - and Tensura's mithril armor, which forges on through
-adamantite into hihiirokane.
+steel set of its own element and Tensura's mithril armor, which forges on
+through adamantite into hihiirokane. The fire dragons are red, green, bronze and
+gray; the ice ones are blue, white, sapphire and silver; the lightning ones are
+electric, amethyst, copper and black.
 
 ## Creature ladder
 
@@ -118,7 +118,7 @@ Knight Spider Carapace -> Charybdis Scalemail -> Dragon Steel or Mithril`
 Tensura's hide, scale and carapace sets are woven into one flow that Monster
 Leather feeds. Monster Leather C forks at 5,000 EP into Monster Leather B (the
 rank ladder as before) or the Ant Carapace, and the creature line runs from
-there. Monster Leather Special A - the rank ladder's top, once a dead end -
+there. Monster Leather Special A, the rank ladder's top and once a dead end,
 now hands off at 225,000 EP into the same creature sets, so both paths split
 at Monster Leather C and merge again at Serpent Scalemail and Knight Spider
 Carapace.
@@ -133,20 +133,20 @@ Carapace.
 | Charybdis Scalemail | 750,000 | **Random**: dragon steel (any element) or mithril armor |
 
 Serpent Scalemail and Knight Spider Carapace still earn their set-wide
-attribute bumps as they climb - now at 280,000, 360,000 and 440,000 EP, late
+attribute bumps as they climb, now at 280,000, 360,000 and 440,000 EP, late
 enough that a piece arriving from Special A earns every one of them. Charybdis
 Scalemail hits the same 750,000 fork as dragon scale armor, so every organic
-line - troll leather, monster leather, creature carapace - ends on the metals
+line (troll leather, monster leather, creature carapace) ends on the metals
 spine, and every metal line ends at hihiirokane.
 
 ## Tools and weapons chain
 
 `Stone -> Copper -> Silver -> Dragon Bone -> Dragon Steel (or Mithril)`
 
-Just like leather armor, the vanilla opening forks here: at 500 EP every stone
+Just like leather armor, the vanilla opening forks here: at 500 EP, every stone
 tool (sword, axe, pickaxe, shovel, hoe) rolls between iron and Ice and Fire
 copper. The iron branch continues on vanilla's own iron -> diamond -> netherite
-line, only the copper branch joins the ladder below.
+line; only the copper branch joins the ladder below.
 
 | Step | Evolves at | Outcome |
 |---|---|---|
@@ -207,11 +207,11 @@ the red death worm gauntlet, and 0.003 for gear with no ladder at all.
   cockatrice scepter, cyclops eye, gorgon head, hippocampus slapper,
   hippogryph sword, fishing spear, stymphalian dagger, amphithere macuahuitl,
   blindfold, earplugs, the dread queen's staff and the dragon flute) are
-  terminal and keep earning EP so they stay usable at endgame.
+  terminal and keep earning EP, so they stay usable at endgame.
 
 ## Tensura gear gap fixes
 
-A few Tensura items had no working progression anywhere - this mod plugs them:
+A few Tensura items had no working progression anywhere; this mod plugs them:
 
 - **Silver hoe, pickaxe and shovel** now evolve like every other Tensura silver
   item with an Ice and Fire counterpart: at 52,000 EP into the dragon bone tool
@@ -250,7 +250,7 @@ Holy Coat II engraving.
 
 ## Engravings
 
-Evolving grants Tensura enchantment engravings the way Tensura does it on its
+Evolving grants Tensura enchantment engravings the way Tensura does on its
 own gear:
 
 | Tier | Engraving |
@@ -265,27 +265,18 @@ own gear:
 
 ## Movesets
 
-I&F weapons are given BetterCombat movesets matching their class - claymores for
+I&F weapons are given BetterCombat movesets matching their class: claymores for
 the dread blades, rapiers for the ghost sword, heavy axes for the axes, spears
 and tridents for the polearms, staves for the casters, fists for the gauntlets.
-These files only take effect when BetterCombat is installed; without it they are
-ignored.
-
-## Installing it
-
-Drop the jar into the `mods` folder - **on the server and on every client**.
-Growth stage decides how large a dragon renders, so a client without the mod
-would show the wrong size.
-
-The gear, evolution and mob data all ship inside the jar; there is nothing to
-extract and no separate datapack to install.
+These files only take effect when BetterCombat is installed; without it they
+are ignored.
 
 ## Configuration - the dragon EP curve
 
-Since 1.5.0 the curve a dragon's EP is pinned to lives in this mod's own
+Since 1.5.0, the curve a dragon's EP is pinned to lives in this mod's own
 config, `config/tensura_iaf_growth-common.toml`, section `[dragon_ep]`. The
-six values are the curve's vertices - the EP at hatch and at the end of each
-growth stage - and the pin interpolates a straight line between them, so the
+six values are the curve's vertices, the EP at hatch and at the end of each
+growth stage, and the pin interpolates a straight line between them, so the
 curve is correct at any growth-cap stretch:
 
 | Key | Default | Meaning |
@@ -300,7 +291,7 @@ curve is correct at any growth-cap stretch:
 The line is the total EP (`aura + magicule`); aura always takes a tenth and
 magicule nine tenths. The values are read live, so a world reload picks them
 up, and they are validated to be non-decreasing (a stage cap below the one
-before it would make the line run backwards) - broken values are clamped into
+before it would make the line run backwards). Broken values are clamped into
 order with one warning in the log.
 
 ## Required configuration for random branches
