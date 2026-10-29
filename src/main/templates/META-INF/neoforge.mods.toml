@@ -15,6 +15,11 @@ license="${mod_license}"
 
 # The growth/stage hooks. Applied only while every target mod is present - the
 # targets below are all required, so the config is never half-applied.
+[modproperties.${mod_id}]
+# Optional: background texture for this mod's Configured config screen (see the
+# In-game config editing section of README.md). Any existing texture works.
+configuredBackground = "minecraft:textures/block/stone.png"
+
 [[mixins]]
     config="tensura_iaf_growth.mixins.json"
 
