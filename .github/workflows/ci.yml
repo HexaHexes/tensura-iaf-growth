@@ -70,19 +70,26 @@ jobs:
         run: |
           set -euo pipefail
 
-          JAR=$(ls build/libs/tensura_iaf_growth-*.jar | head -1)
+          MOD_ID=$(grep '^mod_id=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          JAR=$(ls build/libs/"$MOD_ID"-*.jar | head -1)
           echo "jar: $JAR"
 
-          # The datapack lives inside the jar, not beside it. Missing it would
-          # ship a mod that loads and then does nothing.
-          if ! unzip -l "$JAR" | grep -q 'data/gearevolution/addon_chains/iceandfire/'; then
-            echo "::error::The jar contains no addon_chains datapack files."
+          # Subset, not a list of path greps: the contract is "every generated
+          # file ships". The sorted-list diff proves it for any datapack
+          # directory, needs no edits when a ladder adds a new namespace (the
+          # grep list did), and tolerates hand-authored data/** files alongside
+          # the generated ones.
+          unzip -l "$JAR" | awk '{print $NF}' | grep '^data/.*\.json$' | sort > jar_files.txt
+          (cd src/generated/resources && find data -name '*.json' | sort) > disk_files.txt
+          MISSING=$(comm -23 disk_files.txt jar_files.txt)
+
+          if [ -n "$MISSING" ]; then
+            echo "::error::Generated datapack files missing from the jar:"
+            echo "$MISSING"
             exit 1
           fi
-          if ! unzip -l "$JAR" | grep -q 'data/iceandfire/entity_existence/'; then
-            echo "::error::The jar contains no entity_existence datapack files."
-            exit 1
-          fi
+
+          echo "Jar ships all $(wc -l < disk_files.txt) generated datapack files."
 
       - name: Upload jar
         if: always()
