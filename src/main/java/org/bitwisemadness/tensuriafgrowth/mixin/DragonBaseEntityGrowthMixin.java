@@ -5,10 +5,10 @@ import org.bitwisemadness.tensuriafgrowth.Growth;
 import org.bitwisemadness.tensuriafgrowth.handler.DragonGrowthStatHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
@@ -179,6 +179,13 @@ public final class DragonBaseEntityGrowthMixin {
 
     @Inject(method = "updateAttributes()V", at = @At("TAIL"))
     private void tensura_iaf_growth$refreshGrowthPinnedStats(CallbackInfo ci) {
-        DragonGrowthStatHandler.refresh((DragonBaseEntity) (Object) this);
+        // The downcast travels through an Object parameter: static analysis only
+        // sees the unmerged mixin type and would call it impossible, while the
+        // merge into DragonBaseEntity makes it succeed at runtime.
+        tensura_iaf_growth$refreshGrowthPinnedStatsOn(this);
+    }
+
+    private static void tensura_iaf_growth$refreshGrowthPinnedStatsOn(Object dragon) {
+        DragonGrowthStatHandler.refresh((DragonBaseEntity) dragon);
     }
 }
