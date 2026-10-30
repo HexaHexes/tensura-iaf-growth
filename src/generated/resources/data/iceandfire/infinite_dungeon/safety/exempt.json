@@ -1,0 +1,14 @@
+{
+  "entities": [
+    "iceandfire:fire_dragon",
+    "iceandfire:ice_dragon",
+    "iceandfire:lightning_dragon",
+    "iceandfire:black_frost_dragon",
+    "iceandfire:hydra",
+    "iceandfire:gorgon",
+    "iceandfire:cyclops",
+    "iceandfire:siren",
+    "iceandfire:dread_lich",
+    "iceandfire:dread_queen"
+  ]
+}

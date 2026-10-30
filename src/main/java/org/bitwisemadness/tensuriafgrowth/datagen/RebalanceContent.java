@@ -387,7 +387,9 @@ public final class RebalanceContent {
             Map<String, JsonObject> tensuraGearExistence,
             Map<String, JsonObject> addonChains,
             Map<String, JsonObject> weaponAttributes,
-            Map<String, JsonObject> entityExistence) {
+            Map<String, JsonObject> entityExistence,
+            Map<String, JsonObject> structureMagicule,
+            Map<String, JsonObject> safetyExempt) {
     }
 
     public static Content build() {
@@ -428,9 +430,84 @@ public final class RebalanceContent {
                     ADDON_TROLL_WEAPONS.contains(item) ? terminal(item, 0, EP_GAIN_NO_LADDER, null) : inert(item));
         }
 
-        Content content = new Content(geGear, iafGear, tensuraGear, chains, movesets, EntityExistenceContent.build());
+        Content content = new Content(geGear, iafGear, tensuraGear, chains, movesets,
+                EntityExistenceContent.build(), structureMagiculeData(), safetyExemptData());
         validate(content);
         return content;
+    }
+
+    // --- Structure elevation + spawn exemptions (infinite-dungeon-spawn-safety) ---
+    //
+    // Pack rule: every IaF structure's surrounding chunks carry at least the
+    // magicule baseline of the mobs related to it (see issue references in the
+    // class javadoc). Elevations are the related mobs' EP band maxima from the
+    // entity content this mod ships; radii are the lair/grounds scale. The dread
+    // isle is a separate dimension (iceandfire:dread_land), not an overworld
+    // structure - its bosses are covered by the exemption instead.
+
+    /** structure id -> [radius, elevation]; every worldgen structure, in id order. */
+    private static final String[][] STRUCTURE_ELEVATIONS = {
+            {"iceandfire:cyclops_cave", "192", "8000"},
+            {"iceandfire:dragon_cave", "256", "800000"},
+            {"iceandfire:dragon_roost", "128", "350000"},
+            {"iceandfire:fire_dragon_cave", "256", "800000"},
+            {"iceandfire:fire_dragon_roost", "128", "350000"},
+            {"iceandfire:graveyard", "96", "3100"},
+            {"iceandfire:gorgon_temple", "128", "91000"},
+            {"iceandfire:hydra_cave", "256", "90000"},
+            {"iceandfire:ice_dragon_cave", "256", "800000"},
+            {"iceandfire:ice_dragon_roost", "128", "350000"},
+            {"iceandfire:lightning_dragon_cave", "256", "800000"},
+            {"iceandfire:lightning_dragon_roost", "128", "350000"},
+            {"iceandfire:mausoleum", "128", "800000"},
+            {"iceandfire:pixie_village", "96", "3500"},
+            {"iceandfire:siren_island", "128", "3250"},
+    };
+
+    /**
+     * Dragons and structure bosses this module must never gate: their EP
+     * baselines exceed most of the world's ambient even with the hotspots, and
+     * they roam far from their structures.
+     */
+    private static final String[] SPAWN_EXEMPT = {
+            "iceandfire:fire_dragon",
+            "iceandfire:ice_dragon",
+            "iceandfire:lightning_dragon",
+            "iceandfire:black_frost_dragon",
+            "iceandfire:hydra",
+            "iceandfire:gorgon",
+            "iceandfire:cyclops",
+            "iceandfire:siren",
+            "iceandfire:dread_lich",
+            "iceandfire:dread_queen",
+    };
+
+    private static Map<String, JsonObject> structureMagiculeData() {
+        Map<String, JsonObject> files = new LinkedHashMap<>();
+        JsonArray rows = new JsonArray();
+        for (String[] row : STRUCTURE_ELEVATIONS) {
+            JsonObject entry = new JsonObject();
+            entry.addProperty("structure", row[0]);
+            entry.addProperty("radius", Double.parseDouble(row[1]));
+            entry.addProperty("elevation", Double.parseDouble(row[2]));
+            rows.add(entry);
+        }
+        JsonObject json = new JsonObject();
+        json.add("structures", rows);
+        files.put("data/iceandfire/infinite_dungeon/structure_magicule/structures.json", json);
+        return files;
+    }
+
+    private static Map<String, JsonObject> safetyExemptData() {
+        Map<String, JsonObject> files = new LinkedHashMap<>();
+        JsonArray entities = new JsonArray();
+        for (String id : SPAWN_EXEMPT) {
+            entities.add(id);
+        }
+        JsonObject json = new JsonObject();
+        json.add("entities", entities);
+        files.put("data/iceandfire/infinite_dungeon/safety/exempt.json", json);
+        return files;
     }
 
     // --- Chain 1: armor -----------------------------------------------------
@@ -1132,17 +1209,33 @@ public final class RebalanceContent {
         expect(errors, "addon_chains files", 155, content.addonChains.size());
         expect(errors, "weapon_attributes files", 37, content.weaponAttributes.size());
         expect(errors, "entity_existence files", 24, content.entityExistence.size());
+        expect(errors, "structure elevation files", 1, content.structureMagicule.size());
+        expect(errors, "spawn exemption files", 1, content.safetyExempt.size());
+        expect(errors, "structure elevation rows", STRUCTURE_ELEVATIONS.length, structureRowCount(content));
+        expect(errors, "spawn exemption entities", SPAWN_EXEMPT.length, exemptEntityCount(content));
         expect(errors, "neutralised Gear Evolution built-ins", 17, GE_BUILTIN_NEUTRALISED.size());
         expect(errors, "files the addon ships that we shadow", 32, ADDON_ONLY.size());
         expect(errors, "our files the addon does not ship", 35, NOT_IN_ADDON.size());
-        expect(errors, "files in total", 640,
+        expect(errors, "files in total", 642,
                 content.geGearExistence.size() + content.iafGearExistence.size()
                         + content.tensuraGearExistence.size()
-                        + content.addonChains.size() + content.weaponAttributes.size() + content.entityExistence.size());
+                        + content.addonChains.size() + content.weaponAttributes.size() + content.entityExistence.size()
+                        + content.structureMagicule.size() + content.safetyExempt.size());
 
         List<Map<String, JsonObject>> all = List.of(content.geGearExistence, content.iafGearExistence,
                 content.tensuraGearExistence, content.addonChains, content.weaponAttributes,
-                content.entityExistence);
+                content.entityExistence, content.structureMagicule, content.safetyExempt);
+
+        // Spot-check the pack rule's headline values: a dragon cave lifts its
+        // neighbourhood to the stage-5 baseline, a roost to stage 3, and the
+        // dragons themselves are exempt everywhere.
+        expectStructureRow(errors, content, "iceandfire:dragon_cave", 256.0, 800000.0);
+        expectStructureRow(errors, content, "iceandfire:fire_dragon_roost", 128.0, 350000.0);
+        expectStructureRow(errors, content, "iceandfire:mausoleum", 128.0, 800000.0);
+        if (!exemptContains(content, "iceandfire:fire_dragon")
+                || !exemptContains(content, "iceandfire:dread_lich")) {
+            errors.add("the spawn exemptions must cover the dragons and the dread boss");
+        }
 
         // Every file must land under the path the consuming mod reads it from - the
         // same item legitimately appears under two of them. Gear Evolution's short bow
@@ -1565,6 +1658,59 @@ public final class RebalanceContent {
             }
         }
         errors.add(path + " -> unknown evolution target '" + target + "'");
+    }
+
+    /** The number of rows inside the generated structures file. */
+    private static int structureRowCount(Content content) {
+        JsonObject json = content.structureMagicule.get(
+                "data/iceandfire/infinite_dungeon/structure_magicule/structures.json");
+        return json == null || !json.has("structures") ? 0 : json.getAsJsonArray("structures").size();
+    }
+
+    /** The number of entities inside the generated exempt file. */
+    private static int exemptEntityCount(Content content) {
+        JsonObject json = content.safetyExempt.get(
+                "data/iceandfire/infinite_dungeon/safety/exempt.json");
+        return json == null || !json.has("entities") ? 0 : json.getAsJsonArray("entities").size();
+    }
+
+    /** Whether the exempt file lists the entity id. */
+    private static boolean exemptContains(Content content, String entityId) {
+        JsonObject json = content.safetyExempt.get(
+                "data/iceandfire/infinite_dungeon/safety/exempt.json");
+        if (json == null || !json.has("entities")) {
+            return false;
+        }
+        for (var element : json.getAsJsonArray("entities")) {
+            if (entityId.equals(element.getAsString())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Pins one structure row: floor and radius must match the pack rule's table. */
+    private static void expectStructureRow(List<String> errors, Content content, String structure,
+                                           double radius, double elevation) {
+        JsonObject json = content.structureMagicule.get(
+                "data/iceandfire/infinite_dungeon/structure_magicule/structures.json");
+        if (json == null || !json.has("structures")) {
+            errors.add("structure elevation file missing");
+            return;
+        }
+        for (var element : json.getAsJsonArray("structures")) {
+            JsonObject row = element.getAsJsonObject();
+            if (structure.equals(row.get("structure").getAsString())) {
+                if (row.get("radius").getAsDouble() != radius
+                        || row.get("elevation").getAsDouble() != elevation) {
+                    errors.add(structure + ": expected radius " + radius + " elevation " + elevation
+                            + ", found radius " + row.get("radius").getAsDouble()
+                            + " elevation " + row.get("elevation").getAsDouble());
+                }
+                return;
+            }
+        }
+        errors.add(structure + ": no structure elevation row");
     }
 
     private static void expect(List<String> errors, String what, int wanted, int found) {

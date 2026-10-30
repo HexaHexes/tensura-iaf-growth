@@ -56,5 +56,7 @@ public class TensuraIafGrowth {
         event.addProvider(new JsonFilesProvider("addon_chains", output, content.addonChains()));
         event.addProvider(new JsonFilesProvider("weapon_attributes", output, content.weaponAttributes()));
         event.addProvider(new JsonFilesProvider("entity_existence", output, content.entityExistence()));
+        event.addProvider(new JsonFilesProvider("structure_magicule", output, content.structureMagicule()));
+        event.addProvider(new JsonFilesProvider("safety_exempt", output, content.safetyExempt()));
     }
 }
