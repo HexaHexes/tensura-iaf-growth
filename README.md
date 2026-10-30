@@ -271,6 +271,32 @@ and tridents for the polearms, staves for the casters, fists for the gauntlets.
 These files only take effect when BetterCombat is installed; without it they
 are ignored.
 
+## Structure magicule and spawn exemptions
+
+Every Ice and Fire structure lifts the ambient magicule of the surrounding
+chunks to at least the EP baseline of the mobs related to it. The values are
+datapack rows this mod generates, read by infinite-dungeon-spawn-safety:
+
+| Structure | Radius | Floor (= related mob baseline) |
+|---|---|---|
+| `dragon_cave`, `fire/ice/lightning_dragon_cave` | 256 | 800,000 (stage-5 dragon) |
+| `fire/ice/lightning_dragon_roost`, `dragon_roost` | 128 | 350,000 (stage-3 dragon) |
+| `mausoleum` (dragon tomb) | 128 | 800,000 (stage-5 dragon) |
+| `gorgon_temple` | 128 | 91,000 (gorgon) |
+| `hydra_cave` | 256 | 90,000 (hydra) |
+| `cyclops_cave` | 192 | 8,000 (cyclops) |
+| `pixie_village` | 96 | 3,500 (pixie) |
+| `siren_island` | 128 | 3,250 (siren) |
+| `graveyard` | 96 | 3,100 (ghost) |
+
+The dread isle is a separate dimension, not an overworld structure, so it keeps
+its dimension-level magicule; its bosses ride the exemption instead.
+
+Dragons and the structure bosses are exempt from spawn-safety's magicule gate
+(`exempt.json`): `fire/ice/lightning/black_frost_dragon`, `hydra`, `gorgon`,
+`cyclops`, `siren`, `dread_lich` and `dread_queen` spawn wherever their AI
+takes them, not only inside a hotspot.
+
 ## Configuration - the dragon EP curve
 
 Since 1.5.0, the curve a dragon's EP is pinned to lives in this mod's own
