@@ -5,8 +5,8 @@ import io.github.manasmods.manascore.storage.api.StorageHolder;
 import io.github.manasmods.tensura.registry.attribute.TensuraAttributes;
 import io.github.manasmods.tensura.storage.ep.ExistenceStorage;
 import io.github.manasmods.tensura.storage.ep.IExistence;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -101,7 +101,12 @@ public final class DragonGrowthStatHandler {
         if (dragon.level() == null || dragon.level().isClientSide) {
             return;
         }
-        IExistence existence = ((StorageHolder) dragon).manasCore$getStorage(ExistenceStorage.getKey());
+        // Dragons receive StorageHolder from ManasCore's runtime injection, which
+        // static analysis of this class cannot see; guard instead of casting.
+        if (!(dragon instanceof StorageHolder storageHolder)) {
+            return;
+        }
+        IExistence existence = storageHolder.manasCore$getStorage(ExistenceStorage.getKey());
         if (existence == null) {
             return;
         }
@@ -133,7 +138,7 @@ public final class DragonGrowthStatHandler {
             double ceiling = Math.max(DragonEpConfig.stageCeiling(age), maxBaseSum(dragon));
             double sum = existence.getAura() + existence.getMagicule();
             double target = Mth.clamp(sum, line, ceiling);
-            if (target != sum) {
+            if (Math.abs(target - sum) > 1.0e-6) {
                 moved |= setPools(existence, target / 10.0D, target * 9.0D / 10.0D);
             }
             moved |= setMaxBase(dragon, TensuraAttributes.MAX_AURA,

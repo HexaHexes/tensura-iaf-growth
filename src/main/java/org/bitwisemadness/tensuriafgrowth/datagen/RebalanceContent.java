@@ -417,10 +417,10 @@ public final class RebalanceContent {
         // The addon's file set, reissued with our values: shared files keep our content,
         // the rest are either inert (the addon_chains ladder drives them) or terminal.
         Map<String, JsonObject> iafGear = new LinkedHashMap<>();
-        for (String path : ourGear.keySet()) {
-            String item = name(path);
+        for (Map.Entry<String, JsonObject> entry : ourGear.entrySet()) {
+            String item = name(entry.getKey());
             if (!NOT_IN_ADDON.contains(item)) {
-                put(iafGear, IAF_GEAR + file(item), ourGear.get(path));
+                put(iafGear, IAF_GEAR + file(item), entry.getValue());
             }
         }
         for (String item : ADDON_ONLY) {
