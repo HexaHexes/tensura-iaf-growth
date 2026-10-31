@@ -275,19 +275,23 @@ are ignored.
 
 Every Ice and Fire structure lifts the ambient magicule of the surrounding
 chunks to at least the EP baseline of the mobs related to it. The values are
-datapack rows this mod generates, read by infinite-dungeon-spawn-safety:
+datapack rows this mod generates, read by infinite-dungeon-spawn-safety. Each
+row carries only the **floor** - the related mob's baseline. The **reach is
+derived from the floor** by the consumer
+(`clamp(sqrt(baseline) * 0.35, 48, 320)` blocks), so a dragon cave at 800,000
+radiates across ~313 blocks while a graveyard at 3,100 stays within ~48:
 
-| Structure | Radius | Floor (= related mob baseline) |
+| Structure | Floor (= related mob baseline) | Reach (derived) |
 |---|---|---|
-| `dragon_cave`, `fire/ice/lightning_dragon_cave` | 256 | 800,000 (stage-5 dragon) |
-| `fire/ice/lightning_dragon_roost`, `dragon_roost` | 128 | 350,000 (stage-3 dragon) |
-| `mausoleum` (dragon tomb) | 128 | 800,000 (stage-5 dragon) |
-| `gorgon_temple` | 128 | 91,000 (gorgon) |
-| `hydra_cave` | 256 | 90,000 (hydra) |
-| `cyclops_cave` | 192 | 8,000 (cyclops) |
-| `pixie_village` | 96 | 3,500 (pixie) |
-| `siren_island` | 128 | 3,250 (siren) |
-| `graveyard` | 96 | 3,100 (ghost) |
+| `dragon_cave`, `fire/ice/lightning_dragon_cave` | 800,000 (stage-5 dragon) | ~313 |
+| `fire/ice/lightning_dragon_roost`, `dragon_roost` | 350,000 (stage-3 dragon) | ~207 |
+| `mausoleum` (dragon tomb) | 800,000 (stage-5 dragon) | ~313 |
+| `gorgon_temple` | 91,000 (gorgon) | ~106 |
+| `hydra_cave` | 90,000 (hydra) | ~105 |
+| `cyclops_cave` | 8,000 (cyclops) | ~48 |
+| `pixie_village` | 3,500 (pixie) | ~48 |
+| `siren_island` | 3,250 (siren) | ~48 |
+| `graveyard` | 3,100 (ghost) | ~48 |
 
 The dread isle is a separate dimension, not an overworld structure, so it keeps
 its dimension-level magicule; its bosses ride the exemption instead.

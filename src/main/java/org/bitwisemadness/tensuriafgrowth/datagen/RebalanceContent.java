@@ -441,27 +441,33 @@ public final class RebalanceContent {
     // Pack rule: every IaF structure's surrounding chunks carry at least the
     // magicule baseline of the mobs related to it (see issue references in the
     // class javadoc). Elevations are the related mobs' EP band maxima from the
-    // entity content this mod ships; radii are the lair/grounds scale. The dread
-    // isle is a separate dimension (iceandfire:dread_land), not an overworld
-    // structure - its bosses are covered by the exemption instead.
+    // entity content this mod ships; the consumer derives the reach from the
+    // baseline. The dread isle is a separate dimension (iceandfire:dread_land),
+    // not an overworld structure - its bosses are covered by the exemption
+    // instead.
 
-    /** structure id -> [radius, elevation]; every worldgen structure, in id order. */
+    /**
+     * structure id -> elevation (the related mobs' EP baseline); every worldgen
+     * structure, in id order. The reach is not carried here: the consumer
+     * scales it with the baseline (clamp(sqrt(baseline) * 0.35, 48, 320)
+     * blocks), so a dragon cave reaches far wider than a pixie village.
+     */
     private static final String[][] STRUCTURE_ELEVATIONS = {
-            {"iceandfire:cyclops_cave", "192", "8000"},
-            {"iceandfire:dragon_cave", "256", "800000"},
-            {"iceandfire:dragon_roost", "128", "350000"},
-            {"iceandfire:fire_dragon_cave", "256", "800000"},
-            {"iceandfire:fire_dragon_roost", "128", "350000"},
-            {"iceandfire:graveyard", "96", "3100"},
-            {"iceandfire:gorgon_temple", "128", "91000"},
-            {"iceandfire:hydra_cave", "256", "90000"},
-            {"iceandfire:ice_dragon_cave", "256", "800000"},
-            {"iceandfire:ice_dragon_roost", "128", "350000"},
-            {"iceandfire:lightning_dragon_cave", "256", "800000"},
-            {"iceandfire:lightning_dragon_roost", "128", "350000"},
-            {"iceandfire:mausoleum", "128", "800000"},
-            {"iceandfire:pixie_village", "96", "3500"},
-            {"iceandfire:siren_island", "128", "3250"},
+            {"iceandfire:cyclops_cave", "8000"},
+            {"iceandfire:dragon_cave", "800000"},
+            {"iceandfire:dragon_roost", "350000"},
+            {"iceandfire:fire_dragon_cave", "800000"},
+            {"iceandfire:fire_dragon_roost", "350000"},
+            {"iceandfire:graveyard", "3100"},
+            {"iceandfire:gorgon_temple", "91000"},
+            {"iceandfire:hydra_cave", "90000"},
+            {"iceandfire:ice_dragon_cave", "800000"},
+            {"iceandfire:ice_dragon_roost", "350000"},
+            {"iceandfire:lightning_dragon_cave", "800000"},
+            {"iceandfire:lightning_dragon_roost", "350000"},
+            {"iceandfire:mausoleum", "800000"},
+            {"iceandfire:pixie_village", "3500"},
+            {"iceandfire:siren_island", "3250"},
     };
 
     /**
@@ -488,8 +494,7 @@ public final class RebalanceContent {
         for (String[] row : STRUCTURE_ELEVATIONS) {
             JsonObject entry = new JsonObject();
             entry.addProperty("structure", row[0]);
-            entry.addProperty("radius", Double.parseDouble(row[1]));
-            entry.addProperty("elevation", Double.parseDouble(row[2]));
+            entry.addProperty("elevation", Double.parseDouble(row[1]));
             rows.add(entry);
         }
         JsonObject json = new JsonObject();
@@ -1229,9 +1234,9 @@ public final class RebalanceContent {
         // Spot-check the pack rule's headline values: a dragon cave lifts its
         // neighbourhood to the stage-5 baseline, a roost to stage 3, and the
         // dragons themselves are exempt everywhere.
-        expectStructureRow(errors, content, "iceandfire:dragon_cave", 256.0, 800000.0);
-        expectStructureRow(errors, content, "iceandfire:fire_dragon_roost", 128.0, 350000.0);
-        expectStructureRow(errors, content, "iceandfire:mausoleum", 128.0, 800000.0);
+        expectStructureRow(errors, content, "iceandfire:dragon_cave", 800000.0);
+        expectStructureRow(errors, content, "iceandfire:fire_dragon_roost", 350000.0);
+        expectStructureRow(errors, content, "iceandfire:mausoleum", 800000.0);
         if (!exemptContains(content, "iceandfire:fire_dragon")
                 || !exemptContains(content, "iceandfire:dread_lich")) {
             errors.add("the spawn exemptions must cover the dragons and the dread boss");
@@ -1689,9 +1694,9 @@ public final class RebalanceContent {
         return false;
     }
 
-    /** Pins one structure row: floor and radius must match the pack rule's table. */
+    /** Pins one structure row: its baseline must match the pack rule's table. */
     private static void expectStructureRow(List<String> errors, Content content, String structure,
-                                           double radius, double elevation) {
+                                           double elevation) {
         JsonObject json = content.structureMagicule.get(
                 "data/iceandfire/infinite_dungeon/structure_magicule/structures.json");
         if (json == null || !json.has("structures")) {
@@ -1701,11 +1706,9 @@ public final class RebalanceContent {
         for (var element : json.getAsJsonArray("structures")) {
             JsonObject row = element.getAsJsonObject();
             if (structure.equals(row.get("structure").getAsString())) {
-                if (row.get("radius").getAsDouble() != radius
-                        || row.get("elevation").getAsDouble() != elevation) {
-                    errors.add(structure + ": expected radius " + radius + " elevation " + elevation
-                            + ", found radius " + row.get("radius").getAsDouble()
-                            + " elevation " + row.get("elevation").getAsDouble());
+                if (row.get("elevation").getAsDouble() != elevation) {
+                    errors.add(structure + ": expected elevation " + elevation
+                            + ", found elevation " + row.get("elevation").getAsDouble());
                 }
                 return;
             }
