@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suppressions PUBLIC "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN" "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<!-- Grandfathered findings from the Checkstyle pull: burn-down only, never new code. -->
+<suppressions>
+    <suppress checks="RegexpMultiline" files="EntityExistenceContent.java" lines="63"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="439"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="513"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="527"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="569"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="593"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="603"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="618"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="635"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="647"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="658"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="670"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="747"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="759"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="780"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="796"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="820"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="890"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="904"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1240"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1262"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1303"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1347"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1368"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1392"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1404"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1414"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1456"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1476"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1557"/>
+    <suppress checks="RegexpMultiline" files="RebalanceContent.java" lines="1578"/>
+    <suppress checks="RegexpMultiline" files="DragonBaseEntityGrowthMixin.java" lines="80"/>
+    <suppress checks="RegexpMultiline" files="DragonBaseEntityGrowthMixin.java" lines="124"/>
+    <suppress checks="RegexpMultiline" files="DragonBaseEntityGrowthMixin.java" lines="153"/>
+    <suppress checks="RegexpMultiline" files="DragonBaseEntityGrowthMixin.java" lines="173"/>
+</suppressions>
