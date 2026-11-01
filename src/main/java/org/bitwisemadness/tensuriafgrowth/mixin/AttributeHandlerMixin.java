@@ -2,11 +2,9 @@ package org.bitwisemadness.tensuriafgrowth.mixin;
 
 import com.iafenvoy.iceandfire.entity.DragonBaseEntity;
 import io.github.manasmods.manascore.skill.api.ManasSkillInstance;
-import io.github.manasmods.tensura.data.existence.EntityExistenceData;
 import io.github.manasmods.tensura.handler.AttributeHandler;
 import io.github.manasmods.tensura.storage.ep.IExistence;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.LevelAccessor;
 import org.bitwisemadness.tensuriafgrowth.handler.DragonGrowthStatHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

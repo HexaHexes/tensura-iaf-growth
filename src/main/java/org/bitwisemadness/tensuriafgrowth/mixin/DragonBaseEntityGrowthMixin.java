@@ -77,10 +77,12 @@ public final class DragonBaseEntityGrowthMixin {
         return Growth.scaleSpan(vanillaSpan);
     }
 
-    // --- Growth stages -----------------------------------------------------
-    // Stage 2/3/4/5 at 25/50/75/100 days becomes 25f/50f/75f/100f, keeping
-    // isBaby/isTeen/isMature (and therefore loot, size and EP stage) in step
-    // with the stretched clock.
+    /**
+     *  --- Growth stages -----------------------------------------------------
+     *  Stage 2/3/4/5 at 25/50/75/100 days becomes 25f/50f/75f/100f, keeping
+     *  isBaby/isTeen/isMature (and therefore loot, size and EP stage) in step
+     *  with the stretched clock.
+     */
 
     @ModifyConstant(method = "getDragonStage", constant = @Constant(intValue = 100))
     private int tensura_iaf_growth$stageFiveFrom(int vanillaDays) {
@@ -121,10 +123,12 @@ public final class DragonBaseEntityGrowthMixin {
         return Growth.scaleSpan(vanillaSpan);
     }
 
-    // --- Body size ---------------------------------------------------------
-    // The size table is indexed by stage (already stretched above); the two
-    // 25.0F constants are the per-day step and the full step, so scaling both
-    // keeps the final size byte-identical while the growth takes 25f days.
+    /**
+     *  --- Body size ---------------------------------------------------------
+     *  The size table is indexed by stage (already stretched above); the two
+     *  25.0F constants are the per-day step and the full step, so scaling both
+     *  keeps the final size byte-identical while the growth takes 25f days.
+     */
 
     @ModifyConstant(method = "getRenderSize", constant = @Constant(intValue = 125))
     private int tensura_iaf_growth$sizeAgeCap(int vanillaDays) {
@@ -150,13 +154,15 @@ public final class DragonBaseEntityGrowthMixin {
         return Growth.scaleSpan(vanillaSpan);
     }
 
-    // --- Armor clamp -------------------------------------------------------
-    // The armor line multiplies the raw getAgeInDays() - unclamped, unlike the
-    // health line above it. Vanilla's 128-day cap sat just above the 125-day
-    // span, so the overshoot was bounded at ~2%; with the raised cap armor
-    // would grow linearly forever past full growth. Redirect the second
-    // invocation (the armor line's) to the clamped age so armor tops at Ice and
-    // Fire's own maximumArmor exactly when HP does.
+    /**
+     *  --- Armor clamp -------------------------------------------------------
+     *  The armor line multiplies the raw getAgeInDays() - unclamped, unlike the
+     *  health line above it. Vanilla's 128-day cap sat just above the 125-day
+     *  span, so the overshoot was bounded at ~2%; with the raised cap armor
+     *  would grow linearly forever past full growth. Redirect the second
+     *  invocation (the armor line's) to the clamped age so armor tops at Ice and
+     *  Fire's own maximumArmor exactly when HP does.
+     */
 
     @Redirect(
         method = "updateAttributes()V",
@@ -170,12 +176,14 @@ public final class DragonBaseEntityGrowthMixin {
         return Math.min(dragon.getAgeInDays(), Growth.scaleDays(125));
     }
 
-    // --- Growth-pinned existence -------------------------------------------
-    // Every updateAttributes run ends with the growth handler: the dragon's EP
-    // is pinned to the stage-banded curve from this mod's config by age - see
-    // DragonGrowthStatHandler. updateAttributes runs at construction, on load,
-    // on each growth day (growDragon) and on equipment changes, so the recompute
-    // covers every way a dragon's age or belongings can move.
+    /**
+     *  --- Growth-pinned existence -------------------------------------------
+     *  Every updateAttributes run ends with the growth handler: the dragon's EP
+     *  is pinned to the stage-banded curve from this mod's config by age - see
+     *  DragonGrowthStatHandler. updateAttributes runs at construction, on load,
+     *  on each growth day (growDragon) and on equipment changes, so the recompute
+     *  covers every way a dragon's age or belongings can move.
+     */
 
     @Inject(method = "updateAttributes()V", at = @At("TAIL"))
     private void tensura_iaf_growth$refreshGrowthPinnedStats(CallbackInfo ci) {
