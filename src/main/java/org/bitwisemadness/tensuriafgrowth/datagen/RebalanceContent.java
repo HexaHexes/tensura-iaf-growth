@@ -436,15 +436,17 @@ public final class RebalanceContent {
         return content;
     }
 
-    // --- Structure elevation + spawn exemptions (infinite-dungeon-spawn-safety) ---
-    //
-    // Pack rule: every IaF structure's surrounding chunks carry at least the
-    // magicule baseline of the mobs related to it (see issue references in the
-    // class javadoc). Elevations are the related mobs' EP band maxima from the
-    // entity content this mod ships; the consumer derives the reach from the
-    // baseline. The dread isle is a separate dimension (iceandfire:dread_land),
-    // not an overworld structure - its bosses are covered by the exemption
-    // instead.
+    /**
+     *  --- Structure elevation + spawn exemptions (infinite-dungeon-spawn-safety) ---
+     *
+     *  Pack rule: every IaF structure's surrounding chunks carry at least the
+     *  magicule baseline of the mobs related to it (see issue references in the
+     *  class javadoc). Elevations are the related mobs' EP band maxima from the
+     *  entity content this mod ships; the consumer derives the reach from the
+     *  baseline. The dread isle is a separate dimension (iceandfire:dread_land),
+     *  not an overworld structure - its bosses are covered by the exemption
+     *  instead.
+     */
 
     /**
      * structure id -> elevation (the related mobs' EP baseline); every worldgen
@@ -515,12 +517,14 @@ public final class RebalanceContent {
         return files;
     }
 
-    // --- Chain 1: armor -----------------------------------------------------
-    //
-    // leather (fork: chainmail / copper / monster leather) and sheep disguise ->
-    // copper -> (random) either Ice and Fire silver or Tensura silver -> troll
-    // leather -> death worm chitin -> sea serpent scale -> (random) dragon steel
-    // or mithril armor -> re-banded adamantite -> hihiirokane (see addTensuraGear)
+    /**
+     *  --- Chain 1: armor -----------------------------------------------------
+     *
+     *  leather (fork: chainmail / copper / monster leather) and sheep disguise ->
+     *  copper -> (random) either Ice and Fire silver or Tensura silver -> troll
+     *  leather -> death worm chitin -> sea serpent scale -> (random) dragon steel
+     *  or mithril armor -> re-banded adamantite -> hihiirokane (see addTensuraGear)
+     */
 
     private static void addArmorChain(Map<String, JsonObject> gear, Map<String, JsonObject> chains) {
         for (String slot : SLOTS) {
@@ -529,10 +533,9 @@ public final class RebalanceContent {
                     gear(id("sheep_" + slot), 0, SHEEP_TO_COPPER, epGainFor(SHEEP_TO_COPPER), null,
                             id("armor_copper_metal_" + slot)));
 
-            // Copper -> either silver, rolled at random: the Ice and Fire set or
-            // Tensura's, which then climb their own aligned rungs. The addon chain is
-            // the only file for copper, so Gear Evolution's built-in copper thresholds
-            // can never outvote the fork.
+            // Copper -> either silver, rolled at random: the Ice and Fire set or Tensura's, which
+            // then climb their own aligned rungs. The addon chain is the only file for copper, so
+            // Gear Evolution's built-in copper thresholds can never outvote the fork.
             put(chains, chainPath(id("armor_copper_metal_" + slot)),
                     chain(id("armor_copper_metal_" + slot), 0, COPPER_TO_SILVER, epGainFor(COPPER_TO_SILVER),
                             null, List.of(id("armor_silver_metal_" + slot), "tensura:silver_" + slot)));
@@ -571,10 +574,9 @@ public final class RebalanceContent {
                                 scaleArmorIds(slot)));
             }
 
-            // Dragon scale -> the dragon steel set of its element, or mithril armor,
-            // rolled at random. The engraving lives in gear_existence (Tensura reads
-            // it) with maxEP 0 so Tensura does not manage EP or a target here; the
-            // addon chain is authoritative for both.
+            // Dragon scale -> the dragon steel set of its element, or mithril armor, rolled at
+            // random. The engraving lives in gear_existence (Tensura reads it) with maxEP 0 so
+            // Tensura does not manage EP or a target here; the addon chain is authoritative for both.
             for (Map.Entry<String, List<String>> element : SCALE_COLORS_BY_ELEMENT.entrySet()) {
                 for (String color : element.getValue()) {
                     put(gear, gearPath(id("armor_" + color + "_" + slot)),
@@ -595,20 +597,21 @@ public final class RebalanceContent {
         }
     }
 
-    // --- Chain 2: tools and weapons ----------------------------------------
-    //
-    // stone (fork: iron / copper) and copper -> (random) either Ice and Fire
-    // silver or Tensura silver -> dragon bone -> (random, 50/50) either the
-    // existing branch (blooded dragon bone for swords, dragon steel for the other
-    // tools) or Tensura mithril; plus the vanilla/Tensura bow ladder, slotted
-    // through the dragon bone bow
+    /**
+     *  --- Chain 2: tools and weapons ----------------------------------------
+     *
+     *  stone (fork: iron / copper) and copper -> (random) either Ice and Fire
+     *  silver or Tensura silver -> dragon bone -> (random, 50/50) either the
+     *  existing branch (blooded dragon bone for swords, dragon steel for the other
+     *  tools) or Tensura mithril; plus the vanilla/Tensura bow ladder, slotted
+     *  through the dragon bone bow
+     */
 
     private static void addToolChain(Map<String, JsonObject> gear, Map<String, JsonObject> chains) {
         for (String tool : TOOLS) {
-            // Copper -> either silver, rolled at random: the Ice and Fire tool or
-            // Tensura's, which then climb their own aligned rungs. The addon chain is
-            // the only file for copper, so Gear Evolution's built-in copper thresholds
-            // can never outvote the fork.
+            // Copper -> either silver, rolled at random: the Ice and Fire tool or Tensura's, which
+            // then climb their own aligned rungs. The addon chain is the only file for copper, so
+            // Gear Evolution's built-in copper thresholds can never outvote the fork.
             put(chains, chainPath(id("copper_" + tool)),
                     chain(id("copper_" + tool), 0, COPPER_TO_SILVER_TOOL, epGainFor(COPPER_TO_SILVER_TOOL),
                             null, List.of(id("silver_" + tool), "tensura:silver_" + tool)));
@@ -620,10 +623,9 @@ public final class RebalanceContent {
                             HOLY_COAT_1, id("dragonbone_" + tool)));
 
             if (tool.equals("sword")) {
-                // Dragon bone sword -> a blooded (elemental) dragon bone sword or Tensura's
-                // mithril sword, weighted 50/50 between the branches (each blooded option
-                // weight 1, mithril weight 3 of 6); each blooded sword then forges into
-                // its matching dragon steel.
+                // Dragon bone sword -> a blooded (elemental) dragon bone sword or Tensura's mithril
+                // sword, weighted 50/50 between the branches (each blooded option weight 1, mithril
+                // weight 3 of 6); each blooded sword then forges into its matching dragon steel.
                 put(chains, chainPath(id("dragonbone_sword")),
                         chainWeighted(id("dragonbone_sword"), 0, DRAGONBONE_TO_BLOODED,
                                 epGainFor(DRAGONBONE_TO_BLOODED), branchWeights(
@@ -637,10 +639,9 @@ public final class RebalanceContent {
                                     ELEMENTAL_BOOST, id("dragonsteel_" + element + "_sword")));
                 }
             } else {
-                // Tools have no blooded tier: dragon bone rolls between the three dragon
-                // steel elements and Tensura's mithril tool, again weighted 50/50 - so the
-                // dragon steel tools become terminal from the 225,000 fork gate instead
-                // of waiting out a second rung to 750,000.
+                // Tools have no blooded tier: dragon bone rolls between the three dragon steel
+                // elements and Tensura's mithril tool, again weighted 50/50 - so the dragon steel
+                // tools become terminal from the 225,000 fork gate instead of a second rung to 750,000.
                 put(chains, chainPath(id("dragonbone_" + tool)),
                         chainWeighted(id("dragonbone_" + tool), 0, DRAGONBONE_TO_STEEL,
                                 epGainFor(DRAGONBONE_TO_STEEL), branchWeights(
@@ -649,10 +650,9 @@ public final class RebalanceContent {
                                         "tensura:mithril_" + tool)));
             }
 
-            // Dragon steel tools and weapons: terminal, engraved like hihiirokane.
-            // The non-sword tools take their earning floor from the 225,000 fork gate
-            // they arrive at; the dragon steel sword still floors at 750,000, where the
-            // blooded rung hands it over.
+            // Dragon steel tools and weapons: terminal, engraved like hihiirokane. The non-sword
+            // tools take their earning floor from the 225,000 fork gate they arrive at; the dragon
+            // steel sword still floors at 750,000, where the blooded rung hands it over.
             for (String element : SCALE_COLORS_BY_ELEMENT.keySet()) {
                 int floor = tool.equals("sword") ? TERMINAL_MIN : DRAGONBONE_TO_STEEL;
                 put(gear, gearPath(id("dragonsteel_" + element + "_" + tool)),
@@ -660,10 +660,9 @@ public final class RebalanceContent {
             }
         }
 
-        // The bow ladder, slotted by damage and draw speed: short bow -> dragon bone bow
-        // -> Tensura's long bow -> war bow. The rungs outside our two files (bow at 700,
-        // long bow at 12,500, war bow at 16,000) are Gear Evolution's own and stay
-        // upstream; validation pins their ordering against ours.
+        // The bow ladder, slotted by damage and draw speed: short bow -> dragon bone bow ->
+        // Tensura's long bow -> war bow. The rungs outside our two files (bow at 700, long bow at
+        // 12,500, war bow at 16,000) are Gear Evolution's own; validation pins their ordering.
         put(gear, gearPath(id("dragonbone_bow")),
                 gear(id("dragonbone_bow"), 0, DRAGONBONE_BOW_GATE, epGainFor(DRAGONBONE_BOW_GATE), null, LONG_BOW));
         // Same-path override of Gear Evolution's short_bow rung, retargeted through the
@@ -672,12 +671,14 @@ public final class RebalanceContent {
                 gear("tensura:short_bow", 0, SHORT_BOW_GATE, epGainFor(SHORT_BOW_GATE), null, id("dragonbone_bow")));
     }
 
-    // --- Chain 3: the vanilla opening ---------------------------------------
-    //
-    // leather armor forks at 550 into chainmail / copper / monster leather, and
-    // every stone tool forks at 500 into iron / copper. The copper branch lands
-    // on the rung above; the vanilla branches continue on Gear Evolution's own
-    // bundled ladders, and monster leather continues on Tensura's own D tier.
+    /**
+     *  --- Chain 3: the vanilla opening ---------------------------------------
+     *
+     *  leather armor forks at 550 into chainmail / copper / monster leather, and
+     *  every stone tool forks at 500 into iron / copper. The copper branch lands
+     *  on the rung above; the vanilla branches continue on Gear Evolution's own
+     *  bundled ladders, and monster leather continues on Tensura's own D tier.
+     */
 
     /**
      * Replaces Gear Evolution's bundled leather and stone rungs - inert at their own
@@ -749,26 +750,30 @@ public final class RebalanceContent {
         }
     }
 
-    // --- Tensura silver and mithril merge -----------------------------------
-    //
-    // Tensura silver rejoins the Ice and Fire chain: armor forks into the three
-    // troll sets at 7,800, the five items with an Ice and Fire counterpart step
-    // onto dragon bone at 52,000, and the ten exotic weapons hold their silver
-    // tier to the 225,000 mithril gate. Mithril is a dragon bone fork outcome
-    // (weapons and tools) or a dragon scale one (armor) and forges on through
-    // Tensura's metals - the kunai hand-off and the two no-ladder terminals from
-    // the original gap fixes live alongside them.
+    /**
+     *  --- Tensura silver and mithril merge -----------------------------------
+     *
+     *  Tensura silver rejoins the Ice and Fire chain: armor forks into the three
+     *  troll sets at 7,800, the five items with an Ice and Fire counterpart step
+     *  onto dragon bone at 52,000, and the ten exotic weapons hold their silver
+     *  tier to the 225,000 mithril gate. Mithril is a dragon bone fork outcome
+     *  (weapons and tools) or a dragon scale one (armor) and forges on through
+     *  Tensura's metals - the kunai hand-off and the two no-ladder terminals from
+     *  the original gap fixes live alongside them.
+     */
 
     private static void addTensuraGear(Map<String, JsonObject> gear, Map<String, JsonObject> geGear,
             Map<String, JsonObject> chains) {
-        // Silver, rejoined to the Ice and Fire chain: armor forks like Ice and Fire
-        // silver does (engraving-only file, chain-driven), the five items with an Ice
-        // and Fire counterpart step onto dragon bone at 52,000, and the ten weapons
-        // without one hold silver to the 225,000 mithril gate. Gear Evolution ships
-        // the sixteen non-tool files itself and Tensura ships inert copies of all
-        // nineteen, so those sixteen get the same JsonObject at both resource paths:
-        // whichever file the pack-priority race picks, the values match. The three
-        // tools have no Gear Evolution file - Tensura's own folder is their only path.
+        /**
+         *  Silver, rejoined to the Ice and Fire chain: armor forks like Ice and Fire
+         *  silver does (engraving-only file, chain-driven), the five items with an Ice
+         *  and Fire counterpart step onto dragon bone at 52,000, and the ten weapons
+         *  without one hold silver to the 225,000 mithril gate. Gear Evolution ships
+         *  the sixteen non-tool files itself and Tensura ships inert copies of all
+         *  nineteen, so those sixteen get the same JsonObject at both resource paths:
+         *  whichever file the pack-priority race picks, the values match. The three
+         *  tools have no Gear Evolution file - Tensura's own folder is their only path.
+         */
         for (String slot : SLOTS) {
             putSilverArmor(gear, geGear, chains, slot);
         }
@@ -782,12 +787,9 @@ public final class RebalanceContent {
             putSilver(gear, null, "silver_" + tool, SILVER_TO_DRAGONBONE, id("dragonbone_" + tool));
         }
 
-        // Mithril: weapons and tools arrive from the 225,000 dragon bone fork, so they
-        // floor there and forge on to 500,000 - inside Tensura's own adamantite band
-        // (225,000 to 750,000), which the carried EP then completes without a gap.
-        // Armor arrives from the 750,000 dragon scale fork, floors there, and forges on
-        // to 1,000,000, into the re-banded adamantite armor below. Engravings stay
-        // exactly as Tensura ships them (holy coat II).
+        // Mithril: weapons and tools arrive from the 225,000 dragon bone fork, flooring there and
+        // forging to 500,000 (inside Tensura's 225,000-750,000 adamantite band); armor comes from
+        // the 750,000 scale fork to 1,000,000 (engravings stay exactly as Tensura ships them).
         for (String slot : SLOTS) {
             putMithril(gear, "mithril_" + slot, SCALE_TO_STEEL, MITHRIL_ARMOR_GATE);
         }
@@ -798,12 +800,9 @@ public final class RebalanceContent {
             putMithril(gear, "mithril_" + tool, MITHRIL_WEAPON_FLOOR, MITHRIL_WEAPON_GATE);
         }
 
-        // Adamantite armor, re-banded: Tensura's own file floors at 225,000 and tops at
-        // 750,000, which mithril's 1,000,000 carry would blow straight through into an
-        // instant second evolution. This override moves both edges up to meet the carry:
-        // floor at mithril's exit, top at 1,250,000, where hihiirokane's own floor
-        // (750,000) takes over. Same resource path as Tensura's file, so this jar wins
-        // the pack-priority race exactly like the aligned silver copies already do.
+        // Adamantite armor, re-banded: Tensura's file floors at 225,000 and tops at 750,000, which
+        // mithril's 1,000,000 carry would blow through into an instant second evolution - the override
+        // moves both edges (floor at mithril's exit, top at 1,250,000, where hihiirokane takes over).
         for (String slot : SLOTS) {
             put(gear, TENSURA_GEAR + file("tensura:adamantite_" + slot),
                     gear("tensura:adamantite_" + slot, MITHRIL_ARMOR_GATE, ADAMANTITE_ARMOR_GATE,
@@ -822,16 +821,18 @@ public final class RebalanceContent {
         put(gear, TENSURA_GEAR + file("tensura:severer_blade"), tensuraTerminal("severer_blade"));
     }
 
-    // --- Chain 4: Tensura's creature ladder ----------------------------------
-    //
-    // monster leather C forks at 5,000 into monster leather B or the ant
-    // carapace, and the creature line climbs ant (3,000 -> 6,000) -> armorsaurus
-    // or armorsaurus scalemail (6,000 -> 9,000) -> serpent scalemail or knight
-    // spider carapace (9,000 -> 500,000) -> charybdis (500,000 -> 750,000), where
-    // it hits the same dragon steel / mithril fork dragon scale armor does.
-    // Special A leaves its terminal rank at 225,000 to rejoin the line at the
-    // serpent fork, so the leather and creature sub-lines split at monster
-    // leather C and merge at serpent and again at the metal fork.
+    /**
+     *  --- Chain 4: Tensura's creature ladder ----------------------------------
+     *
+     *  monster leather C forks at 5,000 into monster leather B or the ant
+     *  carapace, and the creature line climbs ant (3,000 -> 6,000) -> armorsaurus
+     *  or armorsaurus scalemail (6,000 -> 9,000) -> serpent scalemail or knight
+     *  spider carapace (9,000 -> 500,000) -> charybdis (500,000 -> 750,000), where
+     *  it hits the same dragon steel / mithril fork dragon scale armor does.
+     *  Special A leaves its terminal rank at 225,000 to rejoin the line at the
+     *  serpent fork, so the leather and creature sub-lines split at monster
+     *  leather C and merge at serpent and again at the metal fork.
+     */
 
     /**
      * Re-gates Tensura's hide/scale/carapace sets into one flow, overriding each set's
@@ -892,10 +893,9 @@ public final class RebalanceContent {
                                         "tensura:knight_spider_carapace_" + slot)));
             }
 
-            // Serpent scalemail and knight spider carapace: plain rungs, so the
-            // shifted milestone bumps survive the run. Both entries land before the
-            // first shifted milestone - the armorsaurus branch at the 9,000 floor,
-            // Special A at 225,000.
+            // Serpent scalemail and knight spider carapace: plain rungs, so the shifted milestone
+            // bumps survive the run. Both entries land before the first shifted milestone - the
+            // armorsaurus branch at the 9,000 floor, Special A at 225,000.
             for (String set : List.of("tensura:serpent_scalemail_" + slot,
                     "tensura:knight_spider_carapace_" + slot)) {
                 put(gear, TENSURA_GEAR + file(set),
@@ -906,12 +906,9 @@ public final class RebalanceContent {
                                         milestone(SERPENT_MILESTONE_3, 1.0d, 1.0d))));
             }
 
-            // Charybdis scalemail: the top of the creature line, forked into the metal
-            // spine at the same 750,000 gate dragon scale armor uses - the three
-            // dragon steel skins weigh 1 each and mithril weighs 3, the same 50/50
-            // branch roll the dragon bone forks run. The inert companion keeps the
-            // magic interference engraving; the native milestones cannot survive the
-            // fork and are dropped.
+            // Charybdis scalemail: the top of the creature line, forked into the metal spine at the
+            // same 750,000 gate dragon scale armor uses (the dragon steel skins weigh 1 each, mithril
+            // 3). The inert companion keeps the magic interference engraving; native milestones drop.
             String charybdis = "tensura:charybdis_scalemail_" + slot;
             put(gear, TENSURA_GEAR + file(charybdis),
                     gear(charybdis, 0, 0, 0, MAGIC_INTERFERENCE, null));
@@ -1242,11 +1239,9 @@ public final class RebalanceContent {
             errors.add("the spawn exemptions must cover the dragons and the dread boss");
         }
 
-        // Every file must land under the path the consuming mod reads it from - the
-        // same item legitimately appears under two of them. Gear Evolution's short bow
-        // and this pack's aligned Tensura silver copies live in Gear Evolution's own
-        // Tensura folder, and the vanilla forks live in its minecraft folder, so those
-        // prefixes are accepted alongside the Ice and Fire one.
+        // Every file must land under the path the consuming mod reads it from - the same item
+        // legitimately appears under two of them: Gear Evolution's short bow and the aligned Tensura
+        // silver copies live in its Tensura folder, the vanilla forks in its minecraft folder.
         checkPrefix(errors, content.geGearExistence, GE_GEAR, GE_TENSURA_GEAR, GE_VANILLA);
         checkPrefix(errors, content.iafGearExistence, IAF_GEAR);
         checkPrefix(errors, content.tensuraGearExistence, TENSURA_GEAR);
@@ -1264,13 +1259,15 @@ public final class RebalanceContent {
             }
         }
 
-        // The item id in every file must carry a real namespace: Tensura matches it
-        // against the item's registry name, and an unqualified id resolves to
-        // minecraft:<name>, which would silently match nothing. Files under Tensura's
-        // own folder or Gear Evolution's Tensura folder must be tensura ids, files
-        // under its minecraft folder must be minecraft ids, addon chains key off the
-        // parsed item id rather than the file path so they may name any of the three,
-        // and everywhere else must be Ice and Fire ids.
+        /**
+         *  The item id in every file must carry a real namespace: Tensura matches it
+         *  against the item's registry name, and an unqualified id resolves to
+         *  minecraft:<name>, which would silently match nothing. Files under Tensura's
+         *  own folder or Gear Evolution's Tensura folder must be tensura ids, files
+         *  under its minecraft folder must be minecraft ids, addon chains key off the
+         *  parsed item id rather than the file path so they may name any of the three,
+         *  and everywhere else must be Ice and Fire ids.
+         */
         for (Map<String, JsonObject> files : all) {
             for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
                 JsonObject json = entry.getValue();
@@ -1305,10 +1302,9 @@ public final class RebalanceContent {
             }
         }
 
-        // Every evolution target must itself be a generated item (catches typos). The ids
-        // come from each file's own type/item fields, so the bow override registers as
-        // tensura:short_bow rather than as an Ice and Fire item, and Tensura's own
-        // silver/mithril rungs register as the tensura ids the copper fork targets.
+        // Every evolution target must itself be a generated item (catches typos). The ids come
+        // from each file's own type/item fields, so the bow override registers as tensura:short_bow
+        // rather than an Ice and Fire item, and Tensura's rungs register as the tensura ids targeted.
         Set<String> generated = new LinkedHashSet<>();
         for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.addonChains,
                 content.tensuraGearExistence)) {
@@ -1349,13 +1345,15 @@ public final class RebalanceContent {
             }
         }
 
-        // Everything written for Gear Evolution also needs a shadow under the addon's
-        // path, or the addon's own thresholds would outvote ours. The neutralised
-        // built-ins are the exception: they are inert, their EP comes from the
-        // addon_chains ladder, and the addon only ships shadows for some of them.
-        // Files in Gear Evolution's Tensura folder are exempt outright - the addon
-        // never ships Ice and Fire shadows for Tensura-namespace items - and its
-        // minecraft folder likewise: the addon ships no vanilla shadows at all.
+        /**
+         *  Everything written for Gear Evolution also needs a shadow under the addon's
+         *  path, or the addon's own thresholds would outvote ours. The neutralised
+         *  built-ins are the exception: they are inert, their EP comes from the
+         *  addon_chains ladder, and the addon only ships shadows for some of them.
+         *  Files in Gear Evolution's Tensura folder are exempt outright - the addon
+         *  never ships Ice and Fire shadows for Tensura-namespace items - and its
+         *  minecraft folder likewise: the addon ships no vanilla shadows at all.
+         */
         for (String path : content.geGearExistence.keySet()) {
             String item = name(path);
             if (GE_BUILTIN_NEUTRALISED.contains(item)) {
@@ -1370,10 +1368,9 @@ public final class RebalanceContent {
             }
         }
 
-        // maxEP semantics: an explicit 0 marks an inert file (the addon_chains ladder
-        // drives the item, so Tensura must not manage EP or a target here), any other
-        // explicit maxEP must name an evolution, and an omitted maxEP is a terminal
-        // that keeps earning with no target - the codec's 2,000,000 default caps it.
+        // maxEP semantics: an explicit 0 marks an inert file (the addon_chains ladder drives the
+        // item, so Tensura must not manage EP or a target here), any other explicit maxEP must name
+        // an evolution, and an omitted maxEP is a terminal - the codec's 2,000,000 default caps it.
         for (Map<String, JsonObject> files : List.of(content.geGearExistence, content.iafGearExistence,
                 content.tensuraGearExistence)) {
             for (Map.Entry<String, JsonObject> entry : files.entrySet()) {
@@ -1394,10 +1391,9 @@ public final class RebalanceContent {
             }
         }
 
-        // Every ladder must climb strictly: a stalled or reversed gate would strand
-        // gear below a threshold it can never reach. The vanilla forks enter the copper
-        // rung from below it, the dragon bone forks hand off to the mithril bands, and
-        // each mithril band lands inside the rung above it.
+        // Every ladder must climb strictly: a stalled or reversed gate would strand gear below a
+        // threshold it can never reach. The vanilla forks enter the copper rung from below it, the
+        // dragon bone forks hand off to the mithril bands, each mithril band inside the rung above.
         checkAscending(errors, "armor spine",
                 SHEEP_TO_COPPER, COPPER_TO_SILVER, SILVER_TO_TROLL, TROLL_TO_CHITIN_GATE, CHITIN_TO_TIDE,
                 TIDE_TO_SCALE, SCALE_TO_STEEL);
@@ -1406,20 +1402,18 @@ public final class RebalanceContent {
         checkAscending(errors, "tool ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE, DRAGONBONE_TO_STEEL);
         checkAscending(errors, "sword ladder", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE,
                 DRAGONBONE_TO_BLOODED, BLOODED_TO_STEEL);
-        // The Tensura merge climbs the same spine: silver forks into the troll sets,
-        // dragon bone forks into mithril at 225,000, and the mithril bands top out on
-        // Tensura's own adamantite rungs - weapons inside its untouched 225,000-750,000
-        // band, armor inside the re-banded file this pack overrides.
+        // The Tensura merge climbs the same spine: silver forks into the troll sets, dragon bone
+        // forks into mithril at 225,000, and the mithril bands top out on Tensura's own adamantite
+        // rungs - weapons inside its untouched band, armor inside the re-banded file this pack overrides.
         checkAscending(errors, "tensura weapons spine", COPPER_TO_SILVER_TOOL, SILVER_TO_DRAGONBONE,
                 MITHRIL_WEAPON_FLOOR, MITHRIL_WEAPON_GATE, SCALE_TO_STEEL);
         checkAscending(errors, "tensura armor spine", COPPER_TO_SILVER, SILVER_TO_TROLL,
                 SCALE_TO_STEEL, MITHRIL_ARMOR_GATE, ADAMANTITE_ARMOR_GATE);
         checkAscending(errors, "dread line", DREAD_KNIGHT, DREAD_QUEEN);
         checkAscending(errors, "death worm gauntlets", GAUNTLET_WHITE, GAUNTLET_RED);
-        // The creature ladder runs parallel to the armor spine: monster leather C
-        // forks at 5,000, the creature line climbs 6,000 / 9,000, Special A rejoins
-        // at 225,000, and charybdis tops out on the same 750,000 metal fork dragon
-        // scale armor uses.
+        // The creature ladder runs parallel to the armor spine: monster leather C forks at 5,000,
+        // the creature line climbs 6,000 / 9,000, Special A rejoins at 225,000, and charybdis tops
+        // out on the same 750,000 metal fork dragon scale armor uses.
         checkAscending(errors, "tensura creature ladder", ML_C_FORK, ANT_GATE, ARMORSAURUS_GATE,
                 SPECIAL_A_GATE, SERPENT_GATE, CHARYBDIS_GATE);
         checkAscending(errors, "bow ladder",
@@ -1458,10 +1452,9 @@ public final class RebalanceContent {
                                         + "|armorsaurus(_scalemail)?_.*|serpent_scalemail_.*"
                                         + "|knight_spider_carapace_.*|charybdis_scalemail_.*)")).count());
 
-        // Ladder spot checks, at literal plan values so a change to epGainFor or the
-        // gate tables cannot quietly redefine what "correct" means: the one silver
-        // rung every sword and tool shares, and the bow pair that reaches outside the
-        // Ice and Fire namespace.
+        // Ladder spot checks, at literal plan values so a change to epGainFor or the gate tables
+        // cannot quietly redefine what "correct" means: the one silver rung every sword and tool
+        // shares, and the bow pair that reaches outside the Ice and Fire namespace.
         expectRung(errors, content, "silver_sword", 52000, 0.02d, id("dragonbone_sword"));
         expectRung(errors, content, "silver_axe", 52000, 0.02d, id("dragonbone_axe"));
         expectRung(errors, content, "dragonbone_bow", 7200, 0.003d, LONG_BOW);
@@ -1478,14 +1471,16 @@ public final class RebalanceContent {
         expectTerminal(errors, content, "troll_weapon_axe", 0, 0.003d);
         expectTerminal(errors, content, "dragon_flute", 0, 0.003d);
 
-        // The Tensura silver and mithril merge, pinned to the final design: armor
-        // forks into the troll sets at 7,800 like Ice and Fire silver, the five items
-        // with an Ice and Fire counterpart step onto dragon bone at 52,000, the ten
-        // exotic weapons hold silver to the 225,000 mithril gate; mithril weapons and
-        // tools floor at 225,000 and forge to 500,000, mithril armor floors at
-        // 750,000 and forges to 1,000,000, and the re-banded adamantite armor carries
-        // on to 1,250,000. The kunai hand-off and the two terminals are unchanged
-        // gap fixes.
+        /**
+         *  The Tensura silver and mithril merge, pinned to the final design: armor
+         *  forks into the troll sets at 7,800 like Ice and Fire silver, the five items
+         *  with an Ice and Fire counterpart step onto dragon bone at 52,000, the ten
+         *  exotic weapons hold silver to the 225,000 mithril gate; mithril weapons and
+         *  tools floor at 225,000 and forge to 500,000, mithril armor floors at
+         *  750,000 and forges to 1,000,000, and the re-banded adamantite armor carries
+         *  on to 1,250,000. The kunai hand-off and the two terminals are unchanged
+         *  gap fixes.
+         */
         expectInert(errors, content, "silver_helmet");
         expectFork(errors, content, "tensura:silver_helmet", 7800, 0.003d,
                 id("mountain_troll_leather_helmet"), id("forest_troll_leather_helmet"),
@@ -1559,10 +1554,9 @@ public final class RebalanceContent {
         expectInert(errors, content, "armor_silver_metal_helmet");
         expectInert(errors, content, "deathworm_red_helmet");
 
-        // Addon chain spot checks: the vanilla forks, the dragon scale fork, the
-        // weighted dragon bone forks, and the troll leather ladder the chains alone
-        // drive. The leather and stone gear files themselves must stay inert - the
-        // chain is the only thing that may move them.
+        // Addon chain spot checks: the vanilla forks, the dragon scale fork, the weighted dragon
+        // bone forks, and the troll leather ladder the chains alone drive. The leather and stone
+        // gear files themselves must stay inert - the chain is the only thing that may move them.
         expectInert(errors, content, "leather_helmet");
         expectInert(errors, content, "stone_pickaxe");
         expectFork(errors, content, "minecraft:leather_helmet", 550, 0.003d,
@@ -1580,13 +1574,15 @@ public final class RebalanceContent {
                 "tensura:mithril_axe");
         expectChainRung(errors, content, "mountain_troll_leather_helmet", 18000, 0.01d);
 
-        // The creature ladder, pinned at literal plan values. The fork points ship
-        // inert companions plus chains - Gear Evolution strips milestones from
-        // chain-driven items, so they carry none - while the serpent and knight
-        // spider sets are plain rungs whose shifted milestones survive, and charybdis
-        // keeps its engraving while the fork takes over its EP. The netherite
-        // re-bands sit on Gear Evolution's bundled resource paths with gates that
-        // leave both netherite and low magisteel a band worth wearing.
+        /**
+         *  The creature ladder, pinned at literal plan values. The fork points ship
+         *  inert companions plus chains - Gear Evolution strips milestones from
+         *  chain-driven items, so they carry none - while the serpent and knight
+         *  spider sets are plain rungs whose shifted milestones survive, and charybdis
+         *  keeps its engraving while the fork takes over its EP. The netherite
+         *  re-bands sit on Gear Evolution's bundled resource paths with gates that
+         *  leave both netherite and low magisteel a band worth wearing.
+         */
         expectInertAt(errors, "tensura:monster_leather_helmet_c",
                 findTensuraGear(errors, content, "monster_leather_helmet_c"));
         expectFork(errors, content, "tensura:monster_leather_helmet_c", 5000, 0.005d,
