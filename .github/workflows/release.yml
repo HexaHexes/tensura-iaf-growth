@@ -1,14 +1,35 @@
 name: Release
 
 # Runs on pushes to the default branch: when gradle.properties carries a version
-# that has no matching v-published tag yet, build the jar and publish it as a
-# GitHub release for that tag. The datapack ships inside that jar, so there is no
-# separate archive to assemble.
+# that has no matching v-published release yet, build the jar and publish it as a
+# GitHub release for that tag. Everything the mod ships rides inside that jar, so
+# there is no separate archive to assemble.
+#
+# Promoted from tensura-iaf-growth, the org's reference implementation (tracked by
+# neoforge-mod-template #4). Two deliberate differences from a mod repo's copy:
+#
+#   - the jar name is derived from mod_id instead of written out, because this file
+#     is copied into repos whose archivesName follows their own mod_id, so a rename
+#     needs no edit here;
+#   - release bodies are GitHub-native auto-generated changelogs (see
+#     .github/release.yml and the changelog ruling in agents/AGENTS.md) - there
+#     is no per-repo promo body to edit.
+#
+# Pre-releases are enabled by default: an -alpha or -beta version publishes on
+# the first push that would create it. Set the repository variable
+# ALPHA_RELEASES to "false" to opt this repo out (skipped with a log line
+# rather than a failure). The default lives in the ${ALPHA_RELEASES:-true}
+# expression below - repository variables cannot ship in template content, so
+# the file itself must carry the default.
 
 on:
   push:
     branches:
       - main
+  # Dispatch entry for the post-merge version bump (#81): the bump lands on
+  # main first, then Release is dispatched to publish the new slot - a
+  # GITHUB_TOKEN push does not cascade to other workflows.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -78,9 +99,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Derived from mod_id rather than written out: the template changed
-          # this deliberately for rename-safety, and this repo's rename
-          # checklist makes a hardcoded jar name a latent trap.
           MOD_ID=$(grep '^mod_id=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')
           JAR="build/libs/$MOD_ID-$VERSION.jar"
           if [ ! -f "$JAR" ]; then
