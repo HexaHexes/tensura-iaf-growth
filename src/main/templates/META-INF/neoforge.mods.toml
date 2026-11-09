@@ -107,3 +107,20 @@ configuredBackground = "minecraft:textures/block/stone.png"
     versionRange="[2,)"
     ordering="AFTER"
     side="BOTH"
+
+# Better Combat - optional (README row). Combo timing/swing integration is
+# presence-gated; without it the stage hooks fall back to Tensura-only.
+[[dependencies.tensura_iaf_growth]]
+    modId="bettercombat"
+    type="optional"
+    versionRange="[2.4,)"
+    ordering="AFTER"
+    side="BOTH"
+
+# Tensura RPG System - optional (README row). Presence-gated compat leg.
+[[dependencies.tensura_iaf_growth]]
+    modId="tensuraevolution"
+    type="optional"
+    versionRange="[0.0,)"
+    ordering="AFTER"
+    side="BOTH"
