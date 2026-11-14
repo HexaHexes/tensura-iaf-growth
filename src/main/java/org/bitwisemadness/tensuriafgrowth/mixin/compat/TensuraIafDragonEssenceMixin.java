@@ -2,7 +2,6 @@ package org.bitwisemadness.tensuriafgrowth.mixin.compat;
 
 import com.iafenvoy.iceandfire.entity.DragonBaseEntity;
 import io.github.manasmods.tensura.registry.item.TensuraMobDropItems;
-import net.minecraft.world.damagesource.DamageSource;
 import org.bitwisemadness.tensuriafgrowth.config.DragonEpConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,8 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class TensuraIafDragonEssenceMixin {
 
     @Inject(method = "dropFromLootTable", at = @At("TAIL"))
-    private void tensuraIaf$dropDragonEssence(DamageSource source, boolean hitByPlayer,
-            CallbackInfo ci) {
+    private void tensuraIaf$dropDragonEssence(CallbackInfo ci) {
         DragonBaseEntity dragon = (DragonBaseEntity) (Object) this;
         int stage = dragon.getDragonStage();
         if (stage < DragonEpConfig.ESSENCE_MIN_STAGE.get()
