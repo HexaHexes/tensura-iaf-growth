@@ -9,7 +9,18 @@
     "EnergyHelperMixin",
     "IafCommonConfigDragonMixin",
     "AttributeHandlerMixin",
-    "MobStatusSystemMixin"
+    "MobStatusSystemMixin",
+    "compat.TensuraIafChainItemMixin",
+    "compat.TensuraIafColdNullificationMixin",
+    "compat.TensuraIafDamageClassificationMixin",
+    "compat.TensuraIafDragonEssenceMixin",
+    "compat.TensuraIafFlameBreathForgeMixin",
+    "compat.TensuraIafGorgonStareMixin",
+    "compat.TensuraIafIceBreathForgeMixin",
+    "compat.TensuraIafIceSpikesMixin",
+    "compat.TensuraIafRaceUtilsMixin",
+    "compat.TensuraIafSirenCharmMixin",
+    "compat.TensuraIafThunderBreathForgeMixin"
   ],
 
   "injectors": {

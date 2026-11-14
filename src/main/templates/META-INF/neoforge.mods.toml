@@ -64,15 +64,6 @@ configuredBackground = "minecraft:textures/block/stone.png"
     ordering="AFTER"
     side="BOTH"
 
-# Tensura - Ice and Fire compat addon - required. Registers the Ice and Fire
-# gear/entity existence content this addon rebalances.
-[[dependencies.tensura_iaf_growth]]
-    modId="tensura_iaf"
-    type="required"
-    versionRange="[2,)"
-    ordering="AFTER"
-    side="BOTH"
-
 # Architectury - required by Ice and Fire and the compat addon; declared so this
 # addon loads after it.
 [[dependencies.tensura_iaf_growth]]

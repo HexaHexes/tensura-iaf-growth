@@ -1,6 +1,6 @@
 package org.bitwisemadness.tensuriafgrowth.datagen;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,9 +23,9 @@ import net.minecraft.data.PackOutput;
 public final class JsonFilesProvider implements DataProvider {
     private final String name;
     private final PackOutput output;
-    private final Map<String, JsonObject> files;
+    private final Map<String, ? extends JsonElement> files;
 
-    public JsonFilesProvider(String name, PackOutput output, Map<String, JsonObject> files) {
+    public JsonFilesProvider(String name, PackOutput output, Map<String, ? extends JsonElement> files) {
         this.name = name;
         this.output = output;
         this.files = Collections.unmodifiableMap(new LinkedHashMap<>(files));
