@@ -57,6 +57,34 @@ public final class TensuraIafGameTests {
         helper.succeed();
     }
 
+    /**
+     * The spawn-age stretch redirects attach (issue #82): the structure piece
+     * and feature classes are loaded lazily by world generation, so this test
+     * force-loads them without initialization to trigger their transforms -
+     * with {@code defaultRequire: 1} a redirect whose target Ice and Fire
+     * renamed or removed fails the run here instead of at the first cave or
+     * roost generation. The ponder storyboard mixin is client-only (registered
+     * in the config's {@code client} array) and deliberately not touched by
+     * this server-side test; it is proven by a client launch instead.
+     */
+    @GameTest(template = "empty")
+    public static void spawn_age_mixins_attach(GameTestHelper helper) {
+        ClassLoader loader = TensuraIafGameTests.class.getClassLoader();
+        String[] targets = {
+            "com.iafenvoy.iceandfire.world.structure.DragonCaveStructure$DragonCavePiece",
+            "com.iafenvoy.iceandfire.world.structure.DragonRoostStructure$DragonRoostPiece",
+            "com.iafenvoy.iceandfire.world.feature.DragonSkeletonSpawnFeature",
+        };
+        for (String target : targets) {
+            try {
+                Class.forName(target, false, loader);
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException("Ice and Fire class missing: " + target, e);
+            }
+        }
+        helper.succeed();
+    }
+
     /** Every generated file must be loadable - the proxy for "wired into the jar". */
     private static void checkGearMap(Map<String, JsonObject> files) {
         for (Map.Entry<String, JsonObject> entry : files.entrySet()) {

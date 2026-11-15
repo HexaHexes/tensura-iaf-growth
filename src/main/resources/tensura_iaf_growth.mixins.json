@@ -10,6 +10,9 @@
     "IafCommonConfigDragonMixin",
     "AttributeHandlerMixin",
     "MobStatusSystemMixin",
+    "DragonCavePieceSpawnMixin",
+    "DragonRoostPieceSpawnMixin",
+    "DragonSkeletonSpawnFeatureMixin",
     "compat.TensuraIafChainItemMixin",
     "compat.TensuraIafColdNullificationMixin",
     "compat.TensuraIafDamageClassificationMixin",
@@ -21,6 +24,10 @@
     "compat.TensuraIafRaceUtilsMixin",
     "compat.TensuraIafSirenCharmMixin",
     "compat.TensuraIafThunderBreathForgeMixin"
+  ],
+
+  "client": [
+    "DragonForgeStoryBoardAgeMixin"
   ],
 
   "injectors": {
