@@ -39,6 +39,11 @@ public final class DragonEpConfig {
     public static final ModConfigSpec.IntValue STAGE4_EP_CAP;
     public static final ModConfigSpec.IntValue STAGE5_EP_CAP;
 
+    /** The essence-drop window (absorbed from TenSura Compat: Ice and Fire). */
+    public static final ModConfigSpec.IntValue ESSENCE_MIN_STAGE;
+    public static final ModConfigSpec.IntValue ESSENCE_MAX_STAGE;
+    public static final ModConfigSpec.DoubleValue ESSENCE_CHANCE;
+
     /** The last invalid config that was warned about, so reloads do not spam. */
     private static String lastWarning = "";
 
@@ -65,6 +70,19 @@ public final class DragonEpConfig {
                 "EP line at full growth (stage 5, day 125 x stretch), and the ceiling for",
                 "stage 5: as high as this much EP before naming or other top-ups.")
                 .defineInRange("stage5EpCap", 800_000, 1, Integer.MAX_VALUE);
+        builder.pop();
+        builder.push("dragon_essence");
+        ESSENCE_MIN_STAGE = builder.comment(
+                "The lowest dragon stage that drops Dragon Essence on death (absorbed",
+                "from TenSura Compat: Ice and Fire, issue #80).")
+                .defineInRange("minStage", 4, 0, 5);
+        ESSENCE_MAX_STAGE = builder.comment(
+                "The highest dragon stage that drops Dragon Essence on death.")
+                .defineInRange("maxStage", 5, 0, 5);
+        ESSENCE_CHANCE = builder.comment(
+                "Per-death drop chance for Dragon Essence within the stage window.",
+                "0.5 = one in two deaths of an eligible stage-4/5 dragon.")
+                .defineInRange("chance", 0.5D, 0.0D, 1.0D);
         builder.pop();
         SPEC = builder.build();
     }

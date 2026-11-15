@@ -46,7 +46,8 @@ public final class AttributeHandlerMixin {
      * deprecated (issue #30): HP, attack and armor are the pure Ice and Fire
      * growth curve, so the bake is cancelled outright. {@code gainedEP} still
      * accumulates (harmlessly, for downstream readers) and
-     * {@code updateAttributes} is re-run, which re-derives the growth-pinned EP.
+     * {@code refreshDirtyAttributes} (the 2.2 rename) is re-run, which
+     * re-derives the growth-pinned EP.
      * Tensura's own remainder bookkeeping and the step-payout heal are skipped
      * by design - dragons heal through their own regeneration.
      *
@@ -68,7 +69,7 @@ public final class AttributeHandlerMixin {
         existence.setGainedEP(existence.getGainedEP() + gained);
         existence.markDirty();
         if (dragon.level() != null) {
-            dragon.updateAttributes();
+            dragon.refreshDirtyAttributes();
         }
         ci.cancel();
     }

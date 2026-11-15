@@ -348,7 +348,7 @@ instead (the chains still work, but the roll is fixed). The other modes are
 | Required | Tensura: Reincarnated | Provides the EP, evolution and existence systems this mod writes into |
 | Required | ManasCore | Tensura's library - the skill and attribute APIs |
 | Required | Ice and Fire: Community Edition | The dragons this mod stretches, and the gear it rebalances |
-| Required | Tensura: Ice and Fire (compat addon) | Registers the Ice and Fire gear and entity data this mod rebalances |
+| Absorbed | ~~Tensura: Ice and Fire (compat addon)~~ | Its data and behavior now ship from this mod (issue #80); the external mod is no longer required |
 | Optional | Tensura: Gear Evolution | Reads the chain files; without it the gear chains do not run |
 | Optional | Mysticism | Provides the light manipulation skill fire dragons are granted |
 | Optional | TensuraRPGSystem | Dragons are excluded from its +1% HP-per-level status layer when it is present |

@@ -7,6 +7,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.bitwisemadness.tensuriafgrowth.config.DragonEpConfig;
+import org.bitwisemadness.tensuriafgrowth.datagen.CompatBaselineContent;
 import org.bitwisemadness.tensuriafgrowth.datagen.JsonFilesProvider;
 import org.bitwisemadness.tensuriafgrowth.datagen.RebalanceContent;
 import org.bitwisemadness.tensuriafgrowth.handler.DragonElementHandler;
@@ -58,5 +59,9 @@ public class TensuraIafGrowth {
         event.addProvider(new JsonFilesProvider("entity_existence", output, content.entityExistence()));
         event.addProvider(new JsonFilesProvider("structure_magicule", output, content.structureMagicule()));
         event.addProvider(new JsonFilesProvider("safety_exempt", output, content.safetyExempt()));
+        // The absorbed compat baseline: the tag/wiring files this mod ships at
+        // the exact tensura_iaf and iceandfire paths (issue #80).
+        event.addProvider(new JsonFilesProvider("compat_baseline", output,
+                CompatBaselineContent.files()));
     }
 }

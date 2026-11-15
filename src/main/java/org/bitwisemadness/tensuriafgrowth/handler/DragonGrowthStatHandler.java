@@ -41,7 +41,8 @@ import org.bitwisemadness.tensuriafgrowth.config.DragonEpConfig;
  *   they cap, preserving Tensura's {@code current <= max} invariant.</li>
  * </ul>
  *
- * <p>Refresh runs at the tail of every {@code updateAttributes} call -
+ * <p>Refresh runs at the tail of every {@code refreshDirtyAttributes} call
+ * (renamed from {@code updateAttributes} in IceAndFireCE 2.2, issue #80) -
  * construction, load, each growth day via {@code growDragon}, equipment changes
  * - and on {@link EntityJoinLevelEvent}, which is what catches spawn rolls and
  * load-time values before anything else observes them. It never heals and never
@@ -61,7 +62,7 @@ public final class DragonGrowthStatHandler {
 
     /**
      * Join-time refresh. The spawn roll (and any load-time value pinned against
-     * the old band) exceeds the early-stage caps and {@code updateAttributes}
+     * the old band) exceeds the early-stage caps and {@code refreshDirtyAttributes}
      * does not run at construction, so the pin must also run the moment the
      * dragon enters the level.
      */
@@ -75,7 +76,7 @@ public final class DragonGrowthStatHandler {
     }
 
     /**
-     * Called from the mixin at the tail of {@code updateAttributes} and after banked gains.
+     * Called from the mixin at the tail of {@code refreshDirtyAttributes} and after banked gains.
      *
      * <p>Reentrancy guard lives here: Tensura fires
      * {@code ATTRIBUTE_BASE_CHANGE_EVENT} from an {@code @Inject} at the
@@ -84,7 +85,7 @@ public final class DragonGrowthStatHandler {
      * {@code getBaseValue()} still reads the old value and the new base has
      * not committed. Every max-base write this pin makes therefore re-enters
      * through the bake mixin ({@code addStatOnEPGain} -&gt;
-     * {@code updateAttributes} -&gt; tail) with the write still mid-flight, and
+     * {@code refreshDirtyAttributes} -&gt; tail) with the write still mid-flight, and
      * without this guard the nested pass sees the same stale base, "raises"
      * it again, and recurses until the stack blows - the 1.5.0 spawn-egg
      * {@code StackOverflowError}. Nested calls return immediately; the
@@ -170,7 +171,7 @@ public final class DragonGrowthStatHandler {
      * {@code initEntityExistence} uses. Raising it fires Tensura's
      * attribute-base-change event <em>before</em> the write commits, whose bake
      * our mixin cancels for dragons - the banked delta is harmless, and the
-     * nested {@code updateAttributes} tail returns at the guard in
+     * nested {@code refreshDirtyAttributes} tail returns at the guard in
      * {@link #refresh} while this write is still in flight.
      */
     private static boolean setMaxBase(DragonBaseEntity dragon, Holder<Attribute> attribute, double value) {

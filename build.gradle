@@ -3,7 +3,8 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.148'
     id 'com.github.spotbugs' version '6.5.13'
-    id 'com.diffplug.spotless' version '8.10.4'
+    id 'com.diffplug.spotless' version '8.10.4'
+
     id 'checkstyle'
 }
 
@@ -61,8 +62,7 @@ dependencies {
     compileOnly 'curse.maven:tensura-reincarnated-643695:8793360'        // tensura-neoforge-2.0.1.3
     compileOnly 'curse.maven:manascore-619025:8022425'                   // manascore-neoforge-4.0.0.2
     compileOnly 'curse.maven:architectury-419699:8492726'                // architectury-13.0.11-neoforge
-    compileOnly 'curse.maven:tensura-compat-ice-fire-1140209:7905387'    // tensura_iaf-neoforge-2.0.0.1
-    compileOnly 'curse.maven:iceandfire-ce-1040076:7722420'              // IceAndFireCE-2.0-beta.15-1.21.1-neoforge
+    compileOnly 'curse.maven:iceandfire-ce-1040076:9455119'              // IceAndFireCE-2.2-1.21.1-neoforge
     compileOnly 'curse.maven:jupiter-1072905:7738312'                    // jupiter-2.3.7-1.21.1-neoforge
     compileOnly 'curse.maven:uranus-1010827:8587525'                     // uranus-2.4.1-bugfix-1.21.1-neoforge (I&F pathfinding types in DragonBaseEntity's hierarchy)
     compileOnly manascoreModuleJars
@@ -74,8 +74,7 @@ dependencies {
     runMods 'curse.maven:tensura-reincarnated-643695:8793360'            // tensura-neoforge-2.0.1.3
     runMods 'curse.maven:manascore-619025:8022425'                       // manascore-neoforge-4.0.0.2
     runMods 'curse.maven:architectury-419699:8492726'                    // architectury-13.0.11-neoforge
-    runMods 'curse.maven:tensura-compat-ice-fire-1140209:7905387'        // tensura_iaf-neoforge-2.0.0.1
-    runMods 'curse.maven:iceandfire-ce-1040076:7722420'                  // IceAndFireCE-2.0-beta.15-1.21.1-neoforge
+    runMods 'curse.maven:iceandfire-ce-1040076:9455119'                  // IceAndFireCE-2.2-1.21.1-neoforge
     runMods 'curse.maven:jupiter-1072905:7738312'                        // jupiter-2.3.7-1.21.1-neoforge
     runMods 'curse.maven:uranus-1010827:8587525'                         // uranus-2.4.1-bugfix-1.21.1-neoforge (Ice and Fire requirement)
     runMods 'curse.maven:geckolib-388172:8893490'                        // geckolib-neoforge-1.21.1-4.9.3

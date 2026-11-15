@@ -28,7 +28,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * itself, and are replaced by the configured value so untamed dragons are
  * uncapped along with tamed ones.
  *
- * <p>Two hooks live on {@code updateAttributes} beyond the stretch: the armor
+ * <p>Two hooks live on {@code refreshDirtyAttributes} (renamed from
+ * {@code updateAttributes} in IceAndFireCE 2.2, issue #80) beyond the stretch: the armor
  * line's raw age is clamped to the span (vanilla's 128 cap hid the overshoot),
  * and the tail hands off to {@link DragonGrowthStatHandler} so the dragon's EP
  * follows growth - see that class for the pin.
@@ -53,12 +54,12 @@ public final class DragonBaseEntityGrowthMixin {
     // age is clamped to the span, and each step divides by the same span, so
     // full stats land on day 125 * f instead of day 125.
 
-    @ModifyConstant(method = "updateAttributes", constant = @Constant(intValue = 125))
+    @ModifyConstant(method = "refreshDirtyAttributes", constant = @Constant(intValue = 125))
     private int tensura_iaf_growth$attributeAgeSpan(int vanillaSpan) {
         return Growth.scaleDays(vanillaSpan);
     }
 
-    @ModifyConstant(method = "updateAttributes", constant = @Constant(doubleValue = 125.0D))
+    @ModifyConstant(method = "refreshDirtyAttributes", constant = @Constant(doubleValue = 125.0D))
     private double tensura_iaf_growth$attributeStepSpan(double vanillaSpan) {
         return Growth.scaleSpan(vanillaSpan);
     }
@@ -165,7 +166,7 @@ public final class DragonBaseEntityGrowthMixin {
      */
 
     @Redirect(
-        method = "updateAttributes()V",
+        method = "refreshDirtyAttributes()V",
         at = @At(
             value = "INVOKE",
             target = "Lcom/iafenvoy/iceandfire/entity/DragonBaseEntity;getAgeInDays()I",
@@ -178,14 +179,14 @@ public final class DragonBaseEntityGrowthMixin {
 
     /**
      *  --- Growth-pinned existence -------------------------------------------
-     *  Every updateAttributes run ends with the growth handler: the dragon's EP
+     *  Every refreshDirtyAttributes run ends with the growth handler: the dragon's EP
      *  is pinned to the stage-banded curve from this mod's config by age - see
-     *  DragonGrowthStatHandler. updateAttributes runs at construction, on load,
+     *  DragonGrowthStatHandler. The method runs at construction, on load,
      *  on each growth day (growDragon) and on equipment changes, so the recompute
      *  covers every way a dragon's age or belongings can move.
      */
 
-    @Inject(method = "updateAttributes()V", at = @At("TAIL"))
+    @Inject(method = "refreshDirtyAttributes()V", at = @At("TAIL"))
     private void tensura_iaf_growth$refreshGrowthPinnedStats(CallbackInfo ci) {
         // The downcast travels through an Object parameter: static analysis only
         // sees the unmerged mixin type and would call it impossible, while the
