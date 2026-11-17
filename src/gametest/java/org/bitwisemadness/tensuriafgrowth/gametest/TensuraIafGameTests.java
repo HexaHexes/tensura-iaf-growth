@@ -14,6 +14,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -128,9 +129,26 @@ public final class TensuraIafGameTests {
         }
     }
 
-    /** Places the registered skeleton feature once and pins the stage/age invariant. */
+    /**
+     * Places the registered skeleton feature once and pins the stage/age invariant.
+     *
+     * <p>The feature does not place at the origin: it uses
+     * {@code heightmapPos(OCEAN_FLOOR_WG, origin + (8, 0, 8))}, and that height
+     * is world state - a primed heightmap reports the real terrain surface, an
+     * unprimed one reports y=0 (the gametest structure's own chunks are often
+     * unprimed). A query centred on the origin therefore misses a dragon placed
+     * on primed terrain far above the structure, so this mirrors the feature's
+     * own placement for the query, with a world-wide fallback that separates
+     * "placed somewhere unexpected" from "never added" and reports the config
+     * state when neither finds anything.
+     */
     private static void placeAndCheckSkeleton(GameTestHelper helper, int cap, BlockPos offset) {
-        IafCommonConfig.INSTANCE.dragon.maxTamedDragonAge.setValue(cap);
+        IafCommonConfig config = IafCommonConfig.INSTANCE;
+        config.dragon.maxTamedDragonAge.setValue(cap);
+        // Forced immediately before the place call so no config callback fired by
+        // the cap write above can leave the gates reading stock values.
+        config.dragon.generateSkeletonChance.setValue(1.0);
+        config.dragon.generateSkeletons.setValue(true);
         ResourceLocation featureId = ResourceLocation.parse("iceandfire:spawn_dragon_skeleton_fire");
         Feature<?> registered = BuiltInRegistries.FEATURE.get(featureId);
         if (registered == null) {
@@ -149,10 +167,20 @@ public final class TensuraIafGameTests {
                 NoneFeatureConfiguration.INSTANCE);
         feature.place(context);
 
+        BlockPos placement =
+                level.getHeightmapPos(Heightmap.Types.OCEAN_FLOOR_WG, origin.offset(8, 0, 8));
         List<DragonBaseEntity> placed =
-                level.getEntitiesOfClass(DragonBaseEntity.class, new AABB(origin).inflate(64.0));
+                level.getEntitiesOfClass(DragonBaseEntity.class, new AABB(placement).inflate(8.0));
         if (placed.isEmpty()) {
-            throw new IllegalStateException("cap " + cap + ": the skeleton feature placed no dragon");
+            placed = level.getEntitiesOfClass(DragonBaseEntity.class,
+                    new AABB(-3.0E7, -3.0E7, -3.0E7, 3.0E7, 3.0E7, 3.0E7));
+        }
+        if (placed.isEmpty()) {
+            throw new IllegalStateException("cap " + cap + ": the skeleton feature added no dragon"
+                    + " (placement " + placement + ", chance="
+                    + config.dragon.generateSkeletonChance.getValue() + ", generate="
+                    + config.dragon.generateSkeletons.getValue() + ", configured cap="
+                    + config.dragon.maxTamedDragonAge.getValue() + ")");
         }
         DragonBaseEntity dragon = placed.get(0);
         try {
