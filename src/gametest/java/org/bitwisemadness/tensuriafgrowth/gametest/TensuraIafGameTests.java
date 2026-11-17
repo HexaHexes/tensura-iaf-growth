@@ -135,7 +135,7 @@ public final class TensuraIafGameTests {
             config.dragon.generateSkeletonChance.setValue(1.0);
             config.dragon.generateSkeletons.setValue(true);
             placeAndCheckSkeleton(helper, 128, BlockPos.ZERO);
-            placeAndCheckSkeleton(helper, 512, new BlockPos(32, 0, 0));
+            placeAndCheckSkeleton(helper, 512, new BlockPos(4, 0, 0));
             helper.succeed();
         } finally {
             config.dragon.maxTamedDragonAge.setValue(oldCap);
@@ -158,7 +158,10 @@ public final class TensuraIafGameTests {
      * harmless mid-air join), and the query below mirrors the feature's own
      * placement for that same height, with a world-wide fallback that separates
      * "placed somewhere unexpected" from "never added" and reports the config
-     * state when neither finds anything.
+     * state when neither finds anything. The second placement stays tight to
+     * the origin because the framework only fully prepares the structure's
+     * immediate neighborhood: beyond it a chunk can exist partial (issue #90's
+     * family), where a joined entity is never tracked and no query sees it.
      */
     private static void placeAndCheckSkeleton(GameTestHelper helper, int cap, BlockPos offset) {
         IafCommonConfig config = IafCommonConfig.INSTANCE;
