@@ -178,6 +178,9 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 // "All N required tests passed :)" when every required test succeeds. Keep
 // expectedTests in sync with the @GameTest methods in src/gametest.
 tasks.matching { it.name == 'runGameTestServer' }.configureEach {
+    // Position-stuck runs never reach a summary (issue #90); fail fast rather
+    // than hang to the platform timeout. Normal runs finish in ~2 minutes.
+    timeout = java.time.Duration.ofMinutes(8)
     def expectedTests = 5
     doLast {
         def log = file('run/logs/latest.log')
