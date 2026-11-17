@@ -20,15 +20,18 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * identity and the feature places byte-for-byte vanilla skeletons.
  *
  * <p>Ice and Fire serves the remains as a skeleton - bone texture and the
- * {@code *_dragon_skeleton} loot table, with the flesh harvest stages (scales,
- * meat, blood, heart) already out of reach - only while
- * {@code deathStage >= ageInDays / 10}. The feature derives the stage from the
- * same unstretched roll ({@code days / 10}), so once the age above is scaled
- * the comparison fails permanently and <em>every</em> placement comes out a
- * fresh, flesh-lootable corpse (issue #84). Reading the stretched age back and
- * taking the maximum keeps the invariant at any cap and collapses to the stock
- * {@code days / 10} at the untouched 128, where {@code age == days} - the
- * identity-parity claim of issue #82 holds.
+ * {@code *_dragon_skeleton} loot table - only once the death stage reaches
+ * the skeleton threshold derived from the same age, while its harvest ladder
+ * ({@code mobInteract}) refuses <em>all</em> interaction the moment the stage
+ * reaches {@code min(age / 5, 25)} - and corpses are damage-immune, so that
+ * refusal leaves the skeleton unharvestable (issue #84, issue #88). At the
+ * untouched 128-day default the two thresholds sit exactly {@code age / 10}
+ * apart in the stock favour, but a raised cap pushed the raw {@code age / 10}
+ * past the ladder's capped ceiling (age >= 250 at cap 512), satisfying
+ * neither side. {@link Growth#corpseStage} is the single canonical value that
+ * satisfies both - skeleton-textured and harvestable at any cap - and it
+ * equals {@code days / 10} at the untouched 128, where {@code age == days},
+ * so the identity-parity claim of issue #82 still holds.
  */
 @Mixin(value = DragonSkeletonSpawnFeature.class, remap = false)
 public final class DragonSkeletonSpawnFeatureMixin {
@@ -44,6 +47,15 @@ public final class DragonSkeletonSpawnFeatureMixin {
         dragon.growDragon(Growth.scaleDays(days));
     }
 
+    /**
+     * Places the remains at the canonical corpse stage instead of the stock
+     * {@code days / 10}: at the untouched default the two are equal, under a
+     * raised cap the stage stays on the damped axis the skeleton gates (now
+     * redirected the same way - see {@code DragonDeadLootTableMixin} and
+     * friends) and the harvest ladder read. The stock argument is therefore
+     * superseded rather than maxed - {@link Growth#corpseStage} already folds
+     * in everything the old {@code max} protected.
+     */
     @Redirect(
         method = "place",
         at = @At(
@@ -51,7 +63,7 @@ public final class DragonSkeletonSpawnFeatureMixin {
             target = "Lcom/iafenvoy/iceandfire/entity/DragonBaseEntity;setDeathStage(I)V"
         )
     )
-    private void tensura_iaf_growth$alignDeathStageToStretchedAge(DragonBaseEntity dragon, int stage) {
-        dragon.setDeathStage(Math.max(stage, dragon.getAgeInDays() / 10));
+    private void tensura_iaf_growth$placeCanonicalCorpseStage(DragonBaseEntity dragon, int stage) {
+        dragon.setDeathStage(Growth.corpseStage(dragon.getAgeInDays()));
     }
 }
