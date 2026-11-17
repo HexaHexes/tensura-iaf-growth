@@ -13,6 +13,8 @@
     "DragonCavePieceSpawnMixin",
     "DragonRoostPieceSpawnMixin",
     "DragonSkeletonSpawnFeatureMixin",
+    "DragonDeadLootTableMixin",
+    "DragonBaseEntitySkeletalMixin",
     "compat.TensuraIafChainItemMixin",
     "compat.TensuraIafColdNullificationMixin",
     "compat.TensuraIafDamageClassificationMixin",
@@ -27,7 +29,8 @@
   ],
 
   "client": [
-    "DragonForgeStoryBoardAgeMixin"
+    "DragonForgeStoryBoardAgeMixin",
+    "DragonTextureProviderMixin"
   ],
 
   "injectors": {

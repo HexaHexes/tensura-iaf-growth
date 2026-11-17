@@ -14,6 +14,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import org.bitwisemadness.tensuriafgrowth.Growth;
 import org.bitwisemadness.tensuriafgrowth.TensuraIafGrowth;
 import org.bitwisemadness.tensuriafgrowth.datagen.RebalanceContent;
 
@@ -70,15 +72,20 @@ public final class TensuraIafGameTests {
     }
 
     /**
-     * The spawn-age stretch redirects attach (issues #82 and #84): the
+     * The spawn-age stretch redirects attach (issues #82, #84 and #88): the
      * structure piece and feature classes are loaded lazily by world
      * generation, so this test force-loads them without initialization to
      * trigger their transforms - with {@code defaultRequire: 1} a redirect
      * whose target Ice and Fire renamed or removed fails the run here instead
-     * of at the first cave, roost or skeleton generation. The ponder storyboard
-     * mixin is client-only (registered in the config's {@code client} array)
-     * and deliberately not touched by this server-side test; it is proven by a
-     * client launch instead.
+     * of at the first cave, roost or skeleton generation. The dragon subtypes
+     * and their base ride along so the corpse-axis redirects
+     * ({@code DragonDeadLootTableMixin}, {@code DragonBaseEntitySkeletalMixin})
+     * transform before any corpse exists; the skeleton feature itself creates
+     * a fire dragon at placement, but all three are pinned here so the run
+     * does not depend on test order. The ponder storyboard and skeleton
+     * texture mixins are client-only (registered in the config's
+     * {@code client} array) and deliberately not touched by this server-side
+     * test; they are proven by a client launch instead.
      */
     @GameTest(template = "empty")
     public static void spawn_age_mixins_attach(GameTestHelper helper) {
@@ -87,6 +94,10 @@ public final class TensuraIafGameTests {
             "com.iafenvoy.iceandfire.world.structure.DragonCaveStructure$DragonCavePiece",
             "com.iafenvoy.iceandfire.world.structure.DragonRoostStructure$DragonRoostPiece",
             "com.iafenvoy.iceandfire.world.feature.DragonSkeletonSpawnFeature",
+            "com.iafenvoy.iceandfire.entity.DragonBaseEntity",
+            "com.iafenvoy.iceandfire.entity.FireDragonEntity",
+            "com.iafenvoy.iceandfire.entity.IceDragonEntity",
+            "com.iafenvoy.iceandfire.entity.LightningDragonEntity",
         };
         for (String target : targets) {
             try {
@@ -99,16 +110,20 @@ public final class TensuraIafGameTests {
     }
 
     /**
-     * The skeleton feature keeps the death stage on the stretched age axis
-     * (issue #84). Ice and Fire renders and loots the placed remains as a
-     * skeleton only while {@code deathStage >= ageInDays / 10}; the feature
-     * derives the stage from the unstretched roll, so under a raised cap the
-     * comparison would fail and every placement would come out a fresh,
-     * flesh-lootable corpse - the regression this test pins. Both caps run the
-     * real registered feature with a deterministic roll: at the default 128
-     * the stage must equal {@code age / 10} exactly (the stock identity,
-     * guarding against overcorrection) and at a 4x-stretched cap it must
-     * still reach the threshold.
+     * The skeleton feature places remains on the canonical corpse axis
+     * (issues #84 and #88): skeleton-textured, skeleton-looted, above the
+     * flesh windows and below the harvest ladder's refuse gate. Ice and Fire
+     * refuses <em>all</em> interaction once the stage reaches
+     * {@code min(age / 5, 25)} and corpses are damage-immune, so a stage on
+     * the raw stretched axis (issue #86 - the {@code age >= 250} range at cap
+     * 512) left worldgen skeletons unharvestable, while a stage below
+     * {@code age / 10} brought back the fresh-corpse regression of issue #84.
+     * Both caps run the real registered feature with a deterministic roll: at
+     * the untouched 128 the stage must equal {@code age / 10} exactly (stock
+     * identity, guarding against overcorrection) and at a 4x-stretched cap it
+     * must satisfy the full invariant set. The loot-table assertion doubles as
+     * the attach proof for {@code DragonDeadLootTableMixin}, and
+     * {@code isSkeletal()} for {@code DragonBaseEntitySkeletalMixin}.
      */
     @GameTest(template = "empty")
     public static void worldgen_skeleton_death_stage_matches_age(GameTestHelper helper) {
@@ -120,7 +135,7 @@ public final class TensuraIafGameTests {
             config.dragon.generateSkeletonChance.setValue(1.0);
             config.dragon.generateSkeletons.setValue(true);
             placeAndCheckSkeleton(helper, 128, BlockPos.ZERO);
-            placeAndCheckSkeleton(helper, 512, new BlockPos(32, 0, 0));
+            placeAndCheckSkeleton(helper, 512, new BlockPos(4, 0, 0));
             helper.succeed();
         } finally {
             config.dragon.maxTamedDragonAge.setValue(oldCap);
@@ -136,11 +151,17 @@ public final class TensuraIafGameTests {
      * {@code heightmapPos(OCEAN_FLOOR_WG, origin + (8, 0, 8))}, and that height
      * is world state - a primed heightmap reports the real terrain surface, an
      * unprimed one reports y=0 (the gametest structure's own chunks are often
-     * unprimed). A query centred on the origin therefore misses a dragon placed
-     * on primed terrain far above the structure, so this mirrors the feature's
-     * own placement for the query, with a world-wide fallback that separates
+     * unprimed), and a chunk primed over void reports the world floor, where
+     * the join does not survive. Before each placement this test plants a stone
+     * at the structure plane so the read is position-independent (terrain keeps
+     * its surface, void raises to the stone, unprimed keeps reporting y=0 - a
+     * harmless mid-air join), and the query below mirrors the feature's own
+     * placement for that same height, with a world-wide fallback that separates
      * "placed somewhere unexpected" from "never added" and reports the config
-     * state when neither finds anything.
+     * state when neither finds anything. The second placement stays tight to
+     * the origin because the framework only fully prepares the structure's
+     * immediate neighborhood: beyond it a chunk can exist partial (issue #90's
+     * family), where a joined entity is never tracked and no query sees it.
      */
     private static void placeAndCheckSkeleton(GameTestHelper helper, int cap, BlockPos offset) {
         IafCommonConfig config = IafCommonConfig.INSTANCE;
@@ -158,6 +179,8 @@ public final class TensuraIafGameTests {
         Feature<NoneFeatureConfiguration> feature = (Feature<NoneFeatureConfiguration>) registered;
         ServerLevel level = helper.getLevel();
         BlockPos origin = helper.absolutePos(offset);
+        // Pin the placement heightmap to the structure plane; rationale in the javadoc.
+        helper.setBlock(offset.offset(8, 0, 8), Blocks.STONE);
         FeaturePlaceContext<NoneFeatureConfiguration> context = new FeaturePlaceContext<>(
                 Optional.empty(),
                 level,
@@ -187,12 +210,32 @@ public final class TensuraIafGameTests {
             if (!dragon.isModelDead()) {
                 throw new IllegalStateException("cap " + cap + ": placed dragon is not marked dead");
             }
+            int age = dragon.getAgeInDays();
             int stage = dragon.getDeathStage();
-            int threshold = dragon.getAgeInDays() / 10;
-            if (stage != threshold) {
+            int expected = Growth.corpseStage(age);
+            if (stage != expected) {
                 throw new IllegalStateException("cap " + cap + ": death stage " + stage
-                        + " != ageInDays / 10 (" + threshold + ") - the remains would"
-                        + " render and loot as a fresh corpse instead of a skeleton");
+                        + " != corpseStage(" + age + ") = " + expected
+                        + " - texture, loot and ladder disagree with the placement");
+            }
+            if (cap == Growth.VANILLA_MAX_AGE && stage != age / 10) {
+                throw new IllegalStateException("cap " + cap + ": stock identity broken - stage "
+                        + stage + " != ageInDays / 10 (" + (age / 10) + ")");
+            }
+            int ceiling = Math.min(age / 5, 25);
+            if (stage >= ceiling) {
+                throw new IllegalStateException("cap " + cap + ": death stage " + stage
+                        + " >= harvest ceiling " + ceiling + " - mobInteract would refuse"
+                        + " all interaction, leaving the corpse unharvestable (issue #88)");
+            }
+            if (stage < ceiling / 2) {
+                throw new IllegalStateException("cap " + cap + ": death stage " + stage
+                        + " sits below the flesh window " + (ceiling / 2)
+                        + " - blood and heart would open on skeleton remains");
+            }
+            if (!dragon.isSkeletal()) {
+                throw new IllegalStateException("cap " + cap + ": isSkeletal() is false at stage "
+                        + stage + " - the flag disagrees with the placed stage");
             }
             if (!dragon.getDeadLootTable().getPath().contains("skeleton")) {
                 throw new IllegalStateException("cap " + cap + ": dead loot table is "
