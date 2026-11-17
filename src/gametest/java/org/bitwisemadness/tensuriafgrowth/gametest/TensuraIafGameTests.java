@@ -14,6 +14,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -73,7 +74,7 @@ public final class TensuraIafGameTests {
     }
 
     /**
-     * The spawn-age stretch redirects attach (issues #82, #84 and #88): the
+     * The spawn-age stretch redirects attach (issues #82, #84, #87 and #88): the
      * structure piece and feature classes are loaded lazily by world
      * generation, so this test force-loads them without initialization to
      * trigger their transforms - with {@code defaultRequire: 1} a redirect
@@ -99,6 +100,7 @@ public final class TensuraIafGameTests {
             "com.iafenvoy.iceandfire.entity.FireDragonEntity",
             "com.iafenvoy.iceandfire.entity.IceDragonEntity",
             "com.iafenvoy.iceandfire.entity.LightningDragonEntity",
+            "com.iafenvoy.iceandfire.loot.DragonLootFunction",
         };
         for (String target : targets) {
             try {
@@ -288,6 +290,69 @@ public final class TensuraIafGameTests {
             }
         } finally {
             dragon.discard();
+        }
+    }
+
+    /**
+     * Dragon loot counts roll on the damped age axis (issue #87): the pure
+     * helper is exact (identity at the untouched 128, halved at a 4x cap),
+     * and the real dead-loot-table roll of a placed skeleton stays inside the
+     * damped range sixteen times over - the raw axis would allow roughly
+     * twice the ceiling count, so a regression to raw ages fails the bound
+     * with overwhelming odds. The roll goes through
+     * {@code DragonLootFunction} (force-loaded by the attach test), whose
+     * three branches all read the age through the one redirected site.
+     */
+    @GameTest(template = "empty")
+    public static void worldgen_loot_counts_follow_damped_age(GameTestHelper helper) {
+        IafCommonConfig config = IafCommonConfig.INSTANCE;
+        int oldCap = config.dragon.maxTamedDragonAge.getValue();
+        double oldChance = config.dragon.generateSkeletonChance.getValue();
+        boolean oldGenerate = config.dragon.generateSkeletons.getValue();
+        double oldFresh = DragonEpConfig.FRESH_CORPSE_CHANCE.get();
+        try {
+            config.dragon.maxTamedDragonAge.setValue(128);
+            for (int age : new int[] { 10, 60, 110, 128 }) {
+                if (Growth.dampLootAge(age) != age) {
+                    throw new IllegalStateException("cap 128: dampLootAge(" + age + ") = "
+                            + Growth.dampLootAge(age) + " - the loot axis lost stock identity");
+                }
+            }
+            config.dragon.maxTamedDragonAge.setValue(512);
+            for (int age : new int[] { 40, 239, 436 }) {
+                int expected = (age + 1) / 2;
+                if (Growth.dampLootAge(age) != expected) {
+                    throw new IllegalStateException("cap 512: dampLootAge(" + age + ") = "
+                            + Growth.dampLootAge(age) + ", expected " + expected
+                            + " - the sqrt-damped axis is off");
+                }
+            }
+
+            DragonBaseEntity dragon = placeDragon(helper, 512, BlockPos.ZERO, 0.0);
+            try {
+                int age = dragon.getAgeInDays();
+                int ceiling = 1 + Growth.dampLootAge(age) / 25;
+                for (int i = 0; i < 16; i++) {
+                    ItemStack roll = dragon.getItemFromLootTable();
+                    if (roll.isEmpty()) {
+                        throw new IllegalStateException("cap 512: dead loot table rolled nothing");
+                    }
+                    int count = roll.getCount();
+                    if (count < 1 || count > ceiling) {
+                        throw new IllegalStateException("cap 512: bone count " + count
+                                + " outside the damped range [1, " + ceiling + "] for age " + age
+                                + " (raw ages would allow up to " + (1 + age / 25) + ")");
+                    }
+                }
+            } finally {
+                dragon.discard();
+            }
+            helper.succeed();
+        } finally {
+            config.dragon.maxTamedDragonAge.setValue(oldCap);
+            config.dragon.generateSkeletonChance.setValue(oldChance);
+            config.dragon.generateSkeletons.setValue(oldGenerate);
+            DragonEpConfig.FRESH_CORPSE_CHANCE.set(oldFresh);
         }
     }
 

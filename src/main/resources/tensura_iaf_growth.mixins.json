@@ -15,6 +15,7 @@
     "DragonSkeletonSpawnFeatureMixin",
     "DragonDeadLootTableMixin",
     "DragonBaseEntitySkeletalMixin",
+    "DragonLootFunctionMixin",
     "compat.TensuraIafChainItemMixin",
     "compat.TensuraIafColdNullificationMixin",
     "compat.TensuraIafDamageClassificationMixin",
