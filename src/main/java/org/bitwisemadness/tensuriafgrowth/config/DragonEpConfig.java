@@ -6,11 +6,13 @@ import org.bitwisemadness.tensuriafgrowth.Growth;
 import org.bitwisemadness.tensuriafgrowth.TensuraIafGrowth;
 
 /**
- * The stage-banded EP curve a dragon's existence is pinned to - this mod's own
- * config, {@code config/tensura_iaf_growth-common.toml}, section {@code [dragon_ep]}.
+ * This mod's own config, {@code config/tensura_iaf_growth-common.toml} - the
+ * file's sections ({@code [dragon_ep]}, {@code [dragon_essence]},
+ * {@code [worldgen]}) all build from the one spec registered here.
  *
- * <p>The six values are the curve's vertices on the age axis: the hatch floor and
- * one cap per growth stage. Read across the stretched stage boundaries
+ * <p>The EP curve ({@code [dragon_ep]}) holds the six values that are the
+ * curve's vertices on the age axis: the hatch floor and one cap per growth
+ * stage. Read across the stretched stage boundaries
  * ({@code 0 -> 25 -> 50 -> 75 -> 100 -> 125} days, each scaled by
  * {@link Growth#scaleDays}), they form a piecewise-linear line from
  * {@code hatchEpFloor} at day 0 to {@code stage5EpCap} at full growth, so the
@@ -43,6 +45,9 @@ public final class DragonEpConfig {
     public static final ModConfigSpec.IntValue ESSENCE_MIN_STAGE;
     public static final ModConfigSpec.IntValue ESSENCE_MAX_STAGE;
     public static final ModConfigSpec.DoubleValue ESSENCE_CHANCE;
+
+    /** Share of generated dead dragons placed fresh instead of skeletons (issue #85). */
+    public static final ModConfigSpec.DoubleValue FRESH_CORPSE_CHANCE;
 
     /** The last invalid config that was warned about, so reloads do not spam. */
     private static String lastWarning = "";
@@ -83,6 +88,13 @@ public final class DragonEpConfig {
                 "Per-death drop chance for Dragon Essence within the stage window.",
                 "0.5 = one in two deaths of an eligible stage-4/5 dragon.")
                 .defineInRange("chance", 0.5D, 0.0D, 1.0D);
+        builder.pop();
+        builder.push("worldgen");
+        FRESH_CORPSE_CHANCE = builder.comment(
+                "Share of randomly generated dead dragons that spawn as fresh,",
+                "harvestable corpses (scales, meat, blood, heart) instead of",
+                "skeletons. 0.01 = one in a hundred.")
+                .defineInRange("freshCorpseChance", 0.01D, 0.0D, 1.0D);
         builder.pop();
         SPEC = builder.build();
     }

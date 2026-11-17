@@ -24,6 +24,7 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import org.bitwisemadness.tensuriafgrowth.Growth;
 import org.bitwisemadness.tensuriafgrowth.TensuraIafGrowth;
+import org.bitwisemadness.tensuriafgrowth.config.DragonEpConfig;
 import org.bitwisemadness.tensuriafgrowth.datagen.RebalanceContent;
 
 /**
@@ -123,7 +124,9 @@ public final class TensuraIafGameTests {
      * identity, guarding against overcorrection) and at a 4x-stretched cap it
      * must satisfy the full invariant set. The loot-table assertion doubles as
      * the attach proof for {@code DragonDeadLootTableMixin}, and
-     * {@code isSkeletal()} for {@code DragonBaseEntitySkeletalMixin}.
+     * {@code isSkeletal()} for {@code DragonBaseEntitySkeletalMixin}. The
+     * fresh share (issue #85) is forced to 0.0 here so the default 1% cannot
+     * flake these skeleton invariants - the fresh branch has its own test.
      */
     @GameTest(template = "empty")
     public static void worldgen_skeleton_death_stage_matches_age(GameTestHelper helper) {
@@ -131,6 +134,7 @@ public final class TensuraIafGameTests {
         int oldCap = config.dragon.maxTamedDragonAge.getValue();
         double oldChance = config.dragon.generateSkeletonChance.getValue();
         boolean oldGenerate = config.dragon.generateSkeletons.getValue();
+        double oldFresh = DragonEpConfig.FRESH_CORPSE_CHANCE.get();
         try {
             config.dragon.generateSkeletonChance.setValue(1.0);
             config.dragon.generateSkeletons.setValue(true);
@@ -141,6 +145,37 @@ public final class TensuraIafGameTests {
             config.dragon.maxTamedDragonAge.setValue(oldCap);
             config.dragon.generateSkeletonChance.setValue(oldChance);
             config.dragon.generateSkeletons.setValue(oldGenerate);
+            DragonEpConfig.FRESH_CORPSE_CHANCE.set(oldFresh);
+        }
+    }
+
+    /**
+     * The fresh minority of generated dead dragons (issue #85) opens the whole
+     * harvest ladder: freshest stage, flesh texture and the male/female loot
+     * table, blood reachable below {@code ceiling / 2}, the heart reachable at
+     * {@code ceiling / 2 - 1}, and the skeleton flag clear - the opposite
+     * pole from the skeleton test, at the 4x cap where every axis is
+     * stretched. One placement only, at the cell's origin (the most reliably
+     * prepared spot - see {@code placeDragon}'s javadoc), because the fresh
+     * branch's invariants do not depend on the cap's identity behaviour.
+     */
+    @GameTest(template = "empty")
+    public static void worldgen_fresh_corpse_ladder_opens(GameTestHelper helper) {
+        IafCommonConfig config = IafCommonConfig.INSTANCE;
+        int oldCap = config.dragon.maxTamedDragonAge.getValue();
+        double oldChance = config.dragon.generateSkeletonChance.getValue();
+        boolean oldGenerate = config.dragon.generateSkeletons.getValue();
+        double oldFresh = DragonEpConfig.FRESH_CORPSE_CHANCE.get();
+        try {
+            config.dragon.generateSkeletonChance.setValue(1.0);
+            config.dragon.generateSkeletons.setValue(true);
+            placeAndCheckFresh(helper, 512, BlockPos.ZERO);
+            helper.succeed();
+        } finally {
+            config.dragon.maxTamedDragonAge.setValue(oldCap);
+            config.dragon.generateSkeletonChance.setValue(oldChance);
+            config.dragon.generateSkeletons.setValue(oldGenerate);
+            DragonEpConfig.FRESH_CORPSE_CHANCE.set(oldFresh);
         }
     }
 
@@ -162,14 +197,18 @@ public final class TensuraIafGameTests {
      * the origin because the framework only fully prepares the structure's
      * immediate neighborhood: beyond it a chunk can exist partial (issue #90's
      * family), where a joined entity is never tracked and no query sees it.
+     *
+     * <p>All four placement gates are forced here - cap, chance, generate and
+     * the fresh share (issue #85) - so no config callback or file default can
+     * change what the caller asked to place.
      */
-    private static void placeAndCheckSkeleton(GameTestHelper helper, int cap, BlockPos offset) {
+    private static DragonBaseEntity placeDragon(
+            GameTestHelper helper, int cap, BlockPos offset, double freshChance) {
         IafCommonConfig config = IafCommonConfig.INSTANCE;
         config.dragon.maxTamedDragonAge.setValue(cap);
-        // Forced immediately before the place call so no config callback fired by
-        // the cap write above can leave the gates reading stock values.
         config.dragon.generateSkeletonChance.setValue(1.0);
         config.dragon.generateSkeletons.setValue(true);
+        DragonEpConfig.FRESH_CORPSE_CHANCE.set(freshChance);
         ResourceLocation featureId = ResourceLocation.parse("iceandfire:spawn_dragon_skeleton_fire");
         Feature<?> registered = BuiltInRegistries.FEATURE.get(featureId);
         if (registered == null) {
@@ -202,10 +241,16 @@ public final class TensuraIafGameTests {
             throw new IllegalStateException("cap " + cap + ": the skeleton feature added no dragon"
                     + " (placement " + placement + ", chance="
                     + config.dragon.generateSkeletonChance.getValue() + ", generate="
-                    + config.dragon.generateSkeletons.getValue() + ", configured cap="
+                    + config.dragon.generateSkeletons.getValue() + ", fresh="
+                    + DragonEpConfig.FRESH_CORPSE_CHANCE.get() + ", configured cap="
                     + config.dragon.maxTamedDragonAge.getValue() + ")");
         }
-        DragonBaseEntity dragon = placed.get(0);
+        return placed.get(0);
+    }
+
+    /** Places with the fresh share forced off and pins the skeleton invariant set. */
+    private static void placeAndCheckSkeleton(GameTestHelper helper, int cap, BlockPos offset) {
+        DragonBaseEntity dragon = placeDragon(helper, cap, offset, 0.0);
         try {
             if (!dragon.isModelDead()) {
                 throw new IllegalStateException("cap " + cap + ": placed dragon is not marked dead");
@@ -240,6 +285,48 @@ public final class TensuraIafGameTests {
             if (!dragon.getDeadLootTable().getPath().contains("skeleton")) {
                 throw new IllegalStateException("cap " + cap + ": dead loot table is "
                         + dragon.getDeadLootTable() + ", not the skeleton table");
+            }
+        } finally {
+            dragon.discard();
+        }
+    }
+
+    /** Places at 100% fresh (issue #85) and pins the open-ladder invariant set. */
+    private static void placeAndCheckFresh(GameTestHelper helper, int cap, BlockPos offset) {
+        DragonBaseEntity dragon = placeDragon(helper, cap, offset, 1.0);
+        try {
+            if (!dragon.isModelDead()) {
+                throw new IllegalStateException("cap " + cap + ": placed dragon is not marked dead");
+            }
+            int age = dragon.getAgeInDays();
+            int stage = dragon.getDeathStage();
+            if (stage != 0) {
+                throw new IllegalStateException("cap " + cap + ": fresh corpse at death stage "
+                        + stage + ", expected the freshest stage 0 (issue #85)");
+            }
+            int threshold = Growth.corpseStage(age);
+            if (stage >= threshold) {
+                throw new IllegalStateException("cap " + cap + ": stage " + stage
+                        + " >= corpseStage " + threshold + " - the remains would render and"
+                        + " loot as a skeleton instead of a fresh corpse");
+            }
+            int ceiling = Math.min(age / 5, 25);
+            if (stage >= ceiling / 2) {
+                throw new IllegalStateException("cap " + cap + ": blood window closed - stage "
+                        + stage + " >= ceiling / 2 (" + (ceiling / 2) + ")");
+            }
+            if (stage > ceiling / 2 - 1) {
+                throw new IllegalStateException("cap " + cap + ": heart unreachable - stage "
+                        + stage + " > ceiling / 2 - 1 (" + (ceiling / 2 - 1) + ")");
+            }
+            if (dragon.isSkeletal()) {
+                throw new IllegalStateException("cap " + cap + ": isSkeletal() is true at stage "
+                        + stage + " - the flag disagrees with a fresh placement");
+            }
+            String loot = dragon.getDeadLootTable().getPath();
+            if (!loot.contains("male") && !loot.contains("female")) {
+                throw new IllegalStateException("cap " + cap + ": dead loot table is "
+                        + dragon.getDeadLootTable() + ", not the flesh table");
             }
         } finally {
             dragon.discard();

@@ -3,6 +3,7 @@ package org.bitwisemadness.tensuriafgrowth.mixin;
 import com.iafenvoy.iceandfire.entity.DragonBaseEntity;
 import com.iafenvoy.iceandfire.world.feature.DragonSkeletonSpawnFeature;
 import org.bitwisemadness.tensuriafgrowth.Growth;
+import org.bitwisemadness.tensuriafgrowth.config.DragonEpConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -48,13 +49,21 @@ public final class DragonSkeletonSpawnFeatureMixin {
     }
 
     /**
-     * Places the remains at the canonical corpse stage instead of the stock
-     * {@code days / 10}: at the untouched default the two are equal, under a
-     * raised cap the stage stays on the damped axis the skeleton gates (now
-     * redirected the same way - see {@code DragonDeadLootTableMixin} and
-     * friends) and the harvest ladder read. The stock argument is therefore
-     * superseded rather than maxed - {@link Growth#corpseStage} already folds
-     * in everything the old {@code max} protected.
+     * Places the remains on the canonical corpse axis instead of the stock
+     * {@code days / 10}: at the untouched default {@link Growth#corpseStage}
+     * equals the stock value, under a raised cap the stage stays on the damped
+     * axis the skeleton gates (redirected the same way - see
+     * {@code DragonDeadLootTableMixin} and friends) and the harvest ladder
+     * read. The stock argument is therefore superseded rather than maxed.
+     *
+     * <p>One in {@code freshCorpseChance} placements (issue #85) instead place
+     * the freshest stage - what a just-killed dragon reads as - so the flesh
+     * texture, the male/female loot table and the whole harvest ladder (blood
+     * below {@code ceiling / 2}, the heart at {@code ceiling / 2 - 1}, then
+     * the loot rolls up to the skull) are open on that minority, while the
+     * skeleton majority keeps the invariants this mixin pins. The roll sits
+     * after Ice and Fire's own {@code generateSkeletons} /
+     * {@code generateSkeletonChance} gates, inside the placement itself.
      */
     @Redirect(
         method = "place",
@@ -64,6 +73,10 @@ public final class DragonSkeletonSpawnFeatureMixin {
         )
     )
     private void tensura_iaf_growth$placeCanonicalCorpseStage(DragonBaseEntity dragon, int stage) {
-        dragon.setDeathStage(Growth.corpseStage(dragon.getAgeInDays()));
+        if (dragon.getRandom().nextDouble() < DragonEpConfig.FRESH_CORPSE_CHANCE.get()) {
+            dragon.setDeathStage(0);
+        } else {
+            dragon.setDeathStage(Growth.corpseStage(dragon.getAgeInDays()));
+        }
     }
 }
