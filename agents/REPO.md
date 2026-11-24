@@ -6,8 +6,8 @@ and pulled in verbatim - **never hand-edit it.** Everything in this file is this
 repo's own and is edited freely; keep it aligned with the org rules rather than
 restating them.
 
-**Repo:** `tensura-iaf-growth` · **Mod ID:** `tensura_iaf_growth` · **Branch:** `main`
-**Platform:** Minecraft 1.21.1 / NeoForge 21.1.259 / JDK 21 · **Jar:** `build/libs/tensura_iaf_growth-<version>.jar`
+**Repo:** `HexaHexes/tensura-iaf-growth` · **Mod ID:** `tensura_iaf_growth` · **Branch:** `neoforge-1.21.1` (the loader line; this is the default branch - no `main`)
+**Platform:** Minecraft 1.21.1 / NeoForge 21.1.259 / JDK 21 · **Jar:** `build/libs/tensura_iaf_growth-neoforge-1.21.1-<version>.jar`
 
 A NeoForge addon for the Tensura RPG pack. It stretches Ice and Fire's dragon
 growth (wider age cap, stage-scaled growth windows), pins each dragon's EP to a
